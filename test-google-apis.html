@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Google APIs - SheetCRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .test-section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .test-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #34495e;
+        }
+        
+        .status {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .status.checking {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .detail {
+            font-family: 'Courier New', monospace;
+            background: #f4f4f4;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        code {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-left: 4px solid #2196f3;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        button {
+            padding: 0.75rem 1.5rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnostyka Google APIs</h1>
+        <p>Ta strona pomoże Ci sprawdzić czy Google APIs ładują się poprawnie.</p>
+
+        <div class="instructions">
+            <strong>📋 Instrukcja:</strong>
+            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Otwórz tę stronę przez HTTP serwer (nie przez <code>file://</code>)</li>
+                <li>Poczekaj 5 sekund aż testy się wykonają</li>
+                <li>Sprawdź wyniki poniżej</li>
+                <li>Otwórz konsolę (F12) żeby zobaczyć szczegóły</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>1️⃣ Test połączenia z internetem</h2>
+            <div id="internetStatus" class="status checking">⏳ Sprawdzanie...</div>
+            <div id="internetDetail" class="detail"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2️⃣ Test ładowania Google API (gapi)</h2>
+            <div id="gapiStatus" class="status checking">⏳ Ładowanie...</div>
+            <div id="gapiDetail" class="detail"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3️⃣ Test ładowania Google Identity Services (GIS)</h2>
+            <div id="gisStatus" class="status checking">⏳ Ładowanie...</div>
+            <div id="gisDetail" class="detail"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4️⃣ Test protokołu (HTTP vs file://)</h2>
+            <div id="protocolStatus" class="status checking">⏳ Sprawdzanie...</div>
+            <div id="protocolDetail" class="detail"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>5️⃣ Informacje o przeglądarce</h2>
+            <div id="browserDetail" class="detail"></div>
+        </div>
+
+        <button onclick="location.reload()">🔄 Uruchom testy ponownie</button>
+        <button onclick="window.open('troubleshooting.html', '_blank')" style="background: #e67e22;">🔧 Otwórz Troubleshooting</button>
+    </div>
+
+    <script>
+        console.log('=== DIAGNOSTYKA GOOGLE APIS ===');
+
+        // Test 1: Internet connection
+        setTimeout(() => {
+            const status = document.getElementById('internetStatus');
+            const detail = document.getElementById('internetDetail');
+            
+            if (navigator.onLine) {
+                status.className = 'status success';
+                status.textContent = '✅ Połączenie z internetem: OK';
+                detail.textContent = 'navigator.onLine = true';
+                console.log('✓ Internet connection: OK');
+            } else {
+                status.className = 'status error';
+                status.textContent = '❌ Brak połączenia z internetem';
+                detail.textContent = 'navigator.onLine = false';
+                console.error('✗ No internet connection');
+            }
+        }, 500);
+
+        // Test 4: Protocol check
+        setTimeout(() => {
+            const status = document.getElementById('protocolStatus');
+            const detail = document.getElementById('protocolDetail');
+            const protocol = window.location.protocol;
+            
+            detail.textContent = `Protocol: ${protocol}\nURL: ${window.location.href}`;
+            
+            if (protocol === 'file:') {
+                status.className = 'status error';
+                status.textContent = '❌ Używasz protokołu file:// - Google OAuth nie będzie działać!';
+                console.error('✗ file:// protocol detected - OAuth will not work');
+            } else if (protocol === 'http:' || protocol === 'https:') {
+                status.className = 'status success';
+                status.textContent = '✅ Protokół HTTP: OK';
+                console.log('✓ HTTP protocol: OK');
+            } else {
+                status.className = 'status error';
+                status.textContent = '⚠️ Nieznany protokół: ' + protocol;
+                console.warn('? Unknown protocol:', protocol);
+            }
+        }, 1000);
+
+        // Test 5: Browser info
+        setTimeout(() => {
+            const detail = document.getElementById('browserDetail');
+            detail.innerHTML = `
+                <strong>User Agent:</strong> ${navigator.userAgent}<br>
+                <strong>Język:</strong> ${navigator.language}<br>
+                <strong>Cookies włączone:</strong> ${navigator.cookieEnabled ? 'TAK' : 'NIE'}<br>
+                <strong>Do Not Track:</strong> ${navigator.doNotTrack || 'nie ustawione'}
+            `;
+        }, 1500);
+
+        // Test 2: Google API
+        let gapiLoaded = false;
+        
+        function checkGapi() {
+            const status = document.getElementById('gapiStatus');
+            const detail = document.getElementById('gapiDetail');
+            
+            if (typeof gapi !== 'undefined') {
+                status.className = 'status success';
+                status.textContent = '✅ Google API (gapi) załadowane';
+                detail.textContent = 'typeof gapi = "object"\nGAPI version: ' + (gapi.version || 'unknown');
+                console.log('✓ GAPI loaded:', gapi);
+                gapiLoaded = true;
+            } else {
+                status.className = 'status error';
+                status.textContent = '❌ Google API (gapi) NIE załadowane';
+                detail.textContent = 'typeof gapi = "undefined"\n\nMożliwe przyczyny:\n- Brak internetu\n- Blokada przez adblocker\n- Firewall blokuje googleapis.com';
+                console.error('✗ GAPI not loaded');
+            }
+        }
+
+        // Test 3: Google Identity Services
+        let gisLoaded = false;
+        
+        function checkGis() {
+            const status = document.getElementById('gisStatus');
+            const detail = document.getElementById('gisDetail');
+            
+            if (typeof google !== 'undefined' && google.accounts) {
+                status.className = 'status success';
+                status.textContent = '✅ Google Identity Services (GIS) załadowane';
+                detail.textContent = 'typeof google = "object"\ngoogle.accounts.oauth2 = available';
+                console.log('✓ GIS loaded:', google.accounts);
+                gisLoaded = true;
+            } else {
+                status.className = 'status error';
+                status.textContent = '❌ Google Identity Services (GIS) NIE załadowane';
+                detail.textContent = 'typeof google = "' + (typeof google) + '"\n\nMożliwe przyczyny:\n- Brak internetu\n- Blokada przez adblocker\n- Firewall blokuje accounts.google.com';
+                console.error('✗ GIS not loaded');
+            }
+        }
+
+        // Wait for scripts to load
+        setTimeout(() => {
+            checkGapi();
+            checkGis();
+            
+            console.log('=== PODSUMOWANIE ===');
+            console.log('GAPI loaded:', gapiLoaded);
+            console.log('GIS loaded:', gisLoaded);
+            console.log('Protocol:', window.location.protocol);
+            console.log('Online:', navigator.onLine);
+            
+            if (gapiLoaded && gisLoaded && window.location.protocol !== 'file:') {
+                console.log('✓✓✓ WSZYSTKO OK - aplikacja powinna działać!');
+            } else {
+                console.error('✗✗✗ PROBLEMY - sprawdź powyższe błędy');
+            }
+        }, 5000);
+    </script>
+
+    <!-- Google API Scripts -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+</body>
+</html>
