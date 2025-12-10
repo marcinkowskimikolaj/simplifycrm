@@ -206,13 +206,6 @@
             width: 100%;
         }
 
-        @media (max-width: 768px) {
-            .app-inner {
-                margin: 2.2rem auto 2.6rem;
-                padding: 0 1.4rem;
-            }
-        }
-
         /* ------------ HEADER ------------ */
 
         .app-header {
@@ -428,7 +421,6 @@
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-card);
             padding: 1.6rem;
-            cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
 
@@ -436,6 +428,10 @@
             transform: translateY(-3px);
             box-shadow: var(--shadow-card);
             border-color: var(--border-strong);
+        }
+
+        .card.clickable {
+            cursor: pointer;
         }
 
         .card-header {
@@ -510,7 +506,7 @@
             font-size: 1rem;
         }
 
-        .contacts-count {
+        .card-badge {
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
@@ -524,6 +520,11 @@
             letter-spacing: 0.1em;
             color: var(--text-primary);
             margin-top: 0.5rem;
+        }
+
+        .card-badge.no-company {
+            background: rgba(220, 38, 38, 0.08);
+            color: var(--error);
         }
 
         /* ------------ DETAIL VIEW ------------ */
@@ -689,6 +690,11 @@
             letter-spacing: 0.12em;
             font-weight: 600;
             color: var(--text-secondary);
+        }
+
+        .form-group label .optional {
+            font-weight: 400;
+            opacity: 0.6;
         }
 
         .form-group input,
@@ -867,6 +873,11 @@
         /* ------------ RESPONSIVE ------------ */
 
         @media (max-width: 768px) {
+            .app-inner {
+                margin: 2.2rem auto 2.6rem;
+                padding: 0 1.4rem;
+            }
+
             .app-header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -900,6 +911,11 @@
                 padding: 1.7rem 1.4rem 1.5rem;
                 border-radius: 18px;
             }
+
+            .tab-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.7rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -909,11 +925,6 @@
 
             .app-inner {
                 padding: 0 1.1rem;
-            }
-
-            .tab-btn {
-                padding: 0.7rem 1rem;
-                font-size: 0.7rem;
             }
         }
     </style>
@@ -970,12 +981,46 @@
 
             <!-- TABS -->
             <div class="tabs">
-                <button class="tab-btn active" data-tab="companies">Firmy</button>
-                <button class="tab-btn" data-tab="contacts">Wszyscy kontakty</button>
+                <button class="tab-btn active" data-tab="contacts">Kontakty</button>
+                <button class="tab-btn" data-tab="companies">Firmy</button>
             </div>
 
-            <!-- TAB: COMPANIES LIST -->
-            <div id="companiesTab" class="tab-content active">
+            <!-- TAB: CONTACTS -->
+            <div id="contactsTab" class="tab-content active">
+                <div class="section-header">
+                    <div class="section-title-block">
+                        <h1 class="section-title">Kontakty</h1>
+                        <div class="section-underline"></div>
+                        <p class="section-subtitle">
+                            Zarządzaj wszystkimi osobami kontaktowymi. Kontakty mogą być przypisane do firm lub istnieć niezależnie.
+                        </p>
+                    </div>
+                    <div class="toolbar">
+                        <button id="addContactBtn" class="add-btn">
+                            <span class="plus">+</span>
+                            <span>Dodaj kontakt</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="contactsLoading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Ładowanie kontaktów...</p>
+                </div>
+
+                <div id="contactsEmpty" class="empty-state" style="display: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <h3>Brak kontaktów</h3>
+                    <p>Dodaj pierwszy kontakt, aby rozpocząć pracę w CRM.</p>
+                </div>
+
+                <div id="contactsGrid" class="cards-grid"></div>
+            </div>
+
+            <!-- TAB: COMPANIES -->
+            <div id="companiesTab" class="tab-content">
                 <div id="companiesListView">
                     <div class="section-header">
                         <div class="section-title-block">
@@ -993,7 +1038,7 @@
                         </div>
                     </div>
 
-                    <div id="companiesLoading" class="loading">
+                    <div id="companiesLoading" class="loading" style="display: none;">
                         <div class="spinner"></div>
                         <p>Ładowanie firm...</p>
                     </div>
@@ -1044,34 +1089,6 @@
                     <div id="companyContactsGrid" class="cards-grid"></div>
                 </div>
             </div>
-
-            <!-- TAB: ALL CONTACTS -->
-            <div id="contactsTab" class="tab-content">
-                <div class="section-header">
-                    <div class="section-title-block">
-                        <h1 class="section-title">Wszyscy kontakty</h1>
-                        <div class="section-underline"></div>
-                        <p class="section-subtitle">
-                            Kompletna lista wszystkich osób kontaktowych z różnych firm.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="contactsLoading" class="loading" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Ładowanie kontaktów...</p>
-                </div>
-
-                <div id="contactsEmpty" class="empty-state" style="display: none;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                    </svg>
-                    <h3>Brak kontaktów</h3>
-                    <p>Dodaj kontakty do firm, aby wyświetlić je tutaj.</p>
-                </div>
-
-                <div id="contactsGrid" class="cards-grid"></div>
-            </div>
         </div>
     </div>
 
@@ -1088,11 +1105,11 @@
                     <input type="text" id="companyName" required>
                 </div>
                 <div class="form-group">
-                    <label for="companyIndustry">Branża</label>
+                    <label for="companyIndustry">Branża <span class="optional">(opcjonalnie)</span></label>
                     <input type="text" id="companyIndustry" placeholder="np. IT, Marketing, Finanse">
                 </div>
                 <div class="form-group">
-                    <label for="companyNotes">Notatki</label>
+                    <label for="companyNotes">Notatki <span class="optional">(opcjonalnie)</span></label>
                     <textarea id="companyNotes" placeholder="Dodatkowe informacje o firmie"></textarea>
                 </div>
                 <div class="modal-actions">
@@ -1112,25 +1129,25 @@
             </div>
             <form id="contactForm">
                 <div class="form-group">
-                    <label for="contactCompany">Firma *</label>
-                    <select id="contactCompany" required>
-                        <option value="">Wybierz firmę</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label for="contactName">Imię i nazwisko *</label>
                     <input type="text" id="contactName" required>
                 </div>
                 <div class="form-group">
-                    <label for="contactPosition">Stanowisko</label>
+                    <label for="contactCompany">Firma <span class="optional">(opcjonalnie)</span></label>
+                    <select id="contactCompany">
+                        <option value="">Brak firmy</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="contactPosition">Stanowisko <span class="optional">(opcjonalnie)</span></label>
                     <input type="text" id="contactPosition" placeholder="np. CEO, Marketing Manager">
                 </div>
                 <div class="form-group">
-                    <label for="contactEmail">Email</label>
+                    <label for="contactEmail">Email <span class="optional">(opcjonalnie)</span></label>
                     <input type="email" id="contactEmail">
                 </div>
                 <div class="form-group">
-                    <label for="contactPhone">Telefon</label>
+                    <label for="contactPhone">Telefon <span class="optional">(opcjonalnie)</span></label>
                     <input type="tel" id="contactPhone">
                 </div>
                 <div class="modal-actions">
@@ -1188,7 +1205,7 @@
                 maybeEnableButtons();
             } catch (err) {
                 console.error('✗ Błąd inicjalizacji GIS:', err);
-                showStatus('Błąd konfiguracji - sprawdź CLIENT_ID', 'error');
+                showStatus('Błąd konfiguracji', 'error');
             }
         }
 
@@ -1237,11 +1254,6 @@
 
         // AUTH
         function handleAuthClick() {
-            if (CONFIG.CLIENT_ID === 'YOUR_CLIENT_ID.apps.googleusercontent.com') {
-                showStatus('Błąd: Ustaw CLIENT_ID w kodzie!', 'error');
-                return;
-            }
-
             if (!tokenClient) {
                 showStatus('Błąd: Google nie załadowane', 'error');
                 return;
@@ -1305,8 +1317,8 @@
 
         // DATA LOADING
         async function loadData() {
-            if (!CONFIG.SHEET_ID || CONFIG.SHEET_ID === '1A4vT2_sQnM48Q74jLPqGIT27P8NRdzKwiOsiDdMByJ0') {
-                showStatus('Błąd: Brak SHEET_ID', 'error');
+            if (!CONFIG.SHEET_ID || CONFIG.SHEET_ID === 'YOUR_SHEET_ID') {
+                showStatus('Błąd: Brak SHEET_ID w konfiguracji', 'error');
                 return;
             }
 
@@ -1316,6 +1328,7 @@
         async function loadCompanies() {
             document.getElementById('companiesLoading').style.display = 'block';
             document.getElementById('companiesGrid').innerHTML = '';
+            document.getElementById('companiesEmpty').style.display = 'none';
 
             try {
                 const response = await gapi.client.sheets.spreadsheets.values.get({
@@ -1325,43 +1338,52 @@
 
                 const rows = response.result.values || [];
                 companies = rows.map(row => ({
-                    id: row[0] || '',
+                    id: row[0] || generateId(),
                     name: row[1] || '',
                     industry: row[2] || '',
                     notes: row[3] || ''
-                }));
+                })).filter(c => c.name); // Only companies with names
 
                 renderCompanies();
                 showStatus('Firmy załadowane', 'success');
             } catch (err) {
                 console.error('Błąd ładowania firm:', err);
-                showStatus('Błąd ładowania firm', 'error');
+                showStatus('Błąd ładowania firm: ' + (err.result?.error?.message || 'Sprawdź czy arkusz "Firmy" istnieje'), 'error');
                 document.getElementById('companiesEmpty').style.display = 'block';
+            } finally {
+                document.getElementById('companiesLoading').style.display = 'none';
             }
-
-            document.getElementById('companiesLoading').style.display = 'none';
         }
 
         async function loadContacts() {
+            document.getElementById('contactsLoading').style.display = 'block';
+            document.getElementById('contactsGrid').innerHTML = '';
+            document.getElementById('contactsEmpty').style.display = 'none';
+
             try {
                 const response = await gapi.client.sheets.spreadsheets.values.get({
                     spreadsheetId: CONFIG.SHEET_ID,
-                    range: `${CONFIG.CONTACTS_SHEET}!A2:G`,
+                    range: `${CONFIG.CONTACTS_SHEET}!A2:F`,
                 });
 
                 const rows = response.result.values || [];
                 contacts = rows.map(row => ({
-                    id: row[0] || '',
-                    companyId: row[1] || '',
+                    id: row[0] || generateId(),
+                    companyId: row[1] || '', // Empty string = no company
                     name: row[2] || '',
                     position: row[3] || '',
                     email: row[4] || '',
                     phone: row[5] || ''
-                }));
+                })).filter(c => c.name); // Only contacts with names
 
                 renderAllContacts();
+                showStatus('Kontakty załadowane', 'success');
             } catch (err) {
                 console.error('Błąd ładowania kontaktów:', err);
+                showStatus('Błąd ładowania kontaktów: ' + (err.result?.error?.message || 'Sprawdź czy arkusz "Kontakty" istnieje'), 'error');
+                document.getElementById('contactsEmpty').style.display = 'block';
+            } finally {
+                document.getElementById('contactsLoading').style.display = 'none';
             }
         }
 
@@ -1380,7 +1402,7 @@
             grid.innerHTML = companies.map((company, index) => {
                 const companyContacts = contacts.filter(c => c.companyId === company.id);
                 return `
-                    <div class="card" onclick="viewCompanyDetail('${company.id}')">
+                    <div class="card clickable" onclick="viewCompanyDetail('${company.id}')">
                         <div class="card-header">
                             <div>
                                 <div class="card-title">${escapeHtml(company.name)}</div>
@@ -1399,9 +1421,9 @@
                                 </div>
                             </div>
                         ` : ''}
-                        <div class="contacts-count">
+                        <div class="card-badge">
                             <span>👥</span>
-                            <span>${companyContacts.length} ${companyContacts.length === 1 ? 'kontakt' : 'kontaktów'}</span>
+                            <span>${companyContacts.length} ${companyContacts.length === 1 ? 'kontakt' : companyContacts.length < 5 ? 'kontakty' : 'kontaktów'}</span>
                         </div>
                     </div>
                 `;
@@ -1438,9 +1460,9 @@
                             ${company ? `
                                 <div class="card-info-row">
                                     <span class="emoji">🏢</span>
-                                    <span>${escapeHtml(company.name)}</span>
+                                    <span onclick="viewCompanyDetail('${company.id}')" style="cursor: pointer; text-decoration: underline;">${escapeHtml(company.name)}</span>
                                 </div>
-                            ` : ''}
+                            ` : '<div class="card-badge no-company"><span>⚠️</span><span>Brak firmy</span></div>'}
                             ${contact.email ? `
                                 <div class="card-info-row">
                                     <span class="emoji">📧</span>
@@ -1461,6 +1483,12 @@
 
         // COMPANY DETAIL VIEW
         function viewCompanyDetail(companyId) {
+            // Switch to companies tab if not already there
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelector('[data-tab="companies"]').classList.add('active');
+            document.getElementById('companiesTab').classList.add('active');
+
             currentCompanyId = companyId;
             const company = companies.find(c => c.id === companyId);
             if (!company) return;
@@ -1496,7 +1524,7 @@
             }
 
             empty.style.display = 'none';
-            grid.innerHTML = companyContacts.map((contact, index) => {
+            grid.innerHTML = companyContacts.map((contact) => {
                 const globalIndex = contacts.findIndex(c => c.id === contact.id);
                 return `
                     <div class="card">
@@ -1567,7 +1595,9 @@
                 const values = [[company.id, company.name, company.industry, company.notes]];
 
                 if (editingCompanyIndex !== null) {
-                    const range = `${CONFIG.COMPANIES_SHEET}!A${editingCompanyIndex + 2}:D${editingCompanyIndex + 2}`;
+                    // Find row number in sheet (need to recalculate because of filters)
+                    const rowNumber = editingCompanyIndex + 2;
+                    const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:D${rowNumber}`;
                     await gapi.client.sheets.spreadsheets.values.update({
                         spreadsheetId: CONFIG.SHEET_ID,
                         range: range,
@@ -1592,23 +1622,38 @@
                 closeCompanyModal();
             } catch (err) {
                 console.error('Błąd zapisu firmy:', err);
-                showStatus('Błąd zapisu firmy', 'error');
+                showStatus('Błąd zapisu firmy: ' + (err.result?.error?.message || ''), 'error');
             }
         }
 
         async function deleteCompany(index) {
-            if (!confirm('Czy na pewno chcesz usunąć tę firmę? Kontakty w niej pozostaną.')) return;
+            if (!confirm('Czy na pewno chcesz usunąć tę firmę?\n\nKontakty przypisane do tej firmy pozostaną, ale stracą powiązanie z firmą.')) return;
 
             try {
-                const range = `${CONFIG.COMPANIES_SHEET}!A${index + 2}:D${index + 2}`;
+                const companyId = companies[index].id;
+                const rowNumber = index + 2;
+                const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:D${rowNumber}`;
+                
                 await gapi.client.sheets.spreadsheets.values.clear({
                     spreadsheetId: CONFIG.SHEET_ID,
                     range: range
                 });
 
                 companies.splice(index, 1);
+                
+                // Update contacts that had this company
+                contacts.forEach(contact => {
+                    if (contact.companyId === companyId) {
+                        contact.companyId = '';
+                    }
+                });
+
                 renderCompanies();
+                renderAllContacts();
+                updateCompanySelects();
                 showStatus('Firma usunięta', 'success');
+                
+                // Reload to clean up empty rows
                 await loadCompanies();
             } catch (err) {
                 console.error('Błąd usuwania firmy:', err);
@@ -1641,7 +1686,7 @@
             const contact = contacts[index];
             document.getElementById('contactModalTitle').textContent = 'Edytuj kontakt';
             updateCompanySelects();
-            document.getElementById('contactCompany').value = contact.companyId;
+            document.getElementById('contactCompany').value = contact.companyId || '';
             document.getElementById('contactName').value = contact.name;
             document.getElementById('contactPosition').value = contact.position;
             document.getElementById('contactEmail').value = contact.email;
@@ -1654,7 +1699,7 @@
             
             const contact = {
                 id: editingContactIndex !== null ? contacts[editingContactIndex].id : generateId(),
-                companyId: document.getElementById('contactCompany').value,
+                companyId: document.getElementById('contactCompany').value || '', // Empty string if no company
                 name: document.getElementById('contactName').value,
                 position: document.getElementById('contactPosition').value,
                 email: document.getElementById('contactEmail').value,
@@ -1665,7 +1710,8 @@
                 const values = [[contact.id, contact.companyId, contact.name, contact.position, contact.email, contact.phone]];
 
                 if (editingContactIndex !== null) {
-                    const range = `${CONFIG.CONTACTS_SHEET}!A${editingContactIndex + 2}:F${editingContactIndex + 2}`;
+                    const rowNumber = editingContactIndex + 2;
+                    const range = `${CONFIG.CONTACTS_SHEET}!A${rowNumber}:F${rowNumber}`;
                     await gapi.client.sheets.spreadsheets.values.update({
                         spreadsheetId: CONFIG.SHEET_ID,
                         range: range,
@@ -1693,7 +1739,7 @@
                 closeContactModal();
             } catch (err) {
                 console.error('Błąd zapisu kontaktu:', err);
-                showStatus('Błąd zapisu kontaktu', 'error');
+                showStatus('Błąd zapisu kontaktu: ' + (err.result?.error?.message || ''), 'error');
             }
         }
 
@@ -1701,7 +1747,9 @@
             if (!confirm('Czy na pewno chcesz usunąć ten kontakt?')) return;
 
             try {
-                const range = `${CONFIG.CONTACTS_SHEET}!A${index + 2}:F${index + 2}`;
+                const rowNumber = index + 2;
+                const range = `${CONFIG.CONTACTS_SHEET}!A${rowNumber}:F${rowNumber}`;
+                
                 await gapi.client.sheets.spreadsheets.values.clear({
                     spreadsheetId: CONFIG.SHEET_ID,
                     range: range
@@ -1714,6 +1762,8 @@
                     renderCompanyContacts(currentCompanyId);
                 }
                 showStatus('Kontakt usunięty', 'success');
+                
+                // Reload to clean up empty rows
                 await loadContacts();
             } catch (err) {
                 console.error('Błąd usuwania kontaktu:', err);
@@ -1729,7 +1779,7 @@
 
         function updateCompanySelects() {
             const select = document.getElementById('contactCompany');
-            select.innerHTML = '<option value="">Wybierz firmę</option>' +
+            select.innerHTML = '<option value="">Brak firmy</option>' +
                 companies.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
         }
 
@@ -1768,6 +1818,7 @@
             document.getElementById('backToCompaniesBtn').addEventListener('click', backToCompaniesList);
 
             // Contacts
+            document.getElementById('addContactBtn').addEventListener('click', () => openContactModal());
             document.getElementById('addCompanyContactBtn').addEventListener('click', () => {
                 openContactModal(currentCompanyId);
             });
