@@ -214,7 +214,7 @@
             justify-content: space-between;
             border-bottom: 1px solid var(--border-subtle);
             padding-bottom: 1.4rem;
-            margin-bottom: 2.3rem;
+            margin-bottom: 1.4rem;
         }
 
         .app-header-left {
@@ -278,6 +278,66 @@
             border-color: var(--text-primary);
             box-shadow: 0 8px 20px rgba(26,26,26,0.16);
             transform: translateY(-1px);
+        }
+
+        /* ------------ GLOBAL SEARCH ------------ */
+
+        .global-search {
+            margin-bottom: 1.8rem;
+        }
+
+        .search-input-container {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--surface);
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            padding: 0.35rem 0.85rem;
+            box-shadow: 0 8px 20px rgba(26,26,26,0.06);
+        }
+
+        .search-icon {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .search-input-container input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0.55rem 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .search-input-container input:focus {
+            outline: none;
+        }
+
+        .clear-search-btn {
+            border: none;
+            background: transparent;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: background 0.18s ease, color 0.18s ease;
+        }
+
+        .clear-search-btn:hover {
+            background: rgba(26,26,26,0.05);
+            color: var(--text-primary);
+        }
+
+        .search-hint {
+            margin-top: 0.4rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
         }
 
         /* ------------ TABS ------------ */
@@ -604,12 +664,21 @@
             letter-spacing: 0.12em;
             font-weight: 600;
             color: var(--text-secondary);
-            min-width: 100px;
+            min-width: 120px;
         }
 
         .detail-info-value {
             font-size: 0.9rem;
             color: var(--text-primary);
+        }
+
+        .detail-info-value a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .detail-info-value a:hover {
+            text-decoration: underline;
         }
 
         /* ------------ MODAL ------------ */
@@ -763,6 +832,55 @@
         .btn-secondary:hover {
             background: rgba(26,26,26,0.03);
             border-color: var(--text-primary);
+        }
+
+        /* ------------ COMPANY PICKER ------------ */
+
+        .company-picker {
+            position: relative;
+        }
+
+        .company-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 0.25rem;
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 18px 40px rgba(26, 26, 26, 0.22);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 1500;
+            display: none;
+        }
+
+        .company-suggestions.visible {
+            display: block;
+        }
+
+        .company-suggestion-item {
+            padding: 0.55rem 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .company-suggestion-item:hover {
+            background: rgba(26,26,26,0.04);
+        }
+
+        .company-suggestion-item .suggestion-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-left: 0.75rem;
+        }
+
+        .company-suggestion-new {
+            font-weight: 600;
         }
 
         /* ------------ LOADING & EMPTY ------------ */
@@ -979,6 +1097,18 @@
                 </div>
             </header>
 
+            <!-- GLOBAL SEARCH -->
+            <div class="global-search">
+                <div class="search-input-container">
+                    <span class="search-icon">🔍</span>
+                    <input id="globalSearchInput" type="text" placeholder="Szukaj w firmach i kontaktach..." autocomplete="off">
+                    <button id="clearSearchBtn" type="button" class="clear-search-btn">Wyczyść</button>
+                </div>
+                <p class="search-hint">
+                    Szukaj po nazwie firmy, osobie, stanowisku, mailu, telefonie, branży, mieście...
+                </p>
+            </div>
+
             <!-- TABS -->
             <div class="tabs">
                 <button class="tab-btn active" data-tab="contacts">Kontakty</button>
@@ -1109,6 +1239,22 @@
                     <input type="text" id="companyIndustry" placeholder="np. IT, Marketing, Finanse">
                 </div>
                 <div class="form-group">
+                    <label for="companyWebsite">Strona WWW <span class="optional">(opcjonalnie)</span></label>
+                    <input type="url" id="companyWebsite" placeholder="np. https://twojafirma.pl">
+                </div>
+                <div class="form-group">
+                    <label for="companyPhone">Telefon firmowy <span class="optional">(opcjonalnie)</span></label>
+                    <input type="tel" id="companyPhone" placeholder="np. +48 123 456 789">
+                </div>
+                <div class="form-group">
+                    <label for="companyCity">Miasto <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyCity" placeholder="np. Warszawa">
+                </div>
+                <div class="form-group">
+                    <label for="companyCountry">Kraj <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyCountry" placeholder="np. Polska">
+                </div>
+                <div class="form-group">
                     <label for="companyNotes">Notatki <span class="optional">(opcjonalnie)</span></label>
                     <textarea id="companyNotes" placeholder="Dodatkowe informacje o firmie"></textarea>
                 </div>
@@ -1133,10 +1279,12 @@
                     <input type="text" id="contactName" required>
                 </div>
                 <div class="form-group">
-                    <label for="contactCompany">Firma <span class="optional">(opcjonalnie)</span></label>
-                    <select id="contactCompany">
-                        <option value="">Brak firmy</option>
-                    </select>
+                    <label for="contactCompanyInput">Firma <span class="optional">(opcjonalnie)</span></label>
+                    <div class="company-picker">
+                        <input type="text" id="contactCompanyInput" placeholder="Zacznij pisać nazwę firmy...">
+                        <input type="hidden" id="contactCompanyId">
+                        <div id="companySuggestions" class="company-suggestions"></div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="contactPosition">Stanowisko <span class="optional">(opcjonalnie)</span></label>
@@ -1165,12 +1313,14 @@
             SHEET_ID: '1A4vT2_sQnM48Q74jLPqGIT27P8NRdzKwiOsiDdMByJ0',
             COMPANIES_SHEET: 'Firmy',
             CONTACTS_SHEET: 'Kontakty',
-            SCOPES: 'https://www.googleapis.com/auth/spreadsheets'
+            SCOPES: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email'
         };
 
+        const SESSION_KEY = 'simplifyCrmSession';
         let gapiInited = false;
         let gisInited = false;
         let tokenClient;
+        let sessionRestored = false;
 
         function gapiLoaded() {
             console.log('✓ Google API (gapi) loaded');
@@ -1216,6 +1366,7 @@
                     loginBtn.disabled = false;
                     console.log('✓ Wszystko załadowane');
                 }
+                restoreSessionIfPossible();
             }
         }
 
@@ -1225,6 +1376,39 @@
             msg.textContent = message;
             document.body.appendChild(msg);
             setTimeout(() => msg.remove(), 3200);
+        }
+
+        async function restoreSessionIfPossible() {
+            if (sessionRestored) return;
+            sessionRestored = true;
+
+            try {
+                const raw = localStorage.getItem(SESSION_KEY);
+                if (!raw) return;
+                const saved = JSON.parse(raw);
+                if (!saved || !saved.accessToken || !saved.email) {
+                    localStorage.removeItem(SESSION_KEY);
+                    return;
+                }
+
+                window.accessToken = saved.accessToken;
+                gapi.client.setToken({ access_token: saved.accessToken });
+
+                showApp(saved.email);
+
+                try {
+                    await loadData();
+                    showStatus('Przywrócono sesję', 'success');
+                } catch (err) {
+                    console.error('Błąd automatycznego logowania:', err);
+                    showStatus('Sesja wygasła, zaloguj się ponownie', 'error');
+                    localStorage.removeItem(SESSION_KEY);
+                    showLogin();
+                }
+            } catch (e) {
+                console.error('Nie udało się odtworzyć sesji:', e);
+                localStorage.removeItem(SESSION_KEY);
+            }
         }
 
         setTimeout(() => {
@@ -1251,6 +1435,11 @@
         let editingCompanyIndex = null;
         let editingContactIndex = null;
         let currentCompanyId = null;
+        let currentSearchTerm = '';
+
+        let companyInputEl = null;
+        let companyIdEl = null;
+        let companySuggestionsEl = null;
 
         // AUTH
         function handleAuthClick() {
@@ -1267,12 +1456,25 @@
                 }
 
                 try {
-                    accessToken = gapi.client.getToken().access_token;
+                    if (resp && resp.access_token) {
+                        accessToken = resp.access_token;
+                        gapi.client.setToken({ access_token: resp.access_token });
+                    } else if (gapi.client.getToken()) {
+                        accessToken = gapi.client.getToken().access_token;
+                    }
+
                     const userInfo = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
                         headers: { Authorization: `Bearer ${accessToken}` }
                     }).then(r => r.json());
 
-                    showApp(userInfo.email || '');
+                    const email = userInfo.email || '';
+                    // Zapis sesji
+                    localStorage.setItem(SESSION_KEY, JSON.stringify({
+                        accessToken,
+                        email
+                    }));
+
+                    showApp(email);
                     await loadData();
                 } catch (err) {
                     console.error('Błąd pobierania danych:', err);
@@ -1296,10 +1498,15 @@
             const token = gapi.client.getToken();
             if (token !== null) {
                 google.accounts.oauth2.revoke(token.access_token);
-                gapi.client.setToken('');
-                accessToken = null;
-                showLogin();
+                gapi.client.setToken(null);
             }
+            accessToken = null;
+            companies = [];
+            contacts = [];
+            currentCompanyId = null;
+            currentSearchTerm = '';
+            localStorage.removeItem(SESSION_KEY);
+            showLogin();
         }
 
         function showApp(email) {
@@ -1311,8 +1518,8 @@
         function showLogin() {
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('appScreen').classList.remove('active');
-            companies = [];
-            contacts = [];
+            const searchInput = document.getElementById('globalSearchInput');
+            if (searchInput) searchInput.value = '';
         }
 
         // DATA LOADING
@@ -1333,7 +1540,7 @@
             try {
                 const response = await gapi.client.sheets.spreadsheets.values.get({
                     spreadsheetId: CONFIG.SHEET_ID,
-                    range: `${CONFIG.COMPANIES_SHEET}!A2:D`,
+                    range: `${CONFIG.COMPANIES_SHEET}!A2:H`,
                 });
 
                 const rows = response.result.values || [];
@@ -1341,10 +1548,15 @@
                     id: row[0] || generateId(),
                     name: row[1] || '',
                     industry: row[2] || '',
-                    notes: row[3] || ''
-                })).filter(c => c.name); // Only companies with names
+                    notes: row[3] || '',
+                    website: row[4] || '',
+                    phone: row[5] || '',
+                    city: row[6] || '',
+                    country: row[7] || ''
+                })).filter(c => c.name); // tylko firmy z nazwą
 
                 renderCompanies();
+                renderAllContacts(); // po załadowaniu firm przerysuj kontakty, żeby poprawnie złapały powiązania
                 showStatus('Firmy załadowane', 'success');
             } catch (err) {
                 console.error('Błąd ładowania firm:', err);
@@ -1369,12 +1581,12 @@
                 const rows = response.result.values || [];
                 contacts = rows.map(row => ({
                     id: row[0] || generateId(),
-                    companyId: row[1] || '', // Empty string = no company
+                    companyId: row[1] || '',
                     name: row[2] || '',
                     position: row[3] || '',
                     email: row[4] || '',
                     phone: row[5] || ''
-                })).filter(c => c.name); // Only contacts with names
+                })).filter(c => c.name); // tylko kontakty z nazwą
 
                 renderAllContacts();
                 showStatus('Kontakty załadowane', 'success');
@@ -1387,20 +1599,94 @@
             }
         }
 
+        // FILTER HELPERS
+        function getFilteredCompanies() {
+            if (!currentSearchTerm) return companies;
+            const q = currentSearchTerm.toLowerCase();
+            return companies.filter(c => {
+                const combined = `${c.name} ${c.industry} ${c.notes} ${c.website} ${c.phone} ${c.city} ${c.country}`.toLowerCase();
+                return combined.includes(q);
+            });
+        }
+
+        function getFilteredContacts() {
+            if (!currentSearchTerm) return contacts;
+            const q = currentSearchTerm.toLowerCase();
+            return contacts.filter(contact => {
+                const company = companies.find(c => c.id === contact.companyId);
+                const companyText = company
+                    ? `${company.name} ${company.industry} ${company.city} ${company.country}`
+                    : '';
+                const combined = `${contact.name} ${contact.position} ${contact.email} ${contact.phone} ${companyText}`.toLowerCase();
+                return combined.includes(q);
+            });
+        }
+
         // RENDER COMPANIES
         function renderCompanies() {
             const grid = document.getElementById('companiesGrid');
             const empty = document.getElementById('companiesEmpty');
+            const list = getFilteredCompanies();
 
             if (companies.length === 0) {
                 grid.innerHTML = '';
                 empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak firm';
+                empty.querySelector('p').textContent = 'Dodaj pierwszą firmę, aby rozpocząć pracę w CRM.';
+                return;
+            }
+
+            if (list.length === 0) {
+                grid.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak wyników';
+                empty.querySelector('p').textContent = 'Brak firm dla aktualnego wyszukiwania.';
                 return;
             }
 
             empty.style.display = 'none';
-            grid.innerHTML = companies.map((company, index) => {
+            grid.innerHTML = list.map((company, index) => {
                 const companyContacts = contacts.filter(c => c.companyId === company.id);
+
+                let infoRows = '';
+
+                if (company.website) {
+                    infoRows += `
+                        <div class="card-info-row">
+                            <span class="emoji">🌐</span>
+                            <span>${escapeHtml(company.website)}</span>
+                        </div>
+                    `;
+                }
+
+                if (company.phone) {
+                    infoRows += `
+                        <div class="card-info-row">
+                            <span class="emoji">📞</span>
+                            <span>${escapeHtml(company.phone)}</span>
+                        </div>
+                    `;
+                }
+
+                if (company.city || company.country) {
+                    const loc = [company.city, company.country].filter(Boolean).join(', ');
+                    infoRows += `
+                        <div class="card-info-row">
+                            <span class="emoji">📍</span>
+                            <span>${escapeHtml(loc)}</span>
+                        </div>
+                    `;
+                }
+
+                if (company.notes) {
+                    infoRows += `
+                        <div class="card-info-row">
+                            <span class="emoji">📝</span>
+                            <span>${escapeHtml(company.notes.substring(0, 100))}${company.notes.length > 100 ? '...' : ''}</span>
+                        </div>
+                    `;
+                }
+
                 return `
                     <div class="card clickable" onclick="viewCompanyDetail('${company.id}')">
                         <div class="card-header">
@@ -1409,18 +1695,11 @@
                                 ${company.industry ? `<div class="card-meta">${escapeHtml(company.industry)}</div>` : ''}
                             </div>
                             <div class="card-actions" onclick="event.stopPropagation()">
-                                <button class="icon-btn" onclick="editCompany(${index})" title="Edytuj">✏️</button>
-                                <button class="icon-btn delete" onclick="deleteCompany(${index})" title="Usuń">🗑️</button>
+                                <button class="icon-btn" onclick="editCompany(${companies.indexOf(company)})" title="Edytuj">✏️</button>
+                                <button class="icon-btn delete" onclick="deleteCompany(${companies.indexOf(company)})" title="Usuń">🗑️</button>
                             </div>
                         </div>
-                        ${company.notes ? `
-                            <div class="card-body">
-                                <div class="card-info-row">
-                                    <span class="emoji">📝</span>
-                                    <span>${escapeHtml(company.notes.substring(0, 100))}${company.notes.length > 100 ? '...' : ''}</span>
-                                </div>
-                            </div>
-                        ` : ''}
+                        ${infoRows ? `<div class="card-body">${infoRows}</div>` : ''}
                         <div class="card-badge">
                             <span>👥</span>
                             <span>${companyContacts.length} ${companyContacts.length === 1 ? 'kontakt' : companyContacts.length < 5 ? 'kontakty' : 'kontaktów'}</span>
@@ -1434,15 +1713,27 @@
         function renderAllContacts() {
             const grid = document.getElementById('contactsGrid');
             const empty = document.getElementById('contactsEmpty');
+            const list = getFilteredContacts();
 
             if (contacts.length === 0) {
                 grid.innerHTML = '';
                 empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak kontaktów';
+                empty.querySelector('p').textContent = 'Dodaj pierwszy kontakt, aby rozpocząć pracę w CRM.';
+                return;
+            }
+
+            if (list.length === 0) {
+                grid.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak wyników';
+                empty.querySelector('p').textContent = 'Brak kontaktów dla aktualnego wyszukiwania.';
                 return;
             }
 
             empty.style.display = 'none';
-            grid.innerHTML = contacts.map((contact, index) => {
+            grid.innerHTML = list.map((contact) => {
+                const index = contacts.findIndex(c => c.id === contact.id);
                 const company = companies.find(c => c.id === contact.companyId);
                 return `
                     <div class="card">
@@ -1462,7 +1753,11 @@
                                     <span class="emoji">🏢</span>
                                     <span onclick="viewCompanyDetail('${company.id}')" style="cursor: pointer; text-decoration: underline;">${escapeHtml(company.name)}</span>
                                 </div>
-                            ` : '<div class="card-badge no-company"><span>⚠️</span><span>Brak firmy</span></div>'}
+                            ` : `
+                                <div class="card-badge no-company">
+                                    <span>⚠️</span><span>Brak firmy</span>
+                                </div>
+                            `}
                             ${contact.email ? `
                                 <div class="card-info-row">
                                     <span class="emoji">📧</span>
@@ -1483,7 +1778,7 @@
 
         // COMPANY DETAIL VIEW
         function viewCompanyDetail(companyId) {
-            // Switch to companies tab if not already there
+            // przełącz na zakładkę Firmy
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelector('[data-tab="companies"]').classList.add('active');
@@ -1496,16 +1791,60 @@
             document.getElementById('companiesListView').style.display = 'none';
             document.getElementById('companyDetailView').classList.add('active');
 
+            let infoHtml = '';
+
+            if (company.website) {
+                const url = company.website.startsWith('http') ? company.website : 'https://' + company.website;
+                infoHtml += `
+                    <div class="detail-info-row">
+                        <div class="detail-info-label">Strona WWW</div>
+                        <div class="detail-info-value"><a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(company.website)}</a></div>
+                    </div>
+                `;
+            }
+
+            if (company.phone) {
+                infoHtml += `
+                    <div class="detail-info-row">
+                        <div class="detail-info-label">Telefon</div>
+                        <div class="detail-info-value">${escapeHtml(company.phone)}</div>
+                    </div>
+                `;
+            }
+
+            if (company.city || company.country) {
+                const loc = [company.city, company.country].filter(Boolean).join(', ');
+                infoHtml += `
+                    <div class="detail-info-row">
+                        <div class="detail-info-label">Lokalizacja</div>
+                        <div class="detail-info-value">${escapeHtml(loc)}</div>
+                    </div>
+                `;
+            }
+
+            if (company.notes) {
+                infoHtml += `
+                    <div class="detail-info-row">
+                        <div class="detail-info-label">Notatki</div>
+                        <div class="detail-info-value">${escapeHtml(company.notes)}</div>
+                    </div>
+                `;
+            }
+
+            if (!infoHtml) {
+                infoHtml = `
+                    <div class="detail-info-row">
+                        <div class="detail-info-label">Informacje</div>
+                        <div class="detail-info-value">Brak dodatkowych informacji o firmie.</div>
+                    </div>
+                `;
+            }
+
             document.getElementById('companyDetailContent').innerHTML = `
                 <div class="detail-title">${escapeHtml(company.name)}</div>
                 ${company.industry ? `<div class="detail-meta">${escapeHtml(company.industry)}</div>` : ''}
                 <div class="detail-info">
-                    ${company.notes ? `
-                        <div class="detail-info-row">
-                            <div class="detail-info-label">Notatki</div>
-                            <div class="detail-info-value">${escapeHtml(company.notes)}</div>
-                        </div>
-                    ` : ''}
+                    ${infoHtml}
                 </div>
             `;
 
@@ -1576,8 +1915,12 @@
             const company = companies[index];
             document.getElementById('companyModalTitle').textContent = 'Edytuj firmę';
             document.getElementById('companyName').value = company.name;
-            document.getElementById('companyIndustry').value = company.industry;
-            document.getElementById('companyNotes').value = company.notes;
+            document.getElementById('companyIndustry').value = company.industry || '';
+            document.getElementById('companyWebsite').value = company.website || '';
+            document.getElementById('companyPhone').value = company.phone || '';
+            document.getElementById('companyCity').value = company.city || '';
+            document.getElementById('companyCountry').value = company.country || '';
+            document.getElementById('companyNotes').value = company.notes || '';
             document.getElementById('companyModal').classList.add('active');
         }
 
@@ -1588,16 +1931,28 @@
                 id: editingCompanyIndex !== null ? companies[editingCompanyIndex].id : generateId(),
                 name: document.getElementById('companyName').value,
                 industry: document.getElementById('companyIndustry').value,
+                website: document.getElementById('companyWebsite').value,
+                phone: document.getElementById('companyPhone').value,
+                city: document.getElementById('companyCity').value,
+                country: document.getElementById('companyCountry').value,
                 notes: document.getElementById('companyNotes').value
             };
 
             try {
-                const values = [[company.id, company.name, company.industry, company.notes]];
+                const values = [[
+                    company.id,
+                    company.name,
+                    company.industry,
+                    company.notes,
+                    company.website,
+                    company.phone,
+                    company.city,
+                    company.country
+                ]];
 
                 if (editingCompanyIndex !== null) {
-                    // Find row number in sheet (need to recalculate because of filters)
                     const rowNumber = editingCompanyIndex + 2;
-                    const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:D${rowNumber}`;
+                    const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:H${rowNumber}`;
                     await gapi.client.sheets.spreadsheets.values.update({
                         spreadsheetId: CONFIG.SHEET_ID,
                         range: range,
@@ -1609,7 +1964,7 @@
                 } else {
                     await gapi.client.sheets.spreadsheets.values.append({
                         spreadsheetId: CONFIG.SHEET_ID,
-                        range: `${CONFIG.COMPANIES_SHEET}!A:D`,
+                        range: `${CONFIG.COMPANIES_SHEET}!A:H`,
                         valueInputOption: 'USER_ENTERED',
                         resource: { values }
                     });
@@ -1618,7 +1973,6 @@
                 }
 
                 renderCompanies();
-                updateCompanySelects();
                 closeCompanyModal();
             } catch (err) {
                 console.error('Błąd zapisu firmy:', err);
@@ -1632,28 +1986,53 @@
             try {
                 const companyId = companies[index].id;
                 const rowNumber = index + 2;
-                const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:D${rowNumber}`;
+                const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:H${rowNumber}`;
                 
+                // Wyczyść wiersz firmy
                 await gapi.client.sheets.spreadsheets.values.clear({
                     spreadsheetId: CONFIG.SHEET_ID,
                     range: range
                 });
 
-                companies.splice(index, 1);
-                
-                // Update contacts that had this company
-                contacts.forEach(contact => {
+                // Odpięcie kontaktów od firmy (w arkuszu i w pamięci)
+                const detachPromises = [];
+                contacts.forEach((contact, cIndex) => {
                     if (contact.companyId === companyId) {
                         contact.companyId = '';
+                        const values = [[
+                            contact.id,
+                            contact.companyId,
+                            contact.name,
+                            contact.position,
+                            contact.email,
+                            contact.phone
+                        ]];
+                        const contactRange = `${CONFIG.CONTACTS_SHEET}!A${cIndex + 2}:F${cIndex + 2}`;
+                        detachPromises.push(
+                            gapi.client.sheets.spreadsheets.values.update({
+                                spreadsheetId: CONFIG.SHEET_ID,
+                                range: contactRange,
+                                valueInputOption: 'USER_ENTERED',
+                                resource: { values }
+                            })
+                        );
                     }
                 });
 
+                if (detachPromises.length) {
+                    await Promise.all(detachPromises);
+                }
+
+                companies.splice(index, 1);
                 renderCompanies();
                 renderAllContacts();
-                updateCompanySelects();
+                if (currentCompanyId === companyId) {
+                    backToCompaniesList();
+                } else if (currentCompanyId) {
+                    renderCompanyContacts(currentCompanyId);
+                }
+
                 showStatus('Firma usunięta', 'success');
-                
-                // Reload to clean up empty rows
                 await loadCompanies();
             } catch (err) {
                 console.error('Błąd usuwania firmy:', err);
@@ -1668,16 +2047,29 @@
         }
 
         // CONTACT CRUD
+        function fillCompanyField(companyId) {
+            if (!companyInputEl || !companyIdEl) return;
+            if (!companyId) {
+                companyInputEl.value = '';
+                companyIdEl.value = '';
+                return;
+            }
+            const company = companies.find(c => c.id === companyId);
+            if (company) {
+                companyInputEl.value = company.name;
+                companyIdEl.value = company.id;
+            } else {
+                companyInputEl.value = '';
+                companyIdEl.value = '';
+            }
+        }
+
         function openContactModal(preselectedCompanyId = null) {
             editingContactIndex = null;
             document.getElementById('contactModalTitle').textContent = 'Dodaj kontakt';
             document.getElementById('contactForm').reset();
-            updateCompanySelects();
-            
-            if (preselectedCompanyId) {
-                document.getElementById('contactCompany').value = preselectedCompanyId;
-            }
-            
+            fillCompanyField(preselectedCompanyId);
+            hideCompanySuggestions();
             document.getElementById('contactModal').classList.add('active');
         }
 
@@ -1685,29 +2077,89 @@
             editingContactIndex = index;
             const contact = contacts[index];
             document.getElementById('contactModalTitle').textContent = 'Edytuj kontakt';
-            updateCompanySelects();
-            document.getElementById('contactCompany').value = contact.companyId || '';
             document.getElementById('contactName').value = contact.name;
             document.getElementById('contactPosition').value = contact.position;
             document.getElementById('contactEmail').value = contact.email;
             document.getElementById('contactPhone').value = contact.phone;
+            fillCompanyField(contact.companyId || null);
+            hideCompanySuggestions();
             document.getElementById('contactModal').classList.add('active');
         }
 
         async function saveContact(e) {
             e.preventDefault();
-            
-            const contact = {
-                id: editingContactIndex !== null ? contacts[editingContactIndex].id : generateId(),
-                companyId: document.getElementById('contactCompany').value || '', // Empty string if no company
-                name: document.getElementById('contactName').value,
-                position: document.getElementById('contactPosition').value,
-                email: document.getElementById('contactEmail').value,
-                phone: document.getElementById('contactPhone').value
-            };
+
+            const name = document.getElementById('contactName').value;
+            const position = document.getElementById('contactPosition').value;
+            const email = document.getElementById('contactEmail').value;
+            const phone = document.getElementById('contactPhone').value;
+            const typedCompanyName = (companyInputEl?.value || '').trim();
+            let selectedCompanyId = companyIdEl?.value || '';
 
             try {
-                const values = [[contact.id, contact.companyId, contact.name, contact.position, contact.email, contact.phone]];
+                // Jeśli wpisana nazwa, ale brak wybranej firmy → sprawdź, czy istnieje
+                if (typedCompanyName && !selectedCompanyId) {
+                    const existing = companies.find(
+                        c => c.name && c.name.toLowerCase() === typedCompanyName.toLowerCase()
+                    );
+
+                    if (existing) {
+                        selectedCompanyId = existing.id;
+                    } else {
+                        // Tworzymy nową firmę na podstawie wpisanej nazwy
+                        const newCompany = {
+                            id: generateId(),
+                            name: typedCompanyName,
+                            industry: '',
+                            notes: '',
+                            website: '',
+                            phone: '',
+                            city: '',
+                            country: ''
+                        };
+
+                        const valuesCompany = [[
+                            newCompany.id,
+                            newCompany.name,
+                            newCompany.industry,
+                            newCompany.notes,
+                            newCompany.website,
+                            newCompany.phone,
+                            newCompany.city,
+                            newCompany.country
+                        ]];
+
+                        await gapi.client.sheets.spreadsheets.values.append({
+                            spreadsheetId: CONFIG.SHEET_ID,
+                            range: `${CONFIG.COMPANIES_SHEET}!A:H`,
+                            valueInputOption: 'USER_ENTERED',
+                            resource: { values: valuesCompany }
+                        });
+
+                        companies.push(newCompany);
+                        selectedCompanyId = newCompany.id;
+                        showStatus(`Utworzono nową firmę "${newCompany.name}"`, 'success');
+                        renderCompanies();
+                    }
+                }
+
+                const contact = {
+                    id: editingContactIndex !== null ? contacts[editingContactIndex].id : generateId(),
+                    companyId: selectedCompanyId || '',
+                    name,
+                    position,
+                    email,
+                    phone
+                };
+
+                const values = [[
+                    contact.id,
+                    contact.companyId,
+                    contact.name,
+                    contact.position,
+                    contact.email,
+                    contact.phone
+                ]];
 
                 if (editingContactIndex !== null) {
                     const rowNumber = editingContactIndex + 2;
@@ -1763,7 +2215,6 @@
                 }
                 showStatus('Kontakt usunięty', 'success');
                 
-                // Reload to clean up empty rows
                 await loadContacts();
             } catch (err) {
                 console.error('Błąd usuwania kontaktu:', err);
@@ -1774,13 +2225,62 @@
         function closeContactModal() {
             document.getElementById('contactModal').classList.remove('active');
             document.getElementById('contactForm').reset();
+            hideCompanySuggestions();
             editingContactIndex = null;
         }
 
-        function updateCompanySelects() {
-            const select = document.getElementById('contactCompany');
-            select.innerHTML = '<option value="">Brak firmy</option>' +
-                companies.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+        // COMPANY PICKER LOGIC
+        function showCompanySuggestions(query) {
+            if (!companySuggestionsEl || !companyInputEl) return;
+            const q = (query || '').trim().toLowerCase();
+
+            let filtered = companies;
+            if (q) {
+                filtered = companies.filter(c => (c.name || '').toLowerCase().includes(q));
+            }
+
+            let html = '';
+            filtered.slice(0, 8).forEach(c => {
+                const metaParts = [];
+                if (c.industry) metaParts.push(c.industry);
+                if (c.city) metaParts.push(c.city);
+                const meta = metaParts.join(' • ');
+
+                html += `
+                    <div class="company-suggestion-item" data-id="${c.id}">
+                        <span>${escapeHtml(c.name)}</span>
+                        ${meta ? `<span class="suggestion-meta">${escapeHtml(meta)}</span>` : ''}
+                    </div>
+                `;
+            });
+
+            const exactExists = companies.some(
+                c => c.name && c.name.toLowerCase() === q && q.length > 0
+            );
+
+            if (q && !exactExists) {
+                html += `
+                    <div class="company-suggestion-item company-suggestion-new">
+                        <span>➕ Utwórz nową firmę "<strong>${escapeHtml(query.trim())}</strong>" (NEW)</span>
+                    </div>
+                `;
+            }
+
+            if (!html) {
+                companySuggestionsEl.innerHTML = '';
+                companySuggestionsEl.classList.remove('visible');
+                return;
+            }
+
+            companySuggestionsEl.innerHTML = html;
+            companySuggestionsEl.classList.add('visible');
+        }
+
+        function hideCompanySuggestions() {
+            if (companySuggestionsEl) {
+                companySuggestionsEl.classList.remove('visible');
+                companySuggestionsEl.innerHTML = '';
+            }
         }
 
         // HELPERS
@@ -1790,7 +2290,7 @@
 
         function escapeHtml(text) {
             const div = document.createElement('div');
-            div.textContent = text;
+            div.textContent = text == null ? '' : text;
             return div.innerHTML;
         }
 
@@ -1810,6 +2310,27 @@
                 });
             });
 
+            // Global search
+            const globalSearchInput = document.getElementById('globalSearchInput');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+            if (globalSearchInput) {
+                globalSearchInput.addEventListener('input', (e) => {
+                    currentSearchTerm = e.target.value || '';
+                    renderAllContacts();
+                    renderCompanies();
+                });
+            }
+
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', () => {
+                    currentSearchTerm = '';
+                    if (globalSearchInput) globalSearchInput.value = '';
+                    renderAllContacts();
+                    renderCompanies();
+                });
+            }
+
             // Companies
             document.getElementById('addCompanyBtn').addEventListener('click', openCompanyModal);
             document.getElementById('closeCompanyModalBtn').addEventListener('click', closeCompanyModal);
@@ -1826,6 +2347,40 @@
             document.getElementById('cancelContactBtn').addEventListener('click', closeContactModal);
             document.getElementById('contactForm').addEventListener('submit', saveContact);
 
+            // Company picker refs
+            companyInputEl = document.getElementById('contactCompanyInput');
+            companyIdEl = document.getElementById('contactCompanyId');
+            companySuggestionsEl = document.getElementById('companySuggestions');
+
+            if (companyInputEl) {
+                const onInput = () => {
+                    companyIdEl.value = ''; // użytkownik zmienia tekst → czyścimy wybrane ID
+                    showCompanySuggestions(companyInputEl.value);
+                };
+                companyInputEl.addEventListener('input', onInput);
+                companyInputEl.addEventListener('focus', onInput);
+            }
+
+            if (companySuggestionsEl) {
+                companySuggestionsEl.addEventListener('click', (e) => {
+                    const item = e.target.closest('.company-suggestion-item');
+                    if (!item) return;
+
+                    if (item.dataset.id) {
+                        const company = companies.find(c => c.id === item.dataset.id);
+                        if (company) {
+                            companyInputEl.value = company.name;
+                            companyIdEl.value = company.id;
+                        }
+                    } else if (item.classList.contains('company-suggestion-new')) {
+                        // nic nie robimy specjalnie, tworzenie firmy nastąpi przy zapisie kontaktu
+                        // (wystarczy, że tekst zostanie w polu)
+                    }
+
+                    hideCompanySuggestions();
+                });
+            }
+
             // Close modals on background click
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.addEventListener('click', (e) => {
@@ -1833,6 +2388,15 @@
                         modal.classList.remove('active');
                     }
                 });
+            });
+
+            // Hide suggestions when clicking outside picker
+            document.addEventListener('click', (e) => {
+                if (companyInputEl && companyInputEl.closest('.company-picker') && companySuggestionsEl) {
+                    if (!companyInputEl.closest('.company-picker').contains(e.target)) {
+                        hideCompanySuggestions();
+                    }
+                }
             });
         });
     </script>
