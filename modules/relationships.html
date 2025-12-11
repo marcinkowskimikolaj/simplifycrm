@@ -2226,11 +2226,11 @@ async function saveCompany(e) {
             }
             window.skipDuplicateCheck = false;
 
-            const company = {
+const company = {
                 id: editingCompanyIndex !== null ? companies[editingCompanyIndex].id : DataService.generateId(),
                 name: document.getElementById('companyName').value,
                 industry: document.getElementById('companyIndustry').value,
-                website: document.getElementById('companyWebsite').value,
+                website: website, // <--- POPRAWKA: Używamy zmiennej wyliczonej wcześniej
                 phone: document.getElementById('companyPhone').value,
                 city: document.getElementById('companyCity').value,
                 country: document.getElementById('companyCountry').value,
