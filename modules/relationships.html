@@ -3318,150 +3318,150 @@ async function assignTagToEntity(entityId, tagId, type) {
     }
 }
 
-    /**
-     * Render tags in detail view (with remove buttons)
-     */
-    function renderDetailTags(entityId, type) {
-        const allTags = type === 'company' ? companyTags : contactTags;
+/**
+ * Render tags in detail view (with remove buttons)
+ */
+function renderDetailTags(entityId, type) {
+    const allTags = type === 'company' ? companyTags : contactTags;
+    const allRelations = type === 'company' ? companyTagRelations : contactTagRelations;
+    
+    const entityTags = type === 'company' 
+        ? DataService.getCompanyTags(entityId, allTags, allRelations)
+        : DataService.getContactTags(entityId, allTags, allRelations);
+    
+    if (entityTags.length === 0) {
+        return '<div class="empty-state-small">Brak etykiet</div>';
+    }
+    
+    return entityTags.map(tag => `
+        <div class="tag-badge" style="background-color: ${tag.color}; position: relative; padding-right: 2rem;">
+            ${escapeHtml(tag.name)}
+            <button 
+                class="remove-tag-btn" 
+                onclick="removeTagFromDetail('${entityId}', '${tag.id}', '${type}')"
+                style="position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: white; cursor: pointer; font-size: 1rem; padding: 0; width: 1.2rem; height: 1.2rem; display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s;"
+                onmouseover="this.style.opacity='1'"
+                onmouseout="this.style.opacity='0.8'"
+                title="Usuń etykietę"
+            >×</button>
+        </div>
+    `).join('');
+}
+
+/**
+ * Assign tag to company from detail view
+ */
+async function assignTagToCompanyDetail() {
+    const select = document.getElementById('companyTagSelect');
+    const tagId = select.value;
+    
+    if (!tagId) {
+        showStatus('Wybierz etykietę', 'error');
+        return;
+    }
+    
+    if (!currentCompanyId) {
+        showStatus('Błąd: brak ID firmy', 'error');
+        return;
+    }
+    
+    try {
+        await assignTagToEntity(currentCompanyId, tagId, 'company');
+        
+        // Reload tags
+        await loadTagsData();
+        
+        // Refresh detail view
+        viewCompanyDetail(currentCompanyId);
+        
+        // Reset select
+        select.value = '';
+        
+        showStatus('Etykieta przypisana', 'success');
+    } catch (error) {
+        console.error('Błąd przypisywania etykiety:', error);
+        showStatus('Błąd przypisywania etykiety', 'error');
+    }
+}
+
+/**
+ * Assign tag to contact from detail view
+ */
+async function assignTagToContactDetail() {
+    const select = document.getElementById('contactTagSelect');
+    const tagId = select.value;
+    
+    if (!tagId) {
+        showStatus('Wybierz etykietę', 'error');
+        return;
+    }
+    
+    if (!currentContactId) {
+        showStatus('Błąd: brak ID kontaktu', 'error');
+        return;
+    }
+    
+    try {
+        await assignTagToEntity(currentContactId, tagId, 'contact');
+        
+        // Reload tags
+        await loadTagsData();
+        
+        // Refresh detail view
+        viewContactDetail(currentContactId);
+        
+        // Reset select
+        select.value = '';
+        
+        showStatus('Etykieta przypisana', 'success');
+    } catch (error) {
+        console.error('Błąd przypisywania etykiety:', error);
+        showStatus('Błąd przypisywania etykiety', 'error');
+    }
+}
+
+/**
+ * Remove tag from entity in detail view
+ */
+async function removeTagFromDetail(entityId, tagId, type) {
+    if (!confirm('Czy na pewno chcesz usunąć tę etykietę?')) {
+        return;
+    }
+    
+    try {
+        // Find relation
         const allRelations = type === 'company' ? companyTagRelations : contactTagRelations;
+        const relation = allRelations.find(r => 
+            (type === 'company' ? r.companyId : r.contactId) === entityId && 
+            r.tagId === tagId
+        );
         
-        const entityTags = type === 'company' 
-            ? DataService.getCompanyTags(entityId, allTags, allRelations)
-            : DataService.getContactTags(entityId, allTags, allRelations);
-        
-        if (entityTags.length === 0) {
-            return '<div class="empty-state-small">Brak etykiet</div>';
+        if (!relation) {
+            showStatus('Nie znaleziono relacji', 'error');
+            return;
         }
         
-        return entityTags.map(tag => `
-            <div class="tag-badge" style="background-color: ${tag.color}; position: relative; padding-right: 2rem;">
-                ${escapeHtml(tag.name)}
-                <button 
-                    class="remove-tag-btn" 
-                    onclick="removeTagFromDetail('${entityId}', '${tag.id}', '${type}')"
-                    style="position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: white; cursor: pointer; font-size: 1rem; padding: 0; width: 1.2rem; height: 1.2rem; display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s;"
-                    onmouseover="this.style.opacity='1'"
-                    onmouseout="this.style.opacity='0.8'"
-                    title="Usuń etykietę"
-                >×</button>
-            </div>
-        `).join('');
+        // Find row index
+        const rowIndex = allRelations.indexOf(relation) + 1; // +1 bo nagłówek
+        
+        await removeTagFromEntity(entityId, tagId, type);
+        
+        // Reload tags
+        await loadTagsData();
+        
+        // Refresh detail view
+        if (type === 'company') {
+            viewCompanyDetail(entityId);
+        } else {
+            viewContactDetail(entityId);
+        }
+        
+        showStatus('Etykieta usunięta', 'success');
+    } catch (error) {
+        console.error('Błąd usuwania etykiety:', error);
+        showStatus('Błąd usuwania etykiety', 'error');
     }
-
-    /**
-     * Assign tag to company from detail view
-     */
-    async function assignTagToCompanyDetail() {
-        const select = document.getElementById('companyTagSelect');
-        const tagId = select.value;
-        
-        if (!tagId) {
-            showStatus('Wybierz etykietę', 'error');
-            return;
-        }
-        
-        if (!currentCompanyId) {
-            showStatus('Błąd: brak ID firmy', 'error');
-            return;
-        }
-        
-        try {
-            await assignTagToEntity(currentCompanyId, tagId, 'company');
-            
-            // Reload tags
-            await loadTagsData();
-            
-            // Refresh detail view
-            viewCompanyDetail(currentCompanyId);
-            
-            // Reset select
-            select.value = '';
-            
-            showStatus('Etykieta przypisana', 'success');
-        } catch (error) {
-            console.error('Błąd przypisywania etykiety:', error);
-            showStatus('Błąd przypisywania etykiety', 'error');
-        }
-    }
-
-    /**
-     * Assign tag to contact from detail view
-     */
-    async function assignTagToContactDetail() {
-        const select = document.getElementById('contactTagSelect');
-        const tagId = select.value;
-        
-        if (!tagId) {
-            showStatus('Wybierz etykietę', 'error');
-            return;
-        }
-        
-        if (!currentContactId) {
-            showStatus('Błąd: brak ID kontaktu', 'error');
-            return;
-        }
-        
-        try {
-            await assignTagToEntity(currentContactId, tagId, 'contact');
-            
-            // Reload tags
-            await loadTagsData();
-            
-            // Refresh detail view
-            viewContactDetail(currentContactId);
-            
-            // Reset select
-            select.value = '';
-            
-            showStatus('Etykieta przypisana', 'success');
-        } catch (error) {
-            console.error('Błąd przypisywania etykiety:', error);
-            showStatus('Błąd przypisywania etykiety', 'error');
-        }
-    }
-
-    /**
-     * Remove tag from entity in detail view
-     */
-    async function removeTagFromDetail(entityId, tagId, type) {
-        if (!confirm('Czy na pewno chcesz usunąć tę etykietę?')) {
-            return;
-        }
-        
-        try {
-            // Find relation
-            const allRelations = type === 'company' ? companyTagRelations : contactTagRelations;
-            const relation = allRelations.find(r => 
-                (type === 'company' ? r.companyId : r.contactId) === entityId && 
-                r.tagId === tagId
-            );
-            
-            if (!relation) {
-                showStatus('Nie znaleziono relacji', 'error');
-                return;
-            }
-            
-            // Find row index
-            const rowIndex = allRelations.indexOf(relation) + 1; // +1 bo nagłówek
-            
-            await removeTagFromEntity(entityId, tagId, type);
-            
-            // Reload tags
-            await loadTagsData();
-            
-            // Refresh detail view
-            if (type === 'company') {
-                viewCompanyDetail(entityId);
-            } else {
-                viewContactDetail(entityId);
-            }
-            
-            showStatus('Etykieta usunięta', 'success');
-        } catch (error) {
-            console.error('Błąd usuwania etykiety:', error);
-            showStatus('Błąd usuwania etykiety', 'error');
-        }
-    }
+}
 
 async function removeTagFromEntity(entityId, tagId, type) {
     try {
