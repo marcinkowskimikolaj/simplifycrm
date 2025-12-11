@@ -82,7 +82,7 @@ export class DataService {
                 console.log('✓ Firmy załadowane z cache');
                 return cached;
             }
-        }
+        } 
 
         return this.retryRequest(async () => {
             const response = await gapi.client.sheets.spreadsheets.values.get({
