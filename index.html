@@ -1643,6 +1643,13 @@
                     <input type="text" id="companyName" required>
                 </div>
                 <div class="form-group">
+                    <label for="companyNip">NIP <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyNip" placeholder="np. 1234567890" maxlength="13">
+                    <small style="display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">
+                        🏢 Po wpisaniu NIP automatycznie pobierzemy dane z GUS (adres, miasto, kraj)
+                    </small>
+                </div>
+                <div class="form-group">
                     <label for="companyIndustry">Branża <span class="optional">(opcjonalnie)</span></label>
                     <input type="text" id="companyIndustry" placeholder="np. IT, Marketing, Finanse">
                 </div>
@@ -1759,7 +1766,8 @@
             CONTACTS_SHEET: 'Kontakty',
             HISTORY_COMPANIES_SHEET: 'HistoriaFirm',
             HISTORY_CONTACTS_SHEET: 'HistoriaKontaktow',
-            SCOPES: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email'
+            SCOPES: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email',
+            GUS_API_URL: 'https://script.google.com/macros/s/AKfycbxuHU38nQgDt4l7-tAVSy-XVH-gZPxKosNeQKVPcs4Tk5bLzW0NyYM5ERUtDdai4Z_a/exec'
         };
 
         const SESSION_KEY = 'simplify_crm_session';
@@ -1901,6 +1909,11 @@
         let noteEntityIdEl = null;
         let noteContentEl = null;
 
+        // Hidden fields for auto-populated data from GUS
+        let hiddenCity = '';
+        let hiddenCountry = '';
+        let hiddenAddress = '';
+
         // AUTH
 
         function handleAuthClick() {
@@ -1988,6 +2001,52 @@
             if (searchInput) searchInput.value = '';
         }
 
+        // GUS API INTEGRATION
+
+        async function fetchGUSData(nip) {
+            const cleanNip = nip.replace(/[\s-]/g, '');
+            
+            if (cleanNip.length !== 10 || !/^\d+$/.test(cleanNip)) {
+                showStatus('NIP musi mieć 10 cyfr', 'error');
+                return null;
+            }
+
+            showStatus('Pobieranie danych z GUS...', '');
+
+            try {
+                const response = await fetch(CONFIG.GUS_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nip: cleanNip })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showStatus('GUS: ' + data.error, 'error');
+                    return null;
+                }
+
+                if (data.success) {
+                    showStatus('✅ Pobrano dane z GUS', 'success');
+                    return {
+                        companyName: data.companyName || '',
+                        address: data.address || '',
+                        city: data.city || '',
+                        country: data.country || 'Polska'
+                    };
+                }
+
+                return null;
+            } catch (error) {
+                console.error('Błąd GUS API:', error);
+                showStatus('Błąd połączenia z GUS', 'error');
+                return null;
+            }
+        }
+
         // DATA LOADING
 
         async function loadData() {
@@ -2011,7 +2070,7 @@
             try {
                 const response = await gapi.client.sheets.spreadsheets.values.get({
                     spreadsheetId: CONFIG.SHEET_ID,
-                    range: `${CONFIG.COMPANIES_SHEET}!A2:I`,
+                    range: `${CONFIG.COMPANIES_SHEET}!A2:K`,
                 });
 
                 const rows = response.result.values || [];
@@ -2024,7 +2083,9 @@
                     phone: row[5] || '',
                     city: row[6] || '',
                     country: row[7] || '',
-                    domain: row[8] || ''
+                    domain: row[8] || '',
+                    nip: row[9] || '',
+                    address: row[10] || ''
                 })).filter(c => c.name);
 
                 renderCompanies();
@@ -2129,7 +2190,7 @@
             if (!currentSearchTerm) return companies;
             const q = currentSearchTerm.toLowerCase();
             return companies.filter(c => {
-                const combined = `${c.name} ${c.industry} ${c.notes} ${c.website} ${c.phone} ${c.city} ${c.country}`.toLowerCase();
+                const combined = `${c.name} ${c.industry} ${c.notes} ${c.website} ${c.phone} ${c.city} ${c.country} ${c.nip} ${c.address}`.toLowerCase();
                 return combined.includes(q);
             });
         }
@@ -2405,6 +2466,24 @@
 
             let infoHtml = '';
 
+            if (company.nip) {
+                infoHtml += `
+                    <div class="detail-info-row">
+                        <div class="detail-info-label">NIP</div>
+                        <div class="detail-info-value">${escapeHtml(company.nip)}</div>
+                    </div>
+                `;
+            }
+
+            if (company.address) {
+                infoHtml += `
+                    <div class="detail-info-row">
+                        <div class="detail-info-label">Adres</div>
+                        <div class="detail-info-value">${escapeHtml(company.address)}</div>
+                    </div>
+                `;
+            }
+
             if (company.website) {
                 const url = company.website.startsWith('http') ? company.website : 'https://' + company.website;
                 infoHtml += `
@@ -2631,6 +2710,9 @@
 
         function openCompanyModal() {
             editingCompanyIndex = null;
+            hiddenCity = '';
+            hiddenCountry = '';
+            hiddenAddress = '';
             document.getElementById('companyModalTitle').textContent = 'Dodaj firmę';
             document.getElementById('companyForm').reset();
             document.getElementById('companyModal').classList.add('active');
@@ -2639,9 +2721,13 @@
         function editCompany(index) {
             editingCompanyIndex = index;
             const company = companies[index];
+            hiddenCity = company.city || '';
+            hiddenCountry = company.country || '';
+            hiddenAddress = company.address || '';
             
             document.getElementById('companyModalTitle').textContent = 'Edytuj firmę';
             document.getElementById('companyName').value = company.name;
+            document.getElementById('companyNip').value = company.nip || '';
             document.getElementById('companyIndustry').value = company.industry || '';
             document.getElementById('companyWebsite').value = company.website || '';
             document.getElementById('companyPhone').value = company.phone || '';
@@ -2656,6 +2742,7 @@
             const name = document.getElementById('companyName').value;
             const phone = document.getElementById('companyPhone').value;
             const domain = document.getElementById('companyDomain').value;
+            const nip = document.getElementById('companyNip').value.trim();
             
             if (!forceSave) {
                 const excludeId = editingCompanyIndex !== null ? companies[editingCompanyIndex].id : null;
@@ -2675,9 +2762,11 @@
                 industry: document.getElementById('companyIndustry').value,
                 website: document.getElementById('companyWebsite').value,
                 phone: document.getElementById('companyPhone').value,
-                city: '',
-                country: '',
+                city: hiddenCity,
+                country: hiddenCountry,
                 domain: document.getElementById('companyDomain').value,
+                nip: nip,
+                address: hiddenAddress,
                 notes: document.getElementById('companyNotes').value
             };
 
@@ -2691,12 +2780,14 @@
                     company.phone,
                     company.city,
                     company.country,
-                    company.domain
+                    company.domain,
+                    company.nip,
+                    company.address
                 ]];
 
                 if (editingCompanyIndex !== null) {
                     const rowNumber = editingCompanyIndex + 2;
-                    const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:I${rowNumber}`;
+                    const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:K${rowNumber}`;
                     await gapi.client.sheets.spreadsheets.values.update({
                         spreadsheetId: CONFIG.SHEET_ID,
                         range,
@@ -2709,7 +2800,7 @@
                 } else {
                     await gapi.client.sheets.spreadsheets.values.append({
                         spreadsheetId: CONFIG.SHEET_ID,
-                        range: `${CONFIG.COMPANIES_SHEET}!A:I`,
+                        range: `${CONFIG.COMPANIES_SHEET}!A:K`,
                         valueInputOption: 'USER_ENTERED',
                         resource: { values }
                     });
@@ -2735,7 +2826,7 @@
             try {
                 const companyId = companies[index].id;
                 const rowNumber = index + 2;
-                const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:I${rowNumber}`;
+                const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:K${rowNumber}`;
 
                 await logCompanyHistory(companyId, 'event', 'Firma usunięta');
 
@@ -2795,6 +2886,9 @@
             document.getElementById('companyModal').classList.remove('active');
             document.getElementById('companyForm').reset();
             editingCompanyIndex = null;
+            hiddenCity = '';
+            hiddenCountry = '';
+            hiddenAddress = '';
         }
 
         // CONTACT CRUD
@@ -2906,7 +3000,9 @@
                             phone: '',
                             city: '',
                             country: '',
-                            domain: ''
+                            domain: '',
+                            nip: '',
+                            address: ''
                         };
 
                         const valuesCompany = [[
@@ -2918,12 +3014,14 @@
                             newCompany.phone,
                             newCompany.city,
                             newCompany.country,
-                            newCompany.domain
+                            newCompany.domain,
+                            newCompany.nip,
+                            newCompany.address
                         ]];
 
                         await gapi.client.sheets.spreadsheets.values.append({
                             spreadsheetId: CONFIG.SHEET_ID,
-                            range: `${CONFIG.COMPANIES_SHEET}!A:I`,
+                            range: `${CONFIG.COMPANIES_SHEET}!A:K`,
                             valueInputOption: 'USER_ENTERED',
                             resource: { values: valuesCompany }
                         });
@@ -3522,6 +3620,26 @@
             document.getElementById('cancelCompanyBtn').addEventListener('click', closeCompanyModal);
             document.getElementById('companyForm').addEventListener('submit', saveCompany);
             document.getElementById('backToCompaniesBtn').addEventListener('click', backToCompaniesList);
+
+            // GUS NIP Auto-fetch
+            const companyNipEl = document.getElementById('companyNip');
+            if (companyNipEl) {
+                companyNipEl.addEventListener('blur', async () => {
+                    const nip = companyNipEl.value.trim();
+                    if (!nip || nip.length < 10) return;
+                    
+                    const gusData = await fetchGUSData(nip);
+                    if (gusData) {
+                        hiddenCity = gusData.city || '';
+                        hiddenCountry = gusData.country || 'Polska';
+                        hiddenAddress = gusData.address || '';
+                        
+                        if (gusData.address) {
+                            showStatus(`📍 Adres: ${gusData.address}`, 'success');
+                        }
+                    }
+                });
+            }
 
             document.getElementById('addContactBtn').addEventListener('click', () => openContactModal());
             document.getElementById('addCompanyContactBtn').addEventListener('click', () => {
