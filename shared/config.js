@@ -37,15 +37,15 @@ export const CONFIG = {
         RETRY_DELAY: 1000
     },
     
-    // Routes (relative paths)
-    ROUTES: {
-        LOGIN: '/login.html',
-        DASHBOARD: '/index.html',
-        RELATIONSHIPS: '/modules/relationships.html',
-        PIPELINE: '/modules/pipeline.html',
-        TASKS: '/modules/tasks.html',
-        ANALYTICS: '/modules/analytics.html'
-    },
+// Routes (absolute paths for GitHub Pages)
+ROUTES: {
+    LOGIN: '/simplifycrm/login.html',
+    DASHBOARD: '/simplifycrm/index.html',
+    RELATIONSHIPS: '/simplifycrm/modules/relationships.html',
+    PIPELINE: '/simplifycrm/modules/pipeline.html',
+    TASKS: '/simplifycrm/modules/tasks.html',
+    ANALYTICS: '/simplifycrm/modules/analytics.html'
+},
     
     // App Info
     APP: {
