@@ -1621,12 +1621,6 @@
             throw new Error('Unauthorized - redirecting to login');
         }
 
-// ============= HELPER: SAFE ID COMPARE =============
-        function areIdsEqual(id1, id2) {
-            if (!id1 || !id2) return false;
-            return String(id1).trim() === String(id2).trim();
-        }
-        
         // ============= VARIABLES =============
         let companies = [];
         let contacts = [];
@@ -1782,7 +1776,7 @@
             if (!currentSearchTerm) return contacts;
             const q = currentSearchTerm.toLowerCase();
             return contacts.filter(contact => {
-                const company = companies.find(c => areIdsEqual(c.id, contact.companyId));
+                const company = companies.find(c => c.id === contact.companyId);
                 const companyText = company
                     ? `${company.name} ${company.industry} ${company.city} ${company.country}`
                     : '';
@@ -1831,7 +1825,7 @@
                         </thead>
                         <tbody>
                             ${list.map(company => {
-                                const companyContacts = contacts.filter(c => areIdsEqual(c.companyId, company.id));
+                                const companyContacts = contacts.filter(c => c.companyId === company.id);
                                 const idx = companies.indexOf(company);
                                 return `
                                     <tr onclick="viewCompanyDetail('${company.id}')">
@@ -1930,7 +1924,7 @@
                         <tbody>
                             ${list.map(contact => {
                                 const index = contacts.findIndex(c => c.id === contact.id);
-                                const company = companies.find(c => areIdsEqual(c.id, contact.companyId));
+                                const company = companies.find(c => c.id === contact.companyId);
                                 return `
                                     <tr onclick="viewContactDetail('${contact.id}')">
                                         <td><strong>${escapeHtml(contact.name)}</strong></td>
@@ -1953,7 +1947,7 @@
             } else {
                 grid.innerHTML = list.map(contact => {
                     const index = contacts.findIndex(c => c.id === contact.id);
-                    const company = companies.find(c => areIdsEqual(c.id, contact.companyId));
+                    const company = companies.find(c => c.id === contact.companyId);
                     return `
                         <div class="card clickable" onclick="viewContactDetail('${contact.id}')">
                             <div class="card-header">
@@ -2023,7 +2017,7 @@
         }
 
         function renderCompanyContacts(companyId) {
-            const companyContacts = contacts.filter(c => areIdsEqual(c.companyId, companyId));
+            const companyContacts = contacts.filter(c => c.companyId === companyId);
             const list = document.getElementById('companyContactsList');
             const empty = document.getElementById('companyContactsEmpty');
 
@@ -2065,7 +2059,7 @@
             document.getElementById('contactsTab').classList.add('active');
 
             currentContactId = contactId;
-            const company = companies.find(c => areIdsEqual(c.id, contact.companyId));
+            const contact = contacts.find(c => c.id === contactId);
             if (!contact) return;
 
             document.getElementById('contactsListView').style.display = 'none';
