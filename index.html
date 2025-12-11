@@ -1643,6 +1643,13 @@
                     <input type="text" id="companyName" required>
                 </div>
                 <div class="form-group">
+                    <label for="companyNip">NIP <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyNip" placeholder="np. 1234567890" maxlength="13">
+                    <small style="display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">
+                        🏢 Po wpisaniu NIP automatycznie pobierzemy dane z GUS (adres, miasto, kraj)
+                    </small>
+                </div>
+                <div class="form-group">
                     <label for="companyIndustry">Branża <span class="optional">(opcjonalnie)</span></label>
                     <input type="text" id="companyIndustry" placeholder="np. IT, Marketing, Finanse">
                 </div>
@@ -1653,14 +1660,6 @@
                 <div class="form-group">
                     <label for="companyPhone">Telefon firmowy <span class="optional">(opcjonalnie)</span></label>
                     <input type="tel" id="companyPhone" placeholder="np. +48 123 456 789">
-                </div>
-                <div class="form-group">
-                    <label for="companyCity">Miasto <span class="optional">(opcjonalnie)</span></label>
-                    <input type="text" id="companyCity" placeholder="np. Warszawa">
-                </div>
-                <div class="form-group">
-                    <label for="companyCountry">Kraj <span class="optional">(opcjonalnie)</span></label>
-                    <input type="text" id="companyCountry" placeholder="np. Polska">
                 </div>
                 <div class="form-group">
                     <label for="companyDomain">Domena <span class="optional">(opcjonalnie)</span></label>
@@ -1690,25 +1689,25 @@
             </div>
             <form id="contactForm">
                 <div class="form-group">
-    <label for="contactName">Imię i nazwisko *</label>
-    <input type="text" id="contactName" required>
-</div>
-<div class="form-group">
-    <label for="contactEmail">Email <span class="optional">(opcjonalnie)</span></label>
-    <input type="email" id="contactEmail" placeholder="np. jan@techcorp.pl">
-</div>
-<div class="form-group">
-    <label for="contactCompanyInput">Firma <span class="optional">(opcjonalnie)</span></label>
-    <div class="company-picker">
-        <input type="text" id="contactCompanyInput" placeholder="Zacznij pisać nazwę firmy...">
-        <input type="hidden" id="contactCompanyId">
-        <div id="companySuggestions" class="company-suggestions"></div>
-    </div>
-</div>
-<div class="form-group">
-    <label for="contactPosition">Stanowisko <span class="optional">(opcjonalnie)</span></label>
-    <input type="text" id="contactPosition" placeholder="np. CEO, Marketing Manager">
-</div>
+                    <label for="contactName">Imię i nazwisko *</label>
+                    <input type="text" id="contactName" required>
+                </div>
+                <div class="form-group">
+                    <label for="contactEmail">Email <span class="optional">(opcjonalnie)</span></label>
+                    <input type="email" id="contactEmail" placeholder="np. jan@techcorp.pl">
+                </div>
+                <div class="form-group">
+                    <label for="contactCompanyInput">Firma <span class="optional">(opcjonalnie)</span></label>
+                    <div class="company-picker">
+                        <input type="text" id="contactCompanyInput" placeholder="Zacznij pisać nazwę firmy...">
+                        <input type="hidden" id="contactCompanyId">
+                        <div id="companySuggestions" class="company-suggestions"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="contactPosition">Stanowisko <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="contactPosition" placeholder="np. CEO, Marketing Manager">
+                </div>
                 <div class="form-group">
                     <label for="contactPhone">Telefon <span class="optional">(opcjonalnie)</span></label>
                     <input type="tel" id="contactPhone">
@@ -1743,6 +1742,21 @@
         </div>
     </div>
 
+    <!-- MODAL: DUPLICATE WARNING -->
+    <div id="duplicateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚠️ Możliwy duplikat</h2>
+                <button class="close-btn" onclick="closeDuplicateModal()">&times;</button>
+            </div>
+            <div id="duplicateContent" style="margin: 1.5rem 0; line-height: 1.7;"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="backToEditBtn">Wróć do edycji</button>
+                <button type="button" class="btn btn-primary" id="saveAnywayBtn">Zapisz mimo to</button>
+            </div>
+        </div>
+    </div>
+
     <!-- GOOGLE API INIT -->
     <script>
         const CONFIG = {
@@ -1752,7 +1766,8 @@
             CONTACTS_SHEET: 'Kontakty',
             HISTORY_COMPANIES_SHEET: 'HistoriaFirm',
             HISTORY_CONTACTS_SHEET: 'HistoriaKontaktow',
-            SCOPES: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email'
+            SCOPES: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email',
+            GUS_API_URL: 'https://script.google.com/macros/s/AKfycbxuHU38nQgDt4l7-tAVSy-XVH-gZPxKosNeQKVPcs4Tk5bLzW0NyYM5ERUtDdai4Z_a/exec'
         };
 
         const SESSION_KEY = 'simplify_crm_session';
@@ -1853,7 +1868,6 @@
             }
         }
 
-        // Prostego timeoutu pilnującego ładowania bibliotek
         setTimeout(() => {
             if (!gapiInited || !gisInited) {
                 const loginBtn = document.getElementById('loginBtn');
@@ -1894,6 +1908,11 @@
         let noteEntityTypeEl = null;
         let noteEntityIdEl = null;
         let noteContentEl = null;
+
+        // Hidden fields for auto-populated data from GUS
+        let hiddenCity = '';
+        let hiddenCountry = '';
+        let hiddenAddress = '';
 
         // AUTH
 
@@ -1982,6 +2001,52 @@
             if (searchInput) searchInput.value = '';
         }
 
+        // GUS API INTEGRATION
+
+        async function fetchGUSData(nip) {
+            const cleanNip = nip.replace(/[\s-]/g, '');
+            
+            if (cleanNip.length !== 10 || !/^\d+$/.test(cleanNip)) {
+                showStatus('NIP musi mieć 10 cyfr', 'error');
+                return null;
+            }
+
+            showStatus('Pobieranie danych z GUS...', '');
+
+            try {
+                const response = await fetch(CONFIG.GUS_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nip: cleanNip })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showStatus('GUS: ' + data.error, 'error');
+                    return null;
+                }
+
+                if (data.success) {
+                    showStatus('✅ Pobrano dane z GUS', 'success');
+                    return {
+                        companyName: data.companyName || '',
+                        address: data.address || '',
+                        city: data.city || '',
+                        country: data.country || 'Polska'
+                    };
+                }
+
+                return null;
+            } catch (error) {
+                console.error('Błąd GUS API:', error);
+                showStatus('Błąd połączenia z GUS', 'error');
+                return null;
+            }
+        }
+
         // DATA LOADING
 
         async function loadData() {
@@ -2005,7 +2070,7 @@
             try {
                 const response = await gapi.client.sheets.spreadsheets.values.get({
                     spreadsheetId: CONFIG.SHEET_ID,
-                    range: `${CONFIG.COMPANIES_SHEET}!A2:I`,  // Extended to column I for Domain
+                    range: `${CONFIG.COMPANIES_SHEET}!A2:K`,
                 });
 
                 const rows = response.result.values || [];
@@ -2018,11 +2083,13 @@
                     phone: row[5] || '',
                     city: row[6] || '',
                     country: row[7] || '',
-                    domain: row[8] || ''  // NEW: Domain for auto-matching contacts
+                    domain: row[8] || '',
+                    nip: row[9] || '',
+                    address: row[10] || ''
                 })).filter(c => c.name);
 
                 renderCompanies();
-                renderAllContacts(); // żeby relacje firma–kontakt były od razu poprawne
+                renderAllContacts();
             } catch (err) {
                 console.error('Błąd ładowania firm:', err);
                 showStatus('Błąd ładowania firm (sprawdź arkusz "Firmy")', 'error');
@@ -2088,7 +2155,7 @@
                     meta: row[6] || ''
                 })).filter(h => h.companyId);
             } catch (err) {
-                console.warn('HistoriaFirm nie jest dostępna (utwórz arkusz "HistoriaFirm"):', err);
+                console.warn('HistoriaFirm nie jest dostępna:', err);
             }
         }
 
@@ -2113,7 +2180,7 @@
                     meta: row[6] || ''
                 })).filter(h => h.contactId);
             } catch (err) {
-                console.warn('HistoriaKontaktow nie jest dostępna (utwórz arkusz "HistoriaKontaktow"):', err);
+                console.warn('HistoriaKontaktow nie jest dostępna:', err);
             }
         }
 
@@ -2123,7 +2190,7 @@
             if (!currentSearchTerm) return companies;
             const q = currentSearchTerm.toLowerCase();
             return companies.filter(c => {
-                const combined = `${c.name} ${c.industry} ${c.notes} ${c.website} ${c.phone} ${c.city} ${c.country}`.toLowerCase();
+                const combined = `${c.name} ${c.industry} ${c.notes} ${c.website} ${c.phone} ${c.city} ${c.country} ${c.nip} ${c.address}`.toLowerCase();
                 return combined.includes(q);
             });
         }
@@ -2143,7 +2210,7 @@
 
         // RENDER COMPANIES
 
-function renderCompanies() {
+        function renderCompanies() {
             const grid = document.getElementById('companiesGrid');
             const listView = document.getElementById('companiesList');
             const empty = document.getElementById('companiesEmpty');
@@ -2170,7 +2237,6 @@ function renderCompanies() {
             empty.style.display = 'none';
 
             if (companiesViewMode === 'list' && listView) {
-                // LIST VIEW
                 listView.innerHTML = `
                     <table class="list-view-table">
                         <thead>
@@ -2207,7 +2273,6 @@ function renderCompanies() {
                     </table>
                 `;
             } else {
-                // GRID VIEW
                 grid.innerHTML = list.map(company => {
                     const companyContacts = contacts.filter(c => c.companyId === company.id);
                     let infoRows = '';
@@ -2274,9 +2339,9 @@ function renderCompanies() {
             }
         }
 
-        // RENDER CONTACTS (LIST)
+        // RENDER CONTACTS
 
-function renderAllContacts() {
+        function renderAllContacts() {
             const grid = document.getElementById('contactsGrid');
             const listView = document.getElementById('contactsList');
             const empty = document.getElementById('contactsEmpty');
@@ -2303,7 +2368,6 @@ function renderAllContacts() {
             empty.style.display = 'none';
 
             if (contactsViewMode === 'list' && listView) {
-                // LIST VIEW
                 listView.innerHTML = `
                     <table class="list-view-table">
                         <thead>
@@ -2340,7 +2404,6 @@ function renderAllContacts() {
                     </table>
                 `;
             } else {
-                // GRID VIEW
                 grid.innerHTML = list.map(contact => {
                     const index = contacts.findIndex(c => c.id === contact.id);
                     const company = companies.find(c => c.id === contact.companyId);
@@ -2389,7 +2452,6 @@ function renderAllContacts() {
         // COMPANY DETAIL
 
         function viewCompanyDetail(companyId) {
-            // przełącz zakładkę
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelector('[data-tab="companies"]').classList.add('active');
@@ -2403,6 +2465,24 @@ function renderAllContacts() {
             document.getElementById('companyDetailView').classList.add('active');
 
             let infoHtml = '';
+
+            if (company.nip) {
+                infoHtml += `
+                    <div class="detail-info-row">
+                        <div class="detail-info-label">NIP</div>
+                        <div class="detail-info-value">${escapeHtml(company.nip)}</div>
+                    </div>
+                `;
+            }
+
+            if (company.address) {
+                infoHtml += `
+                    <div class="detail-info-row">
+                        <div class="detail-info-label">Adres</div>
+                        <div class="detail-info-value">${escapeHtml(company.address)}</div>
+                    </div>
+                `;
+            }
 
             if (company.website) {
                 const url = company.website.startsWith('http') ? company.website : 'https://' + company.website;
@@ -2419,16 +2499,6 @@ function renderAllContacts() {
                     <div class="detail-info-row">
                         <div class="detail-info-label">Telefon</div>
                         <div class="detail-info-value">${escapeHtml(company.phone)}</div>
-                    </div>
-                `;
-            }
-
-            if (company.city || company.country) {
-                const loc = [company.city, company.country].filter(Boolean).join(', ');
-                infoHtml += `
-                    <div class="detail-info-row">
-                        <div class="detail-info-label">Lokalizacja</div>
-                        <div class="detail-info-value">${escapeHtml(loc)}</div>
                     </div>
                 `;
             }
@@ -2452,11 +2522,10 @@ function renderAllContacts() {
             }
 
             document.getElementById('companyDetailContent').innerHTML = `
-<div style="position: relative;">
-    <button class="icon-btn" onclick="editCompanyFromDetail('${company.id}')" title="Edytuj firmę" style="position: absolute; top: 0; right: 0;">✏️</button>
-    <div class="detail-title">${escapeHtml(company.name)}</div>
-</div>
-                <div>
+                <div style="position: relative;">
+                    <button class="icon-btn" onclick="editCompanyFromDetail('${company.id}')" title="Edytuj firmę" style="position: absolute; top: 0; right: 0;">✏️</button>
+                    <div class="detail-title">${escapeHtml(company.name)}</div>
+                </div>
                 ${company.industry ? `<div class="detail-meta">${escapeHtml(company.industry)}</div>` : ''}
                 <div class="detail-info">
                     ${infoHtml}
@@ -2521,7 +2590,6 @@ function renderAllContacts() {
         // CONTACT DETAIL
 
         function viewContactDetail(contactId) {
-            // przełącz zakładkę
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelector('[data-tab="contacts"]').classList.add('active');
@@ -2578,18 +2646,17 @@ function renderAllContacts() {
                 `;
             }
 
-document.getElementById('contactDetailContent').innerHTML = `
-    <div style="position: relative;">
-        <button class="icon-btn" onclick="editContactFromDetail('${contact.id}')" title="Edytuj kontakt" style="position: absolute; top: 0; right: 0;">✏️</button>
-        <div class="detail-title">${escapeHtml(contact.name)}</div>
-    </div>
+            document.getElementById('contactDetailContent').innerHTML = `
+                <div style="position: relative;">
+                    <button class="icon-btn" onclick="editContactFromDetail('${contact.id}')" title="Edytuj kontakt" style="position: absolute; top: 0; right: 0;">✏️</button>
+                    <div class="detail-title">${escapeHtml(contact.name)}</div>
+                </div>
                 ${contact.position ? `<div class="detail-meta">${escapeHtml(contact.position)}</div>` : ''}
                 <div class="detail-info">
                     ${infoHtml}
                 </div>
             `;
 
-            // firma po lewej
             const companyContainer = document.getElementById('contactCompanyCardContainer');
             const companyEmpty = document.getElementById('contactCompanyEmpty');
 
@@ -2643,6 +2710,9 @@ document.getElementById('contactDetailContent').innerHTML = `
 
         function openCompanyModal() {
             editingCompanyIndex = null;
+            hiddenCity = '';
+            hiddenCountry = '';
+            hiddenAddress = '';
             document.getElementById('companyModalTitle').textContent = 'Dodaj firmę';
             document.getElementById('companyForm').reset();
             document.getElementById('companyModal').classList.add('active');
@@ -2651,14 +2721,17 @@ document.getElementById('contactDetailContent').innerHTML = `
         function editCompany(index) {
             editingCompanyIndex = index;
             const company = companies[index];
+            hiddenCity = company.city || '';
+            hiddenCountry = company.country || '';
+            hiddenAddress = company.address || '';
+            
             document.getElementById('companyModalTitle').textContent = 'Edytuj firmę';
             document.getElementById('companyName').value = company.name;
+            document.getElementById('companyNip').value = company.nip || '';
             document.getElementById('companyIndustry').value = company.industry || '';
             document.getElementById('companyWebsite').value = company.website || '';
             document.getElementById('companyPhone').value = company.phone || '';
-            document.getElementById('companyCity').value = company.city || '';
-            document.getElementById('companyCountry').value = company.country || '';
-            document.getElementById('companyDomain').value = company.domain || '';  // NEW
+            document.getElementById('companyDomain').value = company.domain || '';
             document.getElementById('companyNotes').value = company.notes || '';
             document.getElementById('companyModal').classList.add('active');
         }
@@ -2669,8 +2742,8 @@ document.getElementById('contactDetailContent').innerHTML = `
             const name = document.getElementById('companyName').value;
             const phone = document.getElementById('companyPhone').value;
             const domain = document.getElementById('companyDomain').value;
+            const nip = document.getElementById('companyNip').value.trim();
             
-            // Check for duplicates unless forceSave is true
             if (!forceSave) {
                 const excludeId = editingCompanyIndex !== null ? companies[editingCompanyIndex].id : null;
                 const duplicates = checkCompanyDuplicate(name, phone, domain, excludeId);
@@ -2689,9 +2762,11 @@ document.getElementById('contactDetailContent').innerHTML = `
                 industry: document.getElementById('companyIndustry').value,
                 website: document.getElementById('companyWebsite').value,
                 phone: document.getElementById('companyPhone').value,
-                city: document.getElementById('companyCity').value,
-                country: document.getElementById('companyCountry').value,
-                domain: document.getElementById('companyDomain').value,  // NEW
+                city: hiddenCity,
+                country: hiddenCountry,
+                domain: document.getElementById('companyDomain').value,
+                nip: nip,
+                address: hiddenAddress,
                 notes: document.getElementById('companyNotes').value
             };
 
@@ -2705,12 +2780,14 @@ document.getElementById('contactDetailContent').innerHTML = `
                     company.phone,
                     company.city,
                     company.country,
-                    company.domain  // NEW
+                    company.domain,
+                    company.nip,
+                    company.address
                 ]];
 
                 if (editingCompanyIndex !== null) {
                     const rowNumber = editingCompanyIndex + 2;
-                    const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:I${rowNumber}`;  // Extended to I
+                    const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:K${rowNumber}`;
                     await gapi.client.sheets.spreadsheets.values.update({
                         spreadsheetId: CONFIG.SHEET_ID,
                         range,
@@ -2723,7 +2800,7 @@ document.getElementById('contactDetailContent').innerHTML = `
                 } else {
                     await gapi.client.sheets.spreadsheets.values.append({
                         spreadsheetId: CONFIG.SHEET_ID,
-                        range: `${CONFIG.COMPANIES_SHEET}!A:I`,  // Extended to I
+                        range: `${CONFIG.COMPANIES_SHEET}!A:K`,
                         valueInputOption: 'USER_ENTERED',
                         resource: { values }
                     });
@@ -2749,17 +2826,15 @@ document.getElementById('contactDetailContent').innerHTML = `
             try {
                 const companyId = companies[index].id;
                 const rowNumber = index + 2;
-                const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:I${rowNumber}`;  // Extended to I
+                const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:K${rowNumber}`;
 
                 await logCompanyHistory(companyId, 'event', 'Firma usunięta');
 
-                // wyczyść wiersz firmy
                 await gapi.client.sheets.spreadsheets.values.clear({
                     spreadsheetId: CONFIG.SHEET_ID,
                     range
                 });
 
-                // odpięcie kontaktów
                 const detachPromises = [];
                 contacts.forEach((contact, cIndex) => {
                     if (contact.companyId === companyId) {
@@ -2811,6 +2886,9 @@ document.getElementById('contactDetailContent').innerHTML = `
             document.getElementById('companyModal').classList.remove('active');
             document.getElementById('companyForm').reset();
             editingCompanyIndex = null;
+            hiddenCity = '';
+            hiddenCountry = '';
+            hiddenAddress = '';
         }
 
         // CONTACT CRUD
@@ -2854,9 +2932,6 @@ document.getElementById('contactDetailContent').innerHTML = `
             document.getElementById('contactModal').classList.add('active');
         }
 
-
-        // ========== AUTO-MATCHING BY EMAIL DOMAIN ==========
-        
         function extractDomain(email) {
             if (!email || !email.includes('@')) return '';
             return email.split('@')[1].toLowerCase().trim();
@@ -2877,7 +2952,6 @@ document.getElementById('contactDetailContent').innerHTML = `
             const email = document.getElementById('contactEmail').value;
             const phone = document.getElementById('contactPhone').value;
             
-            // Check for duplicates unless forceSave is true
             if (!forceSave) {
                 const excludeId = editingContactIndex !== null ? contacts[editingContactIndex].id : null;
                 const duplicates = checkContactDuplicate(name, email, phone, excludeId);
@@ -2889,13 +2963,13 @@ document.getElementById('contactDetailContent').innerHTML = `
                     return;
                 }
             }
+            
             const typedCompanyName = (companyInputEl?.value || '').trim();
             let selectedCompanyId = companyIdEl?.value || '';
 
             const oldContact = editingContactIndex !== null ? contacts[editingContactIndex] : null;
             const oldCompanyId = oldContact ? oldContact.companyId : '';
 
-            // AUTO-MATCH: If no company selected/typed and email provided, try to match by domain
             if (!typedCompanyName && !selectedCompanyId && email) {
                 const domain = extractDomain(email);
                 const matchedCompany = findCompanyByDomain(domain);
@@ -2909,7 +2983,6 @@ document.getElementById('contactDetailContent').innerHTML = `
             }
 
             try {
-                // Jeżeli wpisano nazwę firmy, ale nie wybrano jej z listy → sprawdź czy istnieje, w razie czego utwórz
                 if (typedCompanyName && !selectedCompanyId) {
                     const existing = companies.find(
                         c => c.name && c.name.toLowerCase() === typedCompanyName.toLowerCase()
@@ -2927,7 +3000,9 @@ document.getElementById('contactDetailContent').innerHTML = `
                             phone: '',
                             city: '',
                             country: '',
-                            domain: ''  // NEW
+                            domain: '',
+                            nip: '',
+                            address: ''
                         };
 
                         const valuesCompany = [[
@@ -2939,12 +3014,14 @@ document.getElementById('contactDetailContent').innerHTML = `
                             newCompany.phone,
                             newCompany.city,
                             newCompany.country,
-                            newCompany.domain  // NEW
+                            newCompany.domain,
+                            newCompany.nip,
+                            newCompany.address
                         ]];
 
                         await gapi.client.sheets.spreadsheets.values.append({
                             spreadsheetId: CONFIG.SHEET_ID,
-                            range: `${CONFIG.COMPANIES_SHEET}!A:I`,  // Extended to I
+                            range: `${CONFIG.COMPANIES_SHEET}!A:K`,
                             valueInputOption: 'USER_ENTERED',
                             resource: { values: valuesCompany }
                         });
@@ -3353,230 +3430,8 @@ document.getElementById('contactDetailContent').innerHTML = `
             }
         }
 
-        // HELPERS
+        // DUPLICATE DETECTION
 
-        function generateId() {
-            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text == null ? '' : text;
-            return div.innerHTML;
-        }
-
-        // INIT
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // auth
-            document.getElementById('loginBtn').addEventListener('click', handleAuthClick);
-            document.getElementById('logoutBtn').addEventListener('click', handleSignoutClick);
-
-            // tabs
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        // Reset detail views when switching tabs
-        if (btn.dataset.tab === 'contacts') {
-            backToContactsList();
-        } else if (btn.dataset.tab === 'companies') {
-            backToCompaniesList();
-        }
-        
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
-    });
-});
-
-            // global search
-            const globalSearchInput = document.getElementById('globalSearchInput');
-            const clearSearchBtn = document.getElementById('clearSearchBtn');
-
-            if (globalSearchInput) {
-                globalSearchInput.addEventListener('input', (e) => {
-                    currentSearchTerm = e.target.value || '';
-                    renderAllContacts();
-                    renderCompanies();
-                    if (currentCompanyId) renderCompanyContacts(currentCompanyId);
-                });
-            }
-
-            if (clearSearchBtn) {
-                clearSearchBtn.addEventListener('click', () => {
-                    currentSearchTerm = '';
-                    if (globalSearchInput) globalSearchInput.value = '';
-                    renderAllContacts();
-                    renderCompanies();
-                    if (currentCompanyId) renderCompanyContacts(currentCompanyId);
-                });
-            }
-
-            // companies
-            document.getElementById('addCompanyBtn').addEventListener('click', openCompanyModal);
-            document.getElementById('closeCompanyModalBtn').addEventListener('click', closeCompanyModal);
-            document.getElementById('cancelCompanyBtn').addEventListener('click', closeCompanyModal);
-            document.getElementById('companyForm').addEventListener('submit', saveCompany);
-            document.getElementById('backToCompaniesBtn').addEventListener('click', backToCompaniesList);
-
-            // contacts
-            document.getElementById('addContactBtn').addEventListener('click', () => openContactModal());
-            document.getElementById('addCompanyContactBtn').addEventListener('click', () => {
-                openContactModal(currentCompanyId);
-            });
-            document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
-            document.getElementById('cancelContactBtn').addEventListener('click', closeContactModal);
-            document.getElementById('contactForm').addEventListener('submit', saveContact);
-            document.getElementById('backToContactsBtn').addEventListener('click', backToContactsList);
-
-            // company picker
-            companyInputEl = document.getElementById('contactCompanyInput');
-            companyIdEl = document.getElementById('contactCompanyId');
-            companySuggestionsEl = document.getElementById('companySuggestions');
-
-            if (companyInputEl) {
-                const onInput = () => {
-                    companyIdEl.value = '';
-                    showCompanySuggestions(companyInputEl.value);
-                };
-                companyInputEl.addEventListener('input', onInput);
-                companyInputEl.addEventListener('focus', onInput);
-            }
-
-            if (companySuggestionsEl) {
-                companySuggestionsEl.addEventListener('click', (e) => {
-                    const item = e.target.closest('.company-suggestion-item');
-                    if (!item) return;
-
-                    if (item.dataset.id) {
-                        const company = companies.find(c => c.id === item.dataset.id);
-                        if (company) {
-                            companyInputEl.value = company.name;
-                            companyIdEl.value = company.id;
-                        }
-                    } else if (item.classList.contains('company-suggestion-new')) {
-                        // nic – tworzenie firmy nastąpi przy zapisie kontaktu
-                    }
-
-                    hideCompanySuggestions();
-                });
-            }
-
-if (companySuggestionsEl) {
-                companySuggestionsEl.addEventListener('click', (e) => {
-                    const item = e.target.closest('.company-suggestion-item');
-                    if (!item) return;
-
-                    if (item.dataset.id) {
-                        const company = companies.find(c => c.id === item.dataset.id);
-                        if (company) {
-                            companyInputEl.value = company.name;
-                            companyIdEl.value = company.id;
-                        }
-                    } else if (item.classList.contains('company-suggestion-new')) {
-                        // nic – tworzenie firmy nastąpi przy zapisie kontaktu
-                    }
-
-                    hideCompanySuggestions();
-                });
-            }
-
-            // Auto-match company by email domain
-            const contactEmailEl = document.getElementById('contactEmail');
-            if (contactEmailEl && companyInputEl && companyIdEl) {
-                contactEmailEl.addEventListener('blur', () => {
-                    const email = contactEmailEl.value.trim();
-                    if (!email || !email.includes('@')) return;
-                    
-                    // Only auto-fill if company field is empty
-                    if (companyInputEl.value.trim() || companyIdEl.value) return;
-                    
-                    const domain = extractDomain(email);
-                    const matchedCompany = findCompanyByDomain(domain);
-                    
-                    if (matchedCompany) {
-                        companyInputEl.value = matchedCompany.name;
-                        companyIdEl.value = matchedCompany.id;
-                        showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
-                    }
-                });
-            }
-
-            // note modal
-            noteEntityTypeEl = document.getElementById('noteEntityType');
-            
-            // note modal
-            noteEntityTypeEl = document.getElementById('noteEntityType');
-            noteEntityIdEl = document.getElementById('noteEntityId');
-            noteContentEl = document.getElementById('noteContent');
-
-            document.getElementById('closeNoteModalBtn').addEventListener('click', closeNoteModal);
-            document.getElementById('cancelNoteBtn').addEventListener('click', closeNoteModal);
-            document.getElementById('noteForm').addEventListener('submit', saveNote);
-
-            document.getElementById('addCompanyNoteBtn').addEventListener('click', () => {
-                openNoteModal('company', currentCompanyId);
-            });
-            document.getElementById('addContactNoteBtn').addEventListener('click', () => {
-                openNoteModal('contact', currentContactId);
-            });
-
-            // history tabs
-            document.querySelectorAll('.history-tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const entity = btn.dataset.entity;
-                    const scope = btn.dataset.scope;
-
-                    document.querySelectorAll(`.history-tab-btn[data-entity="${entity}"]`).forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-
-                    if (entity === 'company') {
-                        currentCompanyHistoryScope = scope;
-                        if (currentCompanyId) renderCompanyHistory(currentCompanyId);
-                    } else if (entity === 'contact') {
-                        currentContactHistoryScope = scope;
-                        if (currentContactId) renderContactHistory(currentContactId);
-                    }
-                });
-            });
-
-            // close modals on background click
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.classList.remove('active');
-                    }
-                });
-            });
-
-            // hide company suggestions when clicking outside
-            document.addEventListener('click', (e) => {
-                if (companyInputEl && companyInputEl.closest('.company-picker') && companySuggestionsEl) {
-                    if (!companyInputEl.closest('.company-picker').contains(e.target)) {
-                        hideCompanySuggestions();
-                    }
-                }
-            });
-        });
-    </script>
-    <!-- MODAL: DUPLICATE WARNING -->
-    <div id="duplicateModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>⚠️ Możliwy duplikat</h2>
-                <button class="close-btn" onclick="closeDuplicateModal()">&times;</button>
-            </div>
-            <div id="duplicateContent" style="margin: 1.5rem 0; line-height: 1.7;"></div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" id="backToEditBtn">Wróć do edycji</button>
-                <button type="button" class="btn btn-primary" id="saveAnywayBtn">Zapisz mimo to</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ========== DUPLICATE DETECTION ==========
-        
         function checkCompanyDuplicate(name, phone, domain, excludeId = null) {
             const duplicates = [];
             companies.forEach(c => {
@@ -3654,8 +3509,8 @@ if (companySuggestionsEl) {
             document.getElementById('duplicateModal').classList.remove('active');
         }
 
-        // ========== VIEW SWITCHING ==========
-        
+        // VIEW SWITCHING
+
         let contactsViewMode = 'grid';
         let companiesViewMode = 'grid';
 
@@ -3693,8 +3548,8 @@ if (companySuggestionsEl) {
             renderCompanies();
         }
 
-        // ========== EDIT FROM DETAILS ==========
-        
+        // EDIT FROM DETAILS
+
         function editCompanyFromDetail(companyId) {
             const index = companies.findIndex(c => c.id === companyId);
             if (index !== -1) editCompany(index);
@@ -3704,6 +3559,195 @@ if (companySuggestionsEl) {
             const index = contacts.findIndex(c => c.id === contactId);
             if (index !== -1) editContact(index);
         }
+
+        // HELPERS
+
+        function generateId() {
+            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text == null ? '' : text;
+            return div.innerHTML;
+        }
+
+        // INIT
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loginBtn').addEventListener('click', handleAuthClick);
+            document.getElementById('logoutBtn').addEventListener('click', handleSignoutClick);
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.dataset.tab === 'contacts') {
+                        backToContactsList();
+                    } else if (btn.dataset.tab === 'companies') {
+                        backToCompaniesList();
+                    }
+                    
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
+                });
+            });
+
+            const globalSearchInput = document.getElementById('globalSearchInput');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+            if (globalSearchInput) {
+                globalSearchInput.addEventListener('input', (e) => {
+                    currentSearchTerm = e.target.value || '';
+                    renderAllContacts();
+                    renderCompanies();
+                    if (currentCompanyId) renderCompanyContacts(currentCompanyId);
+                });
+            }
+
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', () => {
+                    currentSearchTerm = '';
+                    if (globalSearchInput) globalSearchInput.value = '';
+                    renderAllContacts();
+                    renderCompanies();
+                    if (currentCompanyId) renderCompanyContacts(currentCompanyId);
+                });
+            }
+
+            document.getElementById('addCompanyBtn').addEventListener('click', openCompanyModal);
+            document.getElementById('closeCompanyModalBtn').addEventListener('click', closeCompanyModal);
+            document.getElementById('cancelCompanyBtn').addEventListener('click', closeCompanyModal);
+            document.getElementById('companyForm').addEventListener('submit', saveCompany);
+            document.getElementById('backToCompaniesBtn').addEventListener('click', backToCompaniesList);
+
+            // GUS NIP Auto-fetch
+            const companyNipEl = document.getElementById('companyNip');
+            if (companyNipEl) {
+                companyNipEl.addEventListener('blur', async () => {
+                    const nip = companyNipEl.value.trim();
+                    if (!nip || nip.length < 10) return;
+                    
+                    const gusData = await fetchGUSData(nip);
+                    if (gusData) {
+                        hiddenCity = gusData.city || '';
+                        hiddenCountry = gusData.country || 'Polska';
+                        hiddenAddress = gusData.address || '';
+                        
+                        if (gusData.address) {
+                            showStatus(`📍 Adres: ${gusData.address}`, 'success');
+                        }
+                    }
+                });
+            }
+
+            document.getElementById('addContactBtn').addEventListener('click', () => openContactModal());
+            document.getElementById('addCompanyContactBtn').addEventListener('click', () => {
+                openContactModal(currentCompanyId);
+            });
+            document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
+            document.getElementById('cancelContactBtn').addEventListener('click', closeContactModal);
+            document.getElementById('contactForm').addEventListener('submit', saveContact);
+            document.getElementById('backToContactsBtn').addEventListener('click', backToContactsList);
+
+            companyInputEl = document.getElementById('contactCompanyInput');
+            companyIdEl = document.getElementById('contactCompanyId');
+            companySuggestionsEl = document.getElementById('companySuggestions');
+
+            if (companyInputEl) {
+                const onInput = () => {
+                    companyIdEl.value = '';
+                    showCompanySuggestions(companyInputEl.value);
+                };
+                companyInputEl.addEventListener('input', onInput);
+                companyInputEl.addEventListener('focus', onInput);
+            }
+
+            if (companySuggestionsEl) {
+                companySuggestionsEl.addEventListener('click', (e) => {
+                    const item = e.target.closest('.company-suggestion-item');
+                    if (!item) return;
+
+                    if (item.dataset.id) {
+                        const company = companies.find(c => c.id === item.dataset.id);
+                        if (company) {
+                            companyInputEl.value = company.name;
+                            companyIdEl.value = company.id;
+                        }
+                    }
+
+                    hideCompanySuggestions();
+                });
+            }
+
+            const contactEmailEl = document.getElementById('contactEmail');
+            if (contactEmailEl && companyInputEl && companyIdEl) {
+                contactEmailEl.addEventListener('blur', () => {
+                    const email = contactEmailEl.value.trim();
+                    if (!email || !email.includes('@')) return;
+                    
+                    if (companyInputEl.value.trim() || companyIdEl.value) return;
+                    
+                    const domain = extractDomain(email);
+                    const matchedCompany = findCompanyByDomain(domain);
+                    
+                    if (matchedCompany) {
+                        companyInputEl.value = matchedCompany.name;
+                        companyIdEl.value = matchedCompany.id;
+                        showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
+                    }
+                });
+            }
+
+            noteEntityTypeEl = document.getElementById('noteEntityType');
+            noteEntityIdEl = document.getElementById('noteEntityId');
+            noteContentEl = document.getElementById('noteContent');
+
+            document.getElementById('closeNoteModalBtn').addEventListener('click', closeNoteModal);
+            document.getElementById('cancelNoteBtn').addEventListener('click', closeNoteModal);
+            document.getElementById('noteForm').addEventListener('submit', saveNote);
+
+            document.getElementById('addCompanyNoteBtn').addEventListener('click', () => {
+                openNoteModal('company', currentCompanyId);
+            });
+            document.getElementById('addContactNoteBtn').addEventListener('click', () => {
+                openNoteModal('contact', currentContactId);
+            });
+
+            document.querySelectorAll('.history-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const entity = btn.dataset.entity;
+                    const scope = btn.dataset.scope;
+
+                    document.querySelectorAll(`.history-tab-btn[data-entity="${entity}"]`).forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    if (entity === 'company') {
+                        currentCompanyHistoryScope = scope;
+                        if (currentCompanyId) renderCompanyHistory(currentCompanyId);
+                    } else if (entity === 'contact') {
+                        currentContactHistoryScope = scope;
+                        if (currentContactId) renderContactHistory(currentContactId);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (companyInputEl && companyInputEl.closest('.company-picker') && companySuggestionsEl) {
+                    if (!companyInputEl.closest('.company-picker').contains(e.target)) {
+                        hideCompanySuggestions();
+                    }
+                }
+            });
+        });
     </script>
 </body>
 </html>
