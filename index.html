@@ -1400,7 +1400,27 @@
                                 Zarządzaj wszystkimi osobami kontaktowymi. Kontakty mogą być przypisane do firm lub istnieć niezależnie.
                             </p>
                         </div>
-                        <div class="toolbar">
+<div class="toolbar">
+                            <div class="view-switcher">
+                                <button class="view-btn active" data-view="grid" title="Widok kafelków" onclick="switchContactsView('grid')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="7" height="7" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <rect x="14" y="3" width="7" height="7" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <rect x="14" y="14" width="7" height="7" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <rect x="3" y="14" width="7" height="7" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="view-btn" data-view="list" title="Widok listy" onclick="switchContactsView('list')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="8" y1="6" x2="21" y2="6" stroke-linecap="round"/>
+                                        <line x1="8" y1="12" x2="21" y2="12" stroke-linecap="round"/>
+                                        <line x1="8" y1="18" x2="21" y2="18" stroke-linecap="round"/>
+                                        <line x1="3" y1="6" x2="3.01" y2="6" stroke-linecap="round"/>
+                                        <line x1="3" y1="12" x2="3.01" y2="12" stroke-linecap="round"/>
+                                        <line x1="3" y1="18" x2="3.01" y2="18" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                            </div>
                             <button id="addContactBtn" class="add-btn">
                                 <span class="plus">+</span>
                                 <span>Dodaj kontakt</span>
@@ -1495,7 +1515,27 @@
                                 Zarządzaj listą firm, z którymi współpracujesz. Każda firma może mieć przypisanych wielu kontaktów oraz historię współpracy.
                             </p>
                         </div>
-                        <div class="toolbar">
+<div class="toolbar">
+                            <div class="view-switcher">
+                                <button class="view-btn active" data-view="grid" title="Widok kafelków" onclick="switchCompaniesView('grid')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="7" height="7" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <rect x="14" y="3" width="7" height="7" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <rect x="14" y="14" width="7" height="7" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <rect x="3" y="14" width="7" height="7" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="view-btn" data-view="list" title="Widok listy" onclick="switchCompaniesView('list')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="8" y1="6" x2="21" y2="6" stroke-linecap="round"/>
+                                        <line x1="8" y1="12" x2="21" y2="12" stroke-linecap="round"/>
+                                        <line x1="8" y1="18" x2="21" y2="18" stroke-linecap="round"/>
+                                        <line x1="3" y1="6" x2="3.01" y2="6" stroke-linecap="round"/>
+                                        <line x1="3" y1="12" x2="3.01" y2="12" stroke-linecap="round"/>
+                                        <line x1="3" y1="18" x2="3.01" y2="18" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                            </div>
                             <button id="addCompanyBtn" class="add-btn">
                                 <span class="plus">+</span>
                                 <span>Dodaj firmę</span>
