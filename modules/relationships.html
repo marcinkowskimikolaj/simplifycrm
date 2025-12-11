@@ -2445,11 +2445,10 @@ async function saveContact(e) {
                             id: DataService.generateId(),
                             name: typedCompanyName,
                             industry: '', 
-                            notes: 'Utworzono automatycznie przy dodawaniu kontaktu', 
+                            notes: '', // <--- Teraz pole jest czyste
                             phone: '', 
                             city: '', 
                             country: '', 
-                            // Tutaj automatycznie wypełniamy domenę i stronę WWW
                             domain: newCompanyDomain,
                             website: newCompanyWebsite
                         };
@@ -2458,6 +2457,10 @@ async function saveContact(e) {
                         companies.push(newCompany);
                         selectedCompanyId = newCompany.id;
                         await DataService.logCompanyHistory(newCompany.id, 'event', 'Firma utworzona (z poziomu kontaktu)');
+                        
+                        // DODANO: Pobierz świeżą historię firm, aby zdarzenie pojawiło się w streamie
+                        await loadCompanyHistory(); 
+                        
                         showStatus(`Utworzono nową firmę "${newCompany.name}"`, 'success');
                         renderCompanies();
                     }
