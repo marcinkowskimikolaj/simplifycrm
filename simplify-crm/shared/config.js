@@ -4,7 +4,7 @@
  * Centralna konfiguracja dla całej aplikacji
  * Używana przez wszystkie moduły
  */
-
+ 
 export const CONFIG = {
     // Google OAuth Client ID
     CLIENT_ID: '567555578754-nsqdiab9suu01a9i1mdgc30vf5g9rq2k.apps.googleusercontent.com',
