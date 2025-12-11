@@ -2263,26 +2263,32 @@ async function saveContact(e) {
             const typedCompanyName = (companyInputEl?.value || '').trim();
             let selectedCompanyId = companyIdEl?.value || '';
             
-            // Pobieramy wartości do sprawdzenia
+            // Pobieramy wartości do sprawdzenia (Imie, Email, Telefon)
+            const name = document.getElementById('contactName').value.trim();
             const email = document.getElementById('contactEmail').value.trim();
             const phone = document.getElementById('contactPhone').value.trim();
 
             // === DETEKCJA DUPLIKATÓW ===
-            // Używamy flagi w obiekcie window, aby pominąć sprawdzanie przy "Zapisz mimo to"
             if (!window.skipDuplicateCheck) {
                 const currentId = editingContactIndex !== null ? contacts[editingContactIndex].id : null;
                 
-                // Szukamy duplikatu (pomijamy samych siebie przy edycji)
+                // Szukamy duplikatu
                 const duplicate = contacts.find(c => {
-                    if (c.id === currentId) return false;
+                    if (c.id === currentId) return false; // Pomiń edytowany rekord
                     
+                    // 1. Sprawdzenie po Imieniu i Nazwisku (case-insensitive)
+                    const matchName = name && c.name && c.name.toLowerCase() === name.toLowerCase();
+
+                    // 2. Sprawdzenie po Email
                     const matchEmail = email && c.email && c.email.toLowerCase() === email.toLowerCase();
-                    // Proste oczyszczanie telefonu ze spacji i myślników do porównania
+                    
+                    // 3. Sprawdzenie po Telefonie (czyścimy spacje i myślniki)
                     const cleanPhoneInput = phone.replace(/[\s-]/g, '');
                     const cleanPhoneStored = (c.phone || '').replace(/[\s-]/g, '');
                     const matchPhone = cleanPhoneInput && cleanPhoneStored && cleanPhoneInput === cleanPhoneStored;
                     
-                    return matchEmail || matchPhone;
+                    // Jeśli cokolwiek pasuje -> to duplikat
+                    return matchName || matchEmail || matchPhone;
                 });
 
                 if (duplicate) {
@@ -2291,44 +2297,39 @@ async function saveContact(e) {
                     const saveAnywayBtn = document.getElementById('saveAnywayBtn');
                     const backBtn = document.getElementById('backToEditBtn');
 
-                    // Wypełnij treść ostrzeżenia
+                    // Treść ostrzeżenia
                     content.innerHTML = `
-                        <div>Znaleziono kontakt o podobnych danych:</div>
-                        <div style="background:rgba(15,23,42,0.05); padding:10px; border-radius:8px; margin-top:10px;">
-                            <strong>${escapeHtml(duplicate.name)}</strong><br>
-                            ${duplicate.email ? `<small>📧 ${escapeHtml(duplicate.email)}</small><br>` : ''}
-                            ${duplicate.phone ? `<small>📱 ${escapeHtml(duplicate.phone)}</small>` : ''}
+                        <div>Znaleziono kontakt o podobnych danych (nazwa, email lub telefon):</div>
+                        <div style="background:rgba(15,23,42,0.05); padding:12px; border-radius:8px; margin-top:10px; border:1px solid var(--border-subtle);">
+                            <div style="font-size:1.1em; font-weight:600;">${escapeHtml(duplicate.name)}</div>
+                            ${duplicate.position ? `<div style="font-size:0.8em; color:var(--text-secondary); margin-bottom:4px;">${escapeHtml(duplicate.position)}</div>` : ''}
+                            ${duplicate.email ? `<div>📧 ${escapeHtml(duplicate.email)}</div>` : ''}
+                            ${duplicate.phone ? `<div>📱 ${escapeHtml(duplicate.phone)}</div>` : ''}
                         </div>
-                        <div style="margin-top:10px; font-size:0.85rem;">Czy na pewno chcesz utworzyć kolejny?</div>
+                        <div style="margin-top:15px; font-size:0.9rem;">Czy na pewno chcesz utworzyć ten kontakt?</div>
                     `;
 
-                    // Pokaż modal
                     modal.classList.add('active');
 
-                    // Obsługa przycisku "Zapisz mimo to"
-                    // Nadpisujemy onclick, aby nie dodawać wielu listenerów
+                    // Obsługa przycisków
                     saveAnywayBtn.onclick = () => {
-                        window.skipDuplicateCheck = true; // Ustaw flagę
+                        window.skipDuplicateCheck = true;
                         modal.classList.remove('active');
-                        // Ponowne wywołanie submita formularza - tym razem wejdzie w if(!window.skipDuplicateCheck) jako false
                         document.getElementById('contactForm').requestSubmit(); 
                     };
 
-                    // Obsługa przycisku "Wróć do edycji"
                     backBtn.onclick = () => {
                         modal.classList.remove('active');
-                        // Czyścimy flagę na wszelki wypadek
                         window.skipDuplicateCheck = false;
                     };
 
-                    return; // PRZERYWAMY ZAPIS
+                    return; // STOP - nie zapisuj
                 }
             }
-            // Reset flagi po udanym przejściu (lub przy pierwszym czystym zapisie)
             window.skipDuplicateCheck = false;
             // === KONIEC DETEKCJI DUPLIKATÓW ===
 
-            // Auto-match by domain
+            // Auto-match by domain (dalsza część oryginalnego kodu...)
             if (!typedCompanyName && !selectedCompanyId && email) {
                 const domain = DataService.extractDomain(email);
                 const matchedCompany = DataService.findCompanyByDomain(companies, domain);
