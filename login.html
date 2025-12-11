@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Logowanie - Simplify CRM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- FONTS -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-primary: #f5f1ed;
+            --surface: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-subtle: rgba(17, 24, 39, 0.12);
+            --shadow-soft: 0 18px 55px rgba(15, 23, 42, 0.18);
+            --radius-chip: 999px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1.75rem;
+        }
+
+        .login-card {
+            position: relative;
+            width: 100%;
+            max-width: 460px;
+            background: var(--surface);
+            border-radius: 24px;
+            border: 1px solid var(--border-subtle);
+            padding: 2.6rem 2.8rem 2.2rem;
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            inset: -40%;
+            background:
+                radial-gradient(circle at 0% 0%, rgba(15,23,42,0.10), transparent 55%),
+                radial-gradient(circle at 100% 100%, rgba(15,23,42,0.06), transparent 60%);
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .login-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: var(--radius-chip);
+            border: 1px solid var(--border-subtle);
+            background: rgba(255,255,255,0.7);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+        }
+
+        .app-pill-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--text-primary);
+        }
+
+        .app-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 0.16em;
+            font-weight: 400;
+            text-transform: uppercase;
+            margin-bottom: 0.15rem;
+        }
+
+        .app-subtitle {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--text-secondary);
+            margin-bottom: 1.8rem;
+        }
+
+        .app-description {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 2.1rem;
+            max-width: 26rem;
+        }
+
+        .google-btn {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            border-radius: var(--radius-chip);
+            border: 1px solid var(--text-primary);
+            background: var(--text-primary);
+            color: #f5f1ed;
+            padding: 0.95rem 1.6rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .google-btn span.icon {
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 50%;
+        }
+
+        .google-btn svg {
+            width: 12px;
+            height: 12px;
+            display: block;
+        }
+
+        .google-btn:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(15,23,42,0.25);
+        }
+
+        .google-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .login-hint {
+            margin-top: 1.2rem;
+            font-size: 0.78rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .status-message {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .status-message.error {
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .status-message.info {
+            background: rgba(37, 99, 235, 0.1);
+            color: #2563eb;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .status-message.visible {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border-subtle);
+            border-top-color: var(--text-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 2rem 1.6rem 1.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-inner">
+            <div class="app-pill">
+                <span class="app-pill-dot"></span>
+                Business CRM
+            </div>
+            
+            <h1 class="app-title">Simplify CRM</h1>
+            <p class="app-subtitle">Twój partner w interesach</p>
+
+            <p class="app-description">
+                Zaloguj się kontem Google, aby pracować na swoim arkuszu z firmami i kontaktami.
+                Dodawaj firmy, osoby kontaktowe, historię współpracy i śledź wszystkie zmiany jak w prawdziwym CRM.
+            </p>
+
+            <button id="loginBtn" class="google-btn" disabled>
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path fill="#EA4335" d="M12 10.2v3.7h5.2c-.2 1.2-.9 2.3-2 3.1l3.3 2.6c1.9-1.8 3-4.4 3-7.4 0-.7-.1-1.3-.2-2H12z"/>
+                        <path fill="#34A853" d="M6.6 14.3 5.9 14.8l-2.6 2C5.1 19.9 8.3 21.8 12 21.8c2.7 0 5-.9 6.6-2.4l-3.3-2.6c-.9.6-2 1-3.3 1-2.5 0-4.6-1.7-5.4-4z"/>
+                        <path fill="#4A90E2" d="M3.3 8.8C2.8 10 2.5 11.2 2.5 12.5s.3 2.5.8 3.7l3.3-2.6c-.2-.6-.3-1.2-.3-1.9 0-.6.1-1.3.3-1.9L3.3 8.8z"/>
+                        <path fill="#FBBC05" d="M12 5.2c1.5 0 2.8.5 3.8 1.4l2.8-2.8C16.9 2.2 14.7 1.2 12 1.2 8.3 1.2 5.1 3.1 3.3 6.2l3.3 2.6c.8-2.3 2.9-3.6 5.4-3.6z"/>
+                    </svg>
+                </span>
+                <span id="loginBtnText">Zaloguj przez Google</span>
+            </button>
+
+            <div id="statusMessage" class="status-message"></div>
+
+            <p class="login-hint">
+                Po pierwszym zalogowaniu wyraź zgodę na dostęp do arkuszy Google i adresu e-mail.
+                Sesja będzie zapamiętana, więc po odświeżeniu strony nie będziesz musiał logować się od nowa.
+            </p>
+        </div>
+    </div>
+
+    <!-- Google APIs -->
+    <script src="https://apis.google.com/js/api.js" async defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Login Logic -->
+    <script type="module">
+        import { CONFIG } from './shared/config.js';
+        import { AuthService } from './shared/auth.js';
+
+        // Sprawdź czy użytkownik jest już zalogowany
+        if (AuthService.isAuthenticated()) {
+            console.log('✓ Użytkownik już zalogowany - przekierowanie na dashboard');
+            AuthService.redirectToDashboard();
+        }
+
+        let gapiInited = false;
+        let gisInited = false;
+        let tokenClient;
+
+        const loginBtn = document.getElementById('loginBtn');
+        const loginBtnText = document.getElementById('loginBtnText');
+        const statusMessage = document.getElementById('statusMessage');
+
+        /**
+         * Pokazuje status message
+         */
+        function showStatus(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message visible ${type}`;
+            setTimeout(() => {
+                statusMessage.classList.remove('visible');
+            }, 5000);
+        }
+
+        /**
+         * GAPI loaded callback
+         */
+        window.gapiLoaded = function() {
+            console.log('✓ Google API (gapi) loaded');
+            gapi.load('client', initializeGapiClient);
+        };
+
+        /**
+         * Initialize GAPI client
+         */
+        async function initializeGapiClient() {
+            try {
+                await AuthService.initializeGoogleAPIs();
+                gapiInited = true;
+                console.log('✓ GAPI client initialized');
+                maybeEnableButton();
+            } catch (error) {
+                console.error('✗ Błąd inicjalizacji GAPI:', error);
+                showStatus('Błąd ładowania Google API', 'error');
+            }
+        }
+
+        /**
+         * GIS loaded callback
+         */
+        window.gisLoaded = function() {
+            console.log('✓ Google Identity Services (GIS) loaded');
+            try {
+                tokenClient = AuthService.initializeTokenClient(handleAuthCallback);
+                gisInited = true;
+                console.log('✓ GIS token client initialized');
+                maybeEnableButton();
+            } catch (error) {
+                console.error('✗ Błąd inicjalizacji GIS:', error);
+                showStatus('Błąd konfiguracji logowania', 'error');
+            }
+        };
+
+        /**
+         * Enable button when both APIs are ready
+         */
+        function maybeEnableButton() {
+            if (gapiInited && gisInited) {
+                loginBtn.disabled = false;
+                console.log('✓ Przycisk logowania aktywny');
+            }
+        }
+
+        /**
+         * Handle authorization callback
+         */
+        async function handleAuthCallback(response) {
+            if (response.error !== undefined) {
+                console.error('Błąd autoryzacji:', response);
+                showStatus('Błąd logowania: ' + response.error, 'error');
+                resetButton();
+                return;
+            }
+
+            try {
+                // Pobierz access token
+                let accessToken = response.access_token;
+                if (!accessToken && gapi.client.getToken()) {
+                    accessToken = gapi.client.getToken().access_token;
+                }
+
+                if (!accessToken) {
+                    throw new Error('Brak access token');
+                }
+
+                // Ustaw token w GAPI
+                gapi.client.setToken({ access_token: accessToken });
+
+                // Pobierz informacje o użytkowniku
+                showStatus('Pobieranie danych użytkownika...', 'info');
+                const userInfo = await AuthService.getUserInfo(accessToken);
+                const email = userInfo.email || '';
+
+                // Zapisz sesję
+                const expiresIn = response.expires_in || 3600;
+                AuthService.saveSession(accessToken, email, expiresIn);
+
+                console.log('✓ Logowanie zakończone sukcesem:', email);
+                showStatus('Logowanie zakończone - przekierowanie...', 'info');
+
+                // Przekieruj na dashboard po 1 sekundzie
+                setTimeout(() => {
+                    // Sprawdź czy był returnUrl
+                    const returnUrl = sessionStorage.getItem('returnUrl');
+                    if (returnUrl) {
+                        sessionStorage.removeItem('returnUrl');
+                        window.location.href = returnUrl;
+                    } else {
+                        AuthService.redirectToDashboard();
+                    }
+                }, 1000);
+
+            } catch (error) {
+                console.error('Błąd podczas logowania:', error);
+                showStatus('Błąd podczas logowania: ' + error.message, 'error');
+                resetButton();
+            }
+        }
+
+        /**
+         * Reset button state
+         */
+        function resetButton() {
+            loginBtn.disabled = false;
+            loginBtnText.innerHTML = 'Zaloguj przez Google';
+        }
+
+        /**
+         * Handle login button click
+         */
+        loginBtn.addEventListener('click', async function() {
+            if (!tokenClient) {
+                showStatus('Token client nie jest gotowy', 'error');
+                return;
+            }
+
+            // Disable button and show loading
+            loginBtn.disabled = true;
+            loginBtnText.innerHTML = '<span class="spinner"></span>Logowanie...';
+
+            try {
+                // Check if already has a valid token
+                const existingToken = gapi.client.getToken();
+                if (existingToken === null) {
+                    // Request new token with consent
+                    tokenClient.requestAccessToken({ prompt: 'consent' });
+                } else {
+                    // Request new token without consent
+                    tokenClient.requestAccessToken({ prompt: '' });
+                }
+            } catch (error) {
+                console.error('Błąd requestAccessToken:', error);
+                showStatus('Błąd autoryzacji', 'error');
+                resetButton();
+            }
+        });
+
+        // Timeout dla ładowania bibliotek
+        setTimeout(() => {
+            if (!gapiInited || !gisInited) {
+                loginBtn.disabled = true;
+                loginBtnText.textContent = '⚠️ Błąd ładowania';
+                showStatus('Nie udało się załadować bibliotek Google. Sprawdź połączenie.', 'error');
+            }
+        }, 10000);
+
+        // Wywołaj funkcje jeśli skrypty już załadowane
+        if (typeof gapi !== 'undefined') {
+            window.gapiLoaded();
+        }
+        if (typeof google !== 'undefined' && google.accounts) {
+            window.gisLoaded();
+        }
+    </script>
+</body>
+</html>
