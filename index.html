@@ -25,35 +25,178 @@
             --accent: #2563eb;
             --success: #16a34a;
             --error: #dc2626;
-            --danger: #b91c1c;
-            --accent-soft: rgba(37, 99, 235, 0.08);
-
-            --tab-bg: rgba(17, 24, 39, 0.04);
-            --tab-pill-bg: #ffffff;
-            --tab-pill-shadow: 0 8px 22px rgba(15, 23, 42, 0.18);
         }
 
-        * {
+        *, *::before, *::after {
             box-sizing: border-box;
-        }
-
-        html, body {
             margin: 0;
             padding: 0;
-            font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: radial-gradient(circle at top left, #facc15 0, #f5f1ed 38%, #f97316 100%);
-            color: var(--text-primary);
-            -webkit-font-smoothing: antialiased;
         }
 
         body {
+            font-family: 'Manrope', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
         }
 
-        .app-shell {
+        button {
+            font-family: inherit;
+        }
+
+        /* LOGIN */
+
+        #loginScreen {
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1.75rem;
+            background: var(--bg-primary);
+        }
+
+        .login-card {
+            position: relative;
+            width: 100%;
+            max-width: 460px;
+            background: var(--surface);
+            border-radius: 24px;
+            border: 1px solid var(--border-subtle);
+            padding: 2.6rem 2.8rem 2.2rem;
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            inset: -40%;
+            background:
+                radial-gradient(circle at 0% 0%, rgba(15,23,42,0.10), transparent 55%),
+                radial-gradient(circle at 100% 100%, rgba(15,23,42,0.06), transparent 60%);
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .login-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: var(--radius-chip);
+            border: 1px solid var(--border-subtle);
+            background: rgba(255,255,255,0.7);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+        }
+
+        .app-pill-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--text-primary);
+        }
+
+        .app-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 0.16em;
+            font-weight: 400;
+            text-transform: uppercase;
+            margin-bottom: 0.15rem;
+        }
+
+        .app-subtitle {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--text-secondary);
+            margin-bottom: 1.8rem;
+        }
+
+        .app-description {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 2.1rem;
+            max-width: 26rem;
+        }
+
+        .google-btn {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            border-radius: var(--radius-chip);
+            border: 1px solid var(--text-primary);
+            background: var(--text-primary);
+            color: #f5f1ed;
+            padding: 0.95rem 1.6rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .google-btn span.icon {
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 50%;
+        }
+
+        .google-btn svg {
+            width: 12px;
+            height: 12px;
+            display: block;
+        }
+
+        .google-btn:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(15,23,42,0.25);
+        }
+
+        .google-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .login-hint {
+            margin-top: 1.2rem;
+            font-size: 0.78rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* APP WRAPPER */
+
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg-primary);
         }
 
         .app-inner {
@@ -85,347 +228,165 @@
             font-size: 1.9rem;
             letter-spacing: 0.18em;
             text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .app-logo::before {
-            content: '';
-            width: 24px;
-            height: 24px;
-            border-radius: 10px;
-            background: conic-gradient(from 220deg, #0f172a, #2563eb, #f97316, #facc15, #0f172a);
-            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.12);
         }
 
         .app-logo-subtitle {
-            font-size: 0.86rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
             color: var(--text-secondary);
         }
 
         .app-header-right {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            font-size: 0.82rem;
-            color: var(--text-secondary);
+            gap: 0.8rem;
         }
 
         .user-email {
-            padding: 0.4rem 0.8rem;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(148, 163, 184, 0.7);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-secondary);
             max-width: 220px;
-            text-overflow: ellipsis;
             overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         .logout-btn {
-            border-radius: 999px;
-            border: 1px solid var(--border-subtle);
-            padding: 0.45rem 0.95rem;
-            background: rgba(255, 255, 255, 0.9);
-            cursor: pointer;
-            font-size: 0.78rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-chip);
+            border: 1px solid var(--border-strong);
+            background: transparent;
+            padding: 0.55rem 0.95rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.12em;
             font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            transition: all 0.16s ease;
-        }
-
-        .logout-btn::before {
-            content: '⏏';
-            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
         }
 
         .logout-btn:hover {
-            background: #fff;
-            border-color: var(--border-strong);
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.16);
+            background: rgba(15,23,42,0.03);
+            border-color: var(--text-primary);
+            box-shadow: 0 8px 20px rgba(15,23,42,0.16);
             transform: translateY(-1px);
         }
 
-        /* LOGIN CARD */
+        /* GLOBAL SEARCH */
 
-        .login-wrapper {
+        .global-search {
+            margin-bottom: 1.8rem;
+        }
+
+        .search-input-container {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 2rem 0 3rem;
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 520px;
-            border-radius: 26px;
-            border: 1px solid rgba(148, 163, 184, 0.5);
-            box-shadow: var(--shadow-soft);
-            background: radial-gradient(circle at top left, rgba(248, 250, 252, 0.9), rgba(255, 255, 255, 0.95));
-            padding: 2.4rem 2.6rem 2.3rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background:
-                    radial-gradient(circle at top right, rgba(37, 99, 235, 0.12) 0, transparent 50%),
-                    radial-gradient(circle at bottom left, rgba(249, 115, 22, 0.16) 0, transparent 52%);
-            opacity: 0.9;
-            pointer-events: none;
-        }
-
-        .login-card-inner {
-            position: relative;
-            z-index: 1;
-        }
-
-        .login-eyebrow {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 0.7rem;
-        }
-
-        .login-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.4rem;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            margin: 0 0 0.5rem;
-        }
-
-        .login-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.3rem 0.85rem;
+            gap: 0.4rem;
+            background: var(--surface);
             border-radius: 999px;
-            background: rgba(37, 99, 235, 0.08);
-            border: 1px solid rgba(37, 99, 235, 0.16);
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
-            margin-bottom: 0.8rem;
+            border: 1px solid var(--border-subtle);
+            padding: 0.35rem 0.85rem;
+            box-shadow: 0 8px 20px rgba(15,23,42,0.06);
         }
 
-        .login-badge-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 999px;
-            background: #22c55e;
-            box-shadow: 0 0 0 4px rgba(22, 197, 94, 0.35);
+        .search-icon {
+            font-size: 1rem;
+            opacity: 0.7;
         }
 
-        .login-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            max-width: 30rem;
-            line-height: 1.6;
-            margin-bottom: 1.4rem;
-        }
-
-        .login-subtitle span {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .login-points {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.9rem 1.2rem;
-            margin-bottom: 1.6rem;
-        }
-
-        .login-point {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-        }
-
-        .login-point-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 999px;
-            background: #111827;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            color: #f9fafb;
-            flex-shrink: 0;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.4);
-        }
-
-        .login-point strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .login-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 1.6rem;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .login-meta {
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-        }
-
-        .login-meta b {
-            font-weight: 600;
-        }
-
-        .login-meta span {
-            font-size: 0.76rem;
-            opacity: 0.9;
-        }
-
-        .login-btn {
-            border-radius: 999px;
+        .search-input-container input {
+            flex: 1;
             border: none;
-            background: #111827;
-            color: #f9fafb;
-            padding: 0.75rem 1.6rem;
-            cursor: pointer;
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.18em;
+            background: transparent;
+            padding: 0.55rem 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .search-input-container input:focus {
+            outline: none;
+        }
+
+        .clear-search-btn {
+            border: none;
+            background: transparent;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.55);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(120deg, rgba(248, 250, 252, 0) 0%, rgba(248, 250, 252, 0.4) 35%, rgba(248, 250, 252, 0) 70%);
-            transform: translateX(-120%);
-            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-
-        .login-btn:hover::before {
-            transform: translateX(60%);
-        }
-
-        .login-btn span.icon {
-            font-size: 1.05rem;
-        }
-
-        .login-status {
-            margin-top: 1.2rem;
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .login-status-dot {
-            width: 8px;
-            height: 8px;
+            letter-spacing: 0.12em;
+            padding: 0.35rem 0.8rem;
             border-radius: 999px;
-            background: #22c55e;
-            box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.3);
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: background 0.18s ease, color 0.18s ease;
         }
 
-        .login-note {
+        .clear-search-btn:hover {
+            background: rgba(15,23,42,0.05);
+            color: var(--text-primary);
+        }
+
+        .search-hint {
             margin-top: 0.4rem;
             font-size: 0.75rem;
             color: var(--text-secondary);
-            opacity: 0.9;
         }
 
-        /* MAIN APP */
-
-        .app-main {
-            display: none;
-            padding-top: 0.5rem;
-            padding-bottom: 3rem;
-        }
-
-        .app-main.visible {
-            display: block;
-        }
+        /* TABS */
 
         .tabs {
-            display: inline-flex;
-            background: var(--tab-bg);
-            border-radius: 999px;
-            padding: 0.23rem;
-            margin-bottom: 1.2rem;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
         .tab-btn {
-            border: none;
-            background: transparent;
-            border-radius: 999px;
-            padding: 0.5rem 1.2rem;
+            position: relative;
+            padding: 0.85rem 1.4rem;
             font-family: 'Outfit', sans-serif;
             font-size: 0.75rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.14em;
-            cursor: pointer;
+            letter-spacing: 0.12em;
+            background: transparent;
+            border: none;
             color: var(--text-secondary);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            position: relative;
-            transition: all 0.16s ease;
+            cursor: pointer;
+            transition: color 0.2s ease;
         }
 
-        .tab-btn::before {
+        .tab-btn::after {
             content: '';
-            width: 7px;
-            height: 7px;
-            border-radius: 999px;
-            background: transparent;
-            box-shadow: none;
-            transition: all 0.16s ease;
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--text-primary);
+            transform: scaleX(0);
+            transition: transform 0.2s ease;
         }
 
         .tab-btn.active {
-            background: var(--tab-pill-bg);
             color: var(--text-primary);
-            box-shadow: var(--tab-pill-shadow);
         }
 
-        .tab-btn.active::before {
-            background: #22c55e;
-            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.4);
+        .tab-btn.active::after {
+            transform: scaleX(1);
         }
 
-        .tab-btn[data-tab="contacts"]::after {
-            content: '👤';
-            font-size: 0.95rem;
-        }
-
-        .tab-btn[data-tab="companies"]::after {
-            content: '🏢';
-            font-size: 0.95rem;
+        .tab-btn:hover:not(.active) {
+            color: var(--text-primary);
+            opacity: 0.7;
         }
 
         .tab-content {
@@ -436,24 +397,30 @@
             display: block;
         }
 
+        /* SECTION HEADER */
+
         .section-header {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: space-between;
-            gap: 1rem;
-            margin-bottom: 1.2rem;
+            margin-bottom: 2.2rem;
+            gap: 1.5rem;
+        }
+
+        .section-header.small {
+            margin-bottom: 1.4rem;
         }
 
         .section-title-block {
-            max-width: 520px;
+            flex: 1;
         }
 
         .section-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.0rem;
-            letter-spacing: 0.16em;
+            font-size: 2.1rem;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
-            margin: 0 0 0.35rem;
+            margin-bottom: 0.35rem;
         }
 
         .section-header.small .section-title {
@@ -485,425 +452,231 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.72rem 1.25rem;
-            border-radius: 999px;
-            border: none;
-            background: #111827;
-            color: #f9fafb;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
+            border-radius: var(--radius-chip);
+            border: 1px solid var(--text-primary);
+            background: var(--text-primary);
+            color: #f5f1ed;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem;
             font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .add-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(120deg, rgba(248, 250, 252, 0) 0%, rgba(248, 250, 252, 0.38) 35%, rgba(248, 250, 252, 0) 70%);
-            transform: translateX(-120%);
-            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-
-        .add-btn:hover::before {
-            transform: translateX(60%);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
 
         .add-btn .plus {
-            width: 20px;
-            height: 20px;
-            border-radius: 999px;
-            background: #f97316;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
+            font-size: 1.2rem;
+            font-weight: 400;
         }
 
-        .status-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.8rem;
-            margin-top: -0.2rem;
-            gap: 1rem;
-            flex-wrap: wrap;
+        .add-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(15,23,42,0.24);
         }
 
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.34rem 0.8rem;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.04);
-            font-size: 0.76rem;
-            color: var(--text-secondary);
-        }
-
-        .status-pill-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 999px;
-            background: #22c55e;
-            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.35);
-        }
-
-        .status-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        /* SEARCH & FILTERS */
-
-        .global-search {
-            margin-bottom: 1.4rem;
-        }
-
-        .search-input-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            max-width: 420px;
-        }
-
-        .search-input-container input {
-            width: 100%;
-            border-radius: 999px;
-            border: 1px solid var(--border-subtle);
-            padding: 0.65rem 2.2rem 0.65rem 2.1rem;
-            background: rgba(255, 255, 255, 0.92);
-            font-size: 0.85rem;
-            outline: none;
-            transition: all 0.16s ease;
-        }
-
-        .search-input-container input::placeholder {
-            color: rgba(148, 163, 184, 0.85);
-        }
-
-        .search-input-container input:focus {
-            border-color: rgba(37, 99, 235, 0.55);
-            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.38);
-            background: #ffffff;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.9rem;
-            font-size: 0.95rem;
-            opacity: 0.75;
-        }
-
-        .search-clear-btn {
-            position: absolute;
-            right: 0.6rem;
-            border-radius: 999px;
-            border: none;
-            width: 24px;
-            height: 24px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            cursor: pointer;
-            font-size: 0.9rem;
-            opacity: 0.4;
-            transition: all 0.16s ease;
-        }
-
-        .search-clear-btn:hover {
-            opacity: 0.8;
-            background: rgba(15, 23, 42, 0.04);
-        }
-
-        .search-hint {
-            font-size: 0.76rem;
-            color: var(--text-secondary);
-            margin-top: 0.35rem;
-        }
-
-        /* GRID & CARDS */
+        /* CARDS */
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1.1rem;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.3rem;
         }
 
         .card {
+            position: relative;
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
             border-radius: var(--radius-card);
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
-            padding: 0.85rem 0.95rem 0.95rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.55rem;
-            position: relative;
-            overflow: hidden;
+            padding: 1.6rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background:
-                    linear-gradient(to bottom right, rgba(248, 250, 252, 0.85), rgba(255, 255, 255, 0.98)),
-                    radial-gradient(circle at top right, rgba(37, 99, 235, 0.07), transparent 55%),
-                    radial-gradient(circle at bottom left, rgba(249, 115, 22, 0.08), transparent 50%);
-            mix-blend-mode: normal;
-            pointer-events: none;
+        .card.clickable {
+            cursor: pointer;
         }
 
-        .card-inner {
-            position: relative;
-            z-index: 1;
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-card);
+            border-color: var(--border-strong);
         }
 
         .card-header {
             display: flex;
-            align-items: flex-start;
             justify-content: space-between;
-            gap: 0.5rem;
-            margin-bottom: 0.4rem;
-            position: relative;
-            z-index: 2;
+            align-items: start;
+            margin-bottom: 1rem;
         }
 
         .card-title {
-            font-weight: 700;
-            font-size: 0.95rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
         }
 
         .card-meta {
-            font-size: 0.78rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             color: var(--text-secondary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.18s ease;
+        }
+
+        .icon-btn:hover {
+            background: rgba(15,23,42,0.04);
+            border-color: var(--border-strong);
+        }
+
+        .icon-btn.delete:hover {
+            background: rgba(220,38,38,0.08);
+            border-color: var(--error);
+            color: var(--error);
         }
 
         .card-body {
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
-            font-size: 0.8rem;
-            position: relative;
-            z-index: 2;
+            gap: 0.7rem;
         }
 
         .card-info-row {
             display: flex;
             align-items: center;
-            gap: 0.35rem;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
         }
 
         .card-info-row .emoji {
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
 
         .card-badge {
-            margin-top: 0.3rem;
             display: inline-flex;
             align-items: center;
-            gap: 0.35rem;
-            padding: 0.25rem 0.7rem;
-            border-radius: 999px;
-            font-size: 0.72rem;
-            background: rgba(15, 23, 42, 0.03);
-            color: var(--text-secondary);
-            position: relative;
-            z-index: 2;
+            gap: 0.4rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: var(--radius-chip);
+            background: rgba(15,23,42,0.06);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-primary);
+            margin-top: 0.5rem;
         }
 
         .card-badge.no-company {
             background: rgba(220, 38, 38, 0.08);
-            color: var(--danger);
+            color: var(--error);
         }
 
-        .card-badge.no-company span:first-child {
-            font-size: 0.95rem;
+        /* DETAIL VIEW + LAYOUT */
+
+        .detail-view {
+            display: none;
         }
 
-        .card-actions {
+        .detail-view.active {
+            display: block;
+        }
+
+        .back-btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
-        }
-
-        .icon-btn {
-            border-radius: 999px;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: var(--radius-chip);
             border: 1px solid var(--border-subtle);
-            width: 28px;
-            height: 28px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.9);
+            background: transparent;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.16s ease;
+            transition: all 0.18s ease;
         }
 
-        .icon-btn:hover {
+        .back-btn:hover {
+            background: rgba(15,23,42,0.03);
             border-color: var(--border-strong);
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
-            transform: translateY(-1px);
         }
 
-        .icon-btn.delete {
-            border-color: rgba(220, 38, 38, 0.35);
-            color: var(--danger);
-        }
-
-        .icon-btn.delete:hover {
-            border-color: rgba(220, 38, 38, 0.7);
-            background: rgba(248, 250, 252, 0.9);
-        }
-
-        .clickable {
-            cursor: pointer;
-            transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
-        }
-
-        .clickable:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 55px rgba(15, 23, 42, 0.22);
-            border-color: rgba(37, 99, 235, 0.22);
-        }
-
-        .clickable:active {
-            transform: translateY(-1px);
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
-        }
-
-        /* EMPTY STATE & LOADING */
-
-        .empty-state {
+        .detail-card {
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
             border-radius: var(--radius-card);
-            border: 1px dashed rgba(148, 163, 184, 0.7);
-            background: rgba(255, 255, 255, 0.94);
-            padding: 1.6rem 1.5rem;
-            text-align: center;
-            color: var(--text-secondary);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.7rem;
-        }
-
-        .empty-state svg {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 0.3rem;
-            opacity: 0.75;
-        }
-
-        .empty-state h3 {
-            margin: 0;
-            font-size: 1rem;
-            color: var(--text-primary);
-        }
-
-        .empty-state p {
-            margin: 0;
-            font-size: 0.85rem;
-            max-width: 21rem;
-        }
-
-        .loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.7rem;
-            padding: 1.4rem 0;
-            color: var(--text-secondary);
-        }
-
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border-radius: 999px;
-            border: 3px solid rgba(148, 163, 184, 0.5);
-            border-top-color: #111827;
-            animation: spin 0.7s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* DETAIL VIEW */
-
-        .detail-layout {
-            display: flex;
-            align-items: flex-start;
-            gap: 1.1rem;
-            margin-top: 0.4rem;
-        }
-
-        .detail-column-left,
-        .detail-column-right {
-            border-radius: var(--radius-card);
-            border: 1px solid rgba(148, 163, 184, 0.45);
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
-            padding: 1.0rem 1.0rem 1.1rem;
-            max-height: 480px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-            flex: 1 1 0;
-        }
-
-        .detail-column-left {
-            flex: 1.05;
-        }
-
-        .detail-column-right {
-            flex: 0.95;
+            padding: 2rem;
+            margin-bottom: 2rem;
         }
 
         .detail-title {
-            font-weight: 700;
-            font-size: 1.05rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
         }
 
         .detail-meta {
-            font-size: 0.82rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
             color: var(--text-secondary);
-            margin-top: 0.1rem;
+            margin-bottom: 1.5rem;
         }
 
         .detail-info {
-            margin-top: 0.8rem;
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
-            font-size: 0.84rem;
+            gap: 1rem;
         }
 
         .detail-info-row {
             display: flex;
-            gap: 0.8rem;
+            align-items: flex-start;
+            gap: 1rem;
         }
 
         .detail-info-label {
-            width: 100px;
-            font-size: 0.76rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.16em;
-            color: rgba(107, 114, 128, 0.9);
-            flex-shrink: 0;
+            letter-spacing: 0.12em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 120px;
         }
 
         .detail-info-value {
-            flex: 1;
+            font-size: 0.9rem;
             color: var(--text-primary);
         }
 
@@ -916,133 +689,209 @@
             text-decoration: underline;
         }
 
-        .detail-section-title {
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
-            color: rgba(107, 114, 128, 0.95);
-            margin-bottom: 0.3rem;
+        .detail-layout {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+        }
+
+        .detail-column-left {
+            flex: 0 0 40%;
+            min-width: 0;
+        }
+
+        .detail-column-right {
+            flex: 1;
+            min-width: 0;
         }
 
         .detail-list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-            font-size: 0.82rem;
-        }
-
-        .detail-list-item {
-            padding: 0.45rem 0.55rem;
-            border-radius: 10px;
-            background: rgba(248, 250, 252, 0.9);
-            border: 1px solid rgba(209, 213, 219, 0.9);
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-        }
-
-        .detail-list-item .meta {
-            font-size: 0.76rem;
-            color: var(--text-secondary);
-        }
-
-        .detail-list-empty {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .detail-footer-actions {
-            margin-top: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .detail-back-btn {
-            border-radius: 999px;
-            border: 1px solid var(--border-subtle);
-            background: #f9fafb;
-            font-size: 0.78rem;
-            padding: 0.45rem 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
-            font-weight: 600;
-        }
-
-        .detail-back-btn span.icon {
-            font-size: 0.9rem;
-        }
-
-        .detail-back-btn:hover {
-            border-color: var(--border-strong);
-            background: #ffffff;
-            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
-        }
-
-        .history-chip {
-            border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.6);
-            background: rgba(248, 250, 252, 0.95);
-            font-size: 0.76rem;
-            padding: 0.35rem 0.75rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-
-        /* MODALS */
-
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-            padding: 1.2rem;
-        }
-
-        .modal-backdrop.visible {
-            display: flex;
-        }
-
-        .modal {
-            width: 100%;
-            max-width: 540px;
-            max-height: 90vh;
-            background: #f9fafb;
-            border-radius: 24px;
-            border: 1px solid rgba(148, 163, 184, 0.65);
-            box-shadow: 0 30px 80px rgba(15, 23, 42, 0.65);
-            padding: 1.4rem 1.6rem 1.5rem;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             gap: 0.9rem;
-            position: relative;
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 0.3rem;
         }
 
-        .modal-scroll {
+        .detail-list .card {
+            padding: 1.1rem 1.3rem;
+        }
+
+        .detail-list .card-title {
+            font-size: 1rem;
+        }
+
+        /* HISTORY */
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .history-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .history-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .history-tabs {
+            display: inline-flex;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.04);
+            padding: 0.2rem;
+        }
+
+        .history-tab-btn {
+            border: none;
+            background: transparent;
+            border-radius: 999px;
+            padding: 0.35rem 0.9rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .history-tab-btn.active {
+            background: #ffffff;
+            color: var(--text-primary);
+            box-shadow: 0 4px 10px rgba(15,23,42,0.12);
+        }
+
+        .history-add-btn {
+            padding-inline: 1rem;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 460px;
             overflow-y: auto;
-            padding-right: 0.4rem;
-            margin-right: -0.4rem;
+        }
+
+        .history-item {
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            padding: 0.8rem 1rem;
+        }
+
+        .history-item.note {
+            border-left: 3px solid var(--accent);
+        }
+
+        .history-item.event {
+            border-left: 3px solid var(--text-secondary);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.35rem;
+        }
+
+        .history-item-type {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--text-secondary);
+        }
+
+        .history-item-meta {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        .history-item-body {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state.small {
+            padding: 2.2rem 1.4rem;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.6rem;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        /* MODAL */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 100%;
+            max-width: 520px;
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border-subtle);
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 0.8rem;
-            margin-bottom: 0.2rem;
+            align-items: center;
+            margin-bottom: 1.8rem;
         }
 
         .modal-header h2 {
@@ -1068,129 +917,197 @@
         }
 
         .close-btn:hover {
-            background: rgba(15, 23, 42, 0.04);
+            background: rgba(15,23,42,0.04);
             border-color: var(--border-strong);
         }
 
-        .modal-description {
-            font-size: 0.84rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.6rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem 1rem;
-            margin-bottom: 0.4rem;
-        }
-
-        .form-grid.full-width {
-            grid-template-columns: 1fr;
-        }
-
         .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
+            margin-bottom: 1.4rem;
         }
 
         .form-group label {
-            font-size: 0.8rem;
-            font-weight: 500;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 600;
+            color: var(--text-secondary);
         }
 
-        .optional {
+        .form-group label .optional {
             font-weight: 400;
-            color: var(--text-secondary);
-            font-size: 0.76rem;
+            opacity: 0.6;
         }
 
         .form-group input,
         .form-group textarea,
         .form-group select {
+            width: 100%;
+            padding: 0.85rem 1.1rem;
+            border: 1px solid var(--border-subtle);
             border-radius: 12px;
-            border: 1px solid rgba(148, 163, 184, 0.9);
-            padding: 0.55rem 0.7rem;
-            font-size: 0.85rem;
-            background: #f9fafb;
-            outline: none;
-            transition: all 0.16s ease;
-            font-family: inherit;
+            background: var(--surface);
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
         }
 
         .form-group textarea {
+            min-height: 100px;
             resize: vertical;
-            min-height: 70px;
-            max-height: 200px;
         }
 
         .form-group input:focus,
         .form-group textarea:focus,
         .form-group select:focus {
-            border-color: rgba(37, 99, 235, 0.6);
-            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.4);
-            background: #ffffff;
+            outline: none;
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(15,23,42,0.08);
         }
 
-        .form-footer {
+        .modal-actions {
             display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 0.6rem;
-            margin-top: 0.4rem;
+            gap: 0.8rem;
+            margin-top: 2rem;
         }
 
-        .btn-ghost {
-            border-radius: 999px;
-            border: 1px solid var(--border-subtle);
-            background: transparent;
-            padding: 0.45rem 0.95rem;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
+        .btn {
+            flex: 1;
+            padding: 0.85rem 1.4rem;
+            border-radius: var(--radius-chip);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
             cursor: pointer;
+            transition: all 0.18s ease;
         }
 
         .btn-primary {
-            border-radius: 999px;
-            border: none;
-            background: #111827;
-            color: #f9fafb;
-            padding: 0.55rem 1.2rem;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
-            font-weight: 600;
+            border: 1px solid var(--text-primary);
+            background: var(--text-primary);
+            color: #f5f1ed;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(15,23,42,0.24);
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--border-strong);
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(15,23,42,0.03);
+            border-color: var(--text-primary);
+        }
+
+        /* COMPANY PICKER */
+
+        .company-picker {
+            position: relative;
+        }
+
+        .company-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 0.25rem;
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 18px 40px rgba(15,23,42,0.22);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 1500;
+            display: none;
+        }
+
+        .company-suggestions.visible {
+            display: block;
+        }
+
+        .company-suggestion-item {
+            padding: 0.55rem 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
             cursor: pointer;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.6);
         }
 
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: default;
-            box-shadow: none;
+        .company-suggestion-item:hover {
+            background: rgba(15,23,42,0.04);
         }
 
-        /* SNACKBAR / STATUS */
+        .company-suggestion-item .suggestion-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-left: 0.75rem;
+        }
+
+        .company-suggestion-new {
+            font-weight: 600;
+        }
+
+        /* LOADING */
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border-subtle);
+            border-top-color: var(--text-primary);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 1.2rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-secondary);
+        }
+
+        /* STATUS MESSAGE */
 
         .status-message {
             position: fixed;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 0.7rem 1.1rem;
-            border-radius: 999px;
-            background: #111827;
-            color: #f9fafb;
-            font-size: 0.8rem;
+            top: 1.4rem;
+            right: 1.4rem;
+            padding: 0.85rem 1.1rem;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid rgba(15,23,42,0.16);
+            box-shadow: 0 18px 40px rgba(15,23,42,0.22);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-primary);
             display: inline-flex;
             align-items: center;
             gap: 0.55rem;
-            z-index: 100;
-            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.7);
-            animation: slideInUp 0.18s ease-out;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease-out;
         }
 
         .status-message::before {
@@ -1209,213 +1126,15 @@
             background: var(--error);
         }
 
-        @keyframes slideInUp {
+        @keyframes slideInRight {
             from {
                 opacity: 0;
-                transform: translate(-50%, 16px);
+                transform: translateX(16px);
             }
             to {
                 opacity: 1;
-                transform: translate(-50%, 0);
+                transform: translateX(0);
             }
-        }
-
-        /* LIVE STATUS BADGE (EXAMPLE) */
-
-        .live-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.28rem 0.7rem;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.04);
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-        }
-
-        .live-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 999px;
-            background: #22c55e;
-            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.35);
-            animation: pulse 1.2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            60% {
-                transform: scale(1.35);
-                opacity: 0.45;
-            }
-            100% {
-                transform: scale(1.8);
-                opacity: 0;
-            }
-        }
-
-        /* SCROLLBARS */
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.9);
-            border-radius: 999px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(249, 250, 251, 0.9);
-        }
-
-        /* VIEW TOGGLE & LIST VIEW */
-
-        .view-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.1rem;
-            padding: 0.18rem;
-            border-radius: 999px;
-            background: rgba(15,23,42,0.04);
-        }
-
-        .view-toggle-btn {
-            border: none;
-            background: transparent;
-            border-radius: 999px;
-            padding: 0.3rem 0.8rem;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
-        }
-
-        .view-toggle-btn.active {
-            background: #ffffff;
-            color: var(--text-primary);
-            box-shadow: 0 4px 10px rgba(15,23,42,0.12);
-        }
-
-        .list-wrapper {
-            border-radius: var(--radius-card);
-            border: 1px solid var(--border-subtle);
-            background: var(--surface);
-            box-shadow: var(--shadow-card);
-            overflow: hidden;
-        }
-
-        .list-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-
-        .list-table thead {
-            background: rgba(15,23,42,0.02);
-        }
-
-        .list-table th,
-        .list-table td {
-            padding: 0.7rem 1rem;
-            border-bottom: 1px solid var(--border-subtle);
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        .list-table th {
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: var(--text-secondary);
-            white-space: nowrap;
-        }
-
-        .list-table tbody tr:hover {
-            background: rgba(15,23,42,0.02);
-        }
-
-        .list-primary {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .list-secondary {
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-        }
-
-        .list-cell-main {
-            display: flex;
-            flex-direction: column;
-            gap: 0.18rem;
-        }
-
-        .list-cell-actions {
-            white-space: nowrap;
-        }
-
-        .list-badge-warning {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.2rem 0.6rem;
-            border-radius: 999px;
-            background: rgba(220,38,38,0.08);
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: var(--error);
-        }
-
-        /* DETAIL HEADER & EDIT BUTTON */
-
-        .detail-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .detail-actions {
-            flex-shrink: 0;
-        }
-
-        .detail-edit-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.55rem 1rem;
-            border-radius: var(--radius-chip);
-            border: 1px solid var(--border-strong);
-            background: transparent;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            cursor: pointer;
-            transition:
-                background 0.18s ease,
-                border-color 0.18s ease,
-                box-shadow 0.18s ease,
-                transform 0.18s ease;
-        }
-
-        .detail-edit-btn:hover {
-            background: rgba(15,23,42,0.03);
-            border-color: var(--text-primary);
-            box-shadow: 0 8px 20px rgba(15,23,42,0.16);
-            transform: translateY(-1px);
         }
 
         /* RESPONSIVE */
@@ -1434,161 +1153,135 @@
 
         @media (max-width: 768px) {
             .app-inner {
-                padding: 0 1.3rem 2rem;
-            }
-
-            .login-card {
-                padding: 1.9rem 1.7rem 1.8rem;
-            }
-
-            .login-points {
-                grid-template-columns: 1fr;
+                margin: 2.2rem auto 2.6rem;
+                padding: 0 1.4rem;
             }
 
             .app-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 0.8rem;
+                gap: 0.9rem;
             }
 
-            .status-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .cards-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .detail-layout {
-                gap: 0.8rem;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .login-footer {
-                flex-direction: column-reverse;
-                align-items: flex-start;
-            }
-
-            .tabs {
+            .app-header-right {
                 width: 100%;
                 justify-content: space-between;
-            }
-
-            .tab-btn {
-                flex: 1;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 1.7rem 1.4rem 1.6rem;
             }
 
             .section-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 0.8rem;
             }
 
-            .status-row {
-                gap: 0.6rem;
+            .toolbar {
+                width: 100%;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .login-card {
+                padding: 2.2rem 2.0rem 2.1rem;
+                border-radius: 20px;
+            }
+
+            .modal-content {
+                padding: 1.7rem 1.4rem 1.5rem;
+                border-radius: 18px;
+            }
+
+            .tab-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.7rem;
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 2rem 1.6rem 1.9rem;
+            }
+
+            .app-inner {
+                padding: 0 1.1rem;
+            }
+
+            .history-controls {
+                flex-direction: column-reverse;
+                align-items: flex-start;
             }
         }
     </style>
 </head>
 <body>
-<div class="app-shell">
-    <div class="app-inner">
-        <header class="app-header">
-            <div class="app-header-left">
-                <div class="app-logo">Simplify CRM</div>
-                <div class="app-logo-subtitle">Twój partner w interesach</div>
-            </div>
-            <div class="app-header-right">
-                <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">Wyloguj</button>
-            </div>
-        </header>
-
-        <!-- LOGIN VIEW -->
-        <main id="loginView" class="login-wrapper">
-            <section class="login-card">
-                <div class="login-card-inner">
-                    <div class="login-eyebrow">Panel wdrożeniowy</div>
-                    <h1 class="login-title">Simplify CRM</h1>
-                    <div class="login-badge">
-                        <span class="login-badge-dot"></span>
-                        <span>Gotowy szkielet CRM pod Twoje procesy</span>
-                    </div>
-                    <p class="login-subtitle">
-                        Zaloguj się, aby pracować na swojej bazie <span>firm i kontaktów</span>,
-                        śledzić historię współpracy i łatwo rozwijać procesy sprzedażowe.
-                    </p>
-
-                    <div class="login-points">
-                        <div class="login-point">
-                            <div class="login-point-icon">⚡</div>
-                            <div>
-                                <strong>Szybki start, zero kodowania</strong><br>
-                                Wchodzisz do gotowego systemu, który możesz samodzielnie rozbudowywać.
-                            </div>
-                        </div>
-                        <div class="login-point">
-                            <div class="login-point-icon">📚</div>
-                            <div>
-                                <strong>Jedno miejsce na całą relację</strong><br>
-                                Dane firm, kontakty, notatki i historia działań w jednym prostym widoku.
-                            </div>
-                        </div>
-                        <div class="login-point">
-                            <div class="login-point-icon">👥</div>
-                            <div>
-                                <strong>CRM dla Ciebie i zespołu</strong><br>
-                                Dziel się bazą z zespołem, aby każdy widział ten sam aktualny obraz klienta.
-                            </div>
-                        </div>
-                        <div class="login-point">
-                            <div class="login-point-icon">📈</div>
-                            <div>
-                                <strong>Podłoże pod dalszą rozbudowę</strong><br>
-                                Baza, którą można łatwo spiąć z procesami sprzedaży i raportowaniem.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="login-footer">
-                        <div class="login-meta">
-                            <div><b>Simplify CRM</b> – Twój partner w porządkowaniu relacji z klientami</div>
-                            <span>Po zalogowaniu zobaczysz przykładową bazę firm i kontaktów.</span>
-                        </div>
-                        <button id="loginBtn" class="login-btn">
-                            <span class="icon">🔐</span>
-                            <span>Zaloguj przez Google</span>
-                        </button>
-                    </div>
-
-                    <div class="login-status">
-                        <div class="login-status-dot"></div>
-                        <div>
-                            Połączenie zabezpieczone przez Google OAuth. Dostęp tylko do arkuszy z Twoim CRM.
-                        </div>
-                    </div>
-                    <div class="login-note">
-                        Dane klientów pozostają w Twojej przestrzeni – system jedynie je prezentuje i porządkuje.
-                    </div>
+    <!-- LOGIN -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-inner">
+                <div class="app-pill">
+                    <span class="app-pill-dot"></span>
+                    Business CRM
                 </div>
-            </section>
-        </main>
+                <h1 class="app-title">Simplify CRM</h1>
+                <p class="app-subtitle">Zarządzaj relacjami z klientami</p>
 
-        <!-- APP MAIN VIEW -->
-        <main id="appMain" class="app-main">
+                <p class="app-description">
+                    Zaloguj się kontem Google, aby pracować na swoim arkuszu z firmami i kontaktami.
+                    Dodawaj firmy, osoby kontaktowe, historię współpracy i śledź wszystkie zmiany jak w prawdziwym CRM.
+                </p>
+
+                <button id="loginBtn" class="google-btn" disabled>
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="#EA4335" d="M12 10.2v3.7h5.2c-.2 1.2-.9 2.3-2 3.1l3.3 2.6c1.9-1.8 3-4.4 3-7.4 0-.7-.1-1.3-.2-2H12z"/>
+                            <path fill="#34A853" d="M6.6 14.3 5.9 14.8l-2.6 2C5.1 19.9 8.3 21.8 12 21.8c2.7 0 5-.9 6.6-2.4l-3.3-2.6c-.9.6-2 1-3.3 1-2.5 0-4.6-1.7-5.4-4z"/>
+                            <path fill="#4A90E2" d="M3.3 8.8C2.8 10 2.5 11.2 2.5 12.5s.3 2.5.8 3.7l3.3-2.6c-.2-.6-.3-1.2-.3-1.9 0-.6.1-1.3.3-1.9L3.3 8.8z"/>
+                            <path fill="#FBBC05" d="M12 5.2c1.5 0 2.8.5 3.8 1.4l2.8-2.8C16.9 2.2 14.7 1.2 12 1.2 8.3 1.2 5.1 3.1 3.3 6.2l3.3 2.6c.8-2.3 2.9-3.6 5.4-3.6z"/>
+                        </svg>
+                    </span>
+                    <span>Zaloguj przez Google</span>
+                </button>
+
+                <p class="login-hint">
+                    Po pierwszym zalogowaniu wyraź zgodę na dostęp do arkuszy Google i adresu e-mail.
+                    Sesja będzie zapamiętana, więc po odświeżeniu strony nie będziesz musiał logować się od nowa.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="appScreen" class="app-container">
+        <div class="app-inner">
+            <header class="app-header">
+                <div class="app-header-left">
+                    <div class="app-logo">Simplify CRM</div>
+                    <div class="app-logo-subtitle">Prosty CRM na Google Sheets</div>
+                </div>
+                <div class="app-header-right">
+                    <span class="user-email" id="userEmail"></span>
+                    <button id="logoutBtn" class="logout-btn">Wyloguj</button>
+                </div>
+            </header>
+
+            <!-- GLOBAL SEARCH -->
+            <div class="global-search">
+                <div class="search-input-container">
+                    <span class="search-icon">🔍</span>
+                    <input id="globalSearchInput" type="text" placeholder="Szukaj w firmach i kontaktach..." autocomplete="off">
+                    <button id="clearSearchBtn" type="button" class="clear-search-btn">Wyczyść</button>
+                </div>
+                <p class="search-hint">
+                    Szukaj po nazwie firmy, osobie, stanowisku, e-mailu, telefonie, branży, mieście itd.
+                </p>
+            </div>
+
+            <!-- TABS -->
             <div class="tabs">
                 <button class="tab-btn active" data-tab="contacts">Kontakty</button>
                 <button class="tab-btn" data-tab="companies">Firmy</button>
@@ -1607,10 +1300,6 @@
                             </p>
                         </div>
                         <div class="toolbar">
-                            <div class="view-toggle" data-entity="contacts">
-                                <button type="button" class="view-toggle-btn active" data-view="cards">Kafelki</button>
-                                <button type="button" class="view-toggle-btn" data-view="list">Lista</button>
-                            </div>
                             <button id="addContactBtn" class="add-btn">
                                 <span class="plus">+</span>
                                 <span>Dodaj kontakt</span>
@@ -1626,52 +1315,67 @@
                     <div id="contactsEmpty" class="empty-state" style="display: none;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M9 20H4v-2a3 3 0 015.356-1.857M15 11a3 3 0 10-6 0 3 3 0 006 0zm6 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                         <h3>Brak kontaktów</h3>
-                        <p>Dodaj pierwszy kontakt, aby zacząć pracę z Simplify CRM.</p>
+                        <p>Dodaj pierwszy kontakt, aby rozpocząć pracę w CRM.</p>
                     </div>
 
                     <div id="contactsGrid" class="cards-grid"></div>
                 </div>
 
-                <!-- DETAIL VIEW -->
-                <div id="contactDetailView" style="display: none;">
-                    <div class="section-header small">
-                        <div class="section-title-block">
-                            <h1 class="section-title">Szczegóły kontaktu</h1>
-                            <div class="section-underline"></div>
-                            <p class="section-subtitle">
-                                Podgląd danych kontaktowych, powiązanej firmy oraz historii działań.
-                            </p>
-                        </div>
-                        <div class="toolbar">
-                            <button id="backToContactsBtn" class="detail-back-btn">
-                                <span class="icon">←</span>
-                                <span>Wróć do listy kontaktów</span>
-                            </button>
-                        </div>
+                <!-- CONTACT DETAIL VIEW -->
+                <div id="contactDetailView" class="detail-view">
+                    <button id="backToContactsBtn" class="back-btn">
+                        <span>←</span>
+                        <span>Powrót do listy kontaktów</span>
+                    </button>
+
+                    <div class="detail-card">
+                        <div id="contactDetailContent"></div>
                     </div>
 
                     <div class="detail-layout">
+                        <!-- LEFT: COMPANY OF CONTACT -->
                         <div class="detail-column-left">
-                            <div id="contactDetailContent"></div>
+                            <div class="section-header small">
+                                <div class="section-title-block">
+                                    <h1 class="section-title">Firma kontaktu</h1>
+                                    <div class="section-underline"></div>
+                                </div>
+                            </div>
+
+                            <div id="contactCompanyEmpty" class="empty-state small" style="display: none;">
+                                <h3>Brak firmy</h3>
+                                <p>Ten kontakt nie jest jeszcze przypisany do firmy.</p>
+                            </div>
+
+                            <div id="contactCompanyCardContainer" class="detail-list"></div>
                         </div>
+
+                        <!-- RIGHT: CONTACT HISTORY -->
                         <div class="detail-column-right">
-                            <div class="detail-section">
-                                <div class="detail-section-title">Firma</div>
-                                <div id="contactCompanyCardContainer"></div>
-                                <div id="contactCompanyEmpty" class="detail-list-empty">
-                                    Ten kontakt nie ma jeszcze przypisanej firmy.
+                            <div class="history-header">
+                                <div>
+                                    <h2 class="history-title">Historia kontaktu</h2>
+                                </div>
+                                <div class="history-controls">
+                                    <div class="history-tabs">
+                                        <button class="history-tab-btn active" data-entity="contact" data-scope="notes">Notatki</button>
+                                        <button class="history-tab-btn" data-entity="contact" data-scope="full">Full stream</button>
+                                    </div>
+                                    <button id="addContactNoteBtn" class="add-btn history-add-btn">
+                                        <span class="plus">+</span>
+                                        <span>Dodaj notatkę</span>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="detail-section">
-                                <div class="detail-section-title">Historia współpracy</div>
-                                <ul id="contactHistoryList" class="detail-list"></ul>
-                                <div id="contactHistoryEmpty" class="detail-list-empty">
-                                    Brak zapisanych zdarzeń powiązanych z tym kontaktem.
-                                </div>
+
+                            <div id="contactHistoryEmpty" class="empty-state small" style="display:none;">
+                                <h3>Brak historii</h3>
+                                <p>Nie dodano jeszcze żadnych notatek ani zdarzeń dla tego kontaktu.</p>
                             </div>
+                            <div id="contactHistoryList" class="history-list"></div>
                         </div>
                     </div>
                 </div>
@@ -1679,21 +1383,17 @@
 
             <!-- TAB: COMPANIES -->
             <div id="companiesTab" class="tab-content">
-                <!-- LIST VIEW -->
+                <!-- COMPANY LIST VIEW -->
                 <div id="companiesListView">
                     <div class="section-header">
                         <div class="section-title-block">
                             <h1 class="section-title">Firmy</h1>
                             <div class="section-underline"></div>
                             <p class="section-subtitle">
-                                Zarządzaj listą firm, z którymi współpracuje Twój biznes. Każda firma może mieć przypisanych wielu kontaktów oraz historię współpracy.
+                                Zarządzaj listą firm, z którymi współpracujesz. Każda firma może mieć przypisanych wielu kontaktów oraz historię współpracy.
                             </p>
                         </div>
                         <div class="toolbar">
-                            <div class="view-toggle" data-entity="companies">
-                                <button type="button" class="view-toggle-btn active" data-view="cards">Kafelki</button>
-                                <button type="button" class="view-toggle-btn" data-view="list">Lista</button>
-                            </div>
                             <button id="addCompanyBtn" class="add-btn">
                                 <span class="plus">+</span>
                                 <span>Dodaj firmę</span>
@@ -1709,66 +1409,192 @@
                     <div id="companiesEmpty" class="empty-state" style="display: none;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M3 7l9-4 9 4-9 4-9-4zm0 8l9-4 9 4-9 4-9-4z"/>
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
                         <h3>Brak firm</h3>
-                        <p>Dodaj pierwszą firmę, aby rozpocząć pracę w Simplify CRM.</p>
+                        <p>Dodaj pierwszą firmę, aby rozpocząć pracę w CRM.</p>
                     </div>
 
                     <div id="companiesGrid" class="cards-grid"></div>
                 </div>
 
-                <!-- DETAIL VIEW -->
-                <div id="companyDetailView" style="display: none;">
-                    <div class="section-header small">
-                        <div class="section-title-block">
-                            <h1 class="section-title">Szczegóły firmy</h1>
-                            <div class="section-underline"></div>
-                            <p class="section-subtitle">
-                                Podgląd danych firmy, przypisanych kontaktów oraz historii współpracy.
-                            </p>
-                        </div>
-                        <div class="toolbar">
-                            <button id="backToCompaniesBtn" class="detail-back-btn">
-                                <span class="icon">←</span>
-                                <span>Wróć do listy firm</span>
-                            </button>
-                        </div>
+                <!-- COMPANY DETAIL VIEW -->
+                <div id="companyDetailView" class="detail-view">
+                    <button id="backToCompaniesBtn" class="back-btn">
+                        <span>←</span>
+                        <span>Powrót do listy firm</span>
+                    </button>
+
+                    <div class="detail-card">
+                        <div id="companyDetailContent"></div>
                     </div>
 
                     <div class="detail-layout">
+                        <!-- LEFT: CONTACTS IN COMPANY -->
                         <div class="detail-column-left">
-                            <div id="companyDetailContent"></div>
+                            <div class="section-header small">
+                                <div class="section-title-block">
+                                    <h1 class="section-title">Kontakty w firmie</h1>
+                                    <div class="section-underline"></div>
+                                </div>
+                                <div class="toolbar">
+                                    <button id="addCompanyContactBtn" class="add-btn">
+                                        <span class="plus">+</span>
+                                        <span>Dodaj kontakt</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="companyContactsEmpty" class="empty-state small" style="display: none;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <h3>Brak kontaktów</h3>
+                                <p>Dodaj pierwszy kontakt dla tej firmy.</p>
+                            </div>
+
+                            <div id="companyContactsList" class="detail-list"></div>
                         </div>
+
+                        <!-- RIGHT: COMPANY HISTORY -->
                         <div class="detail-column-right">
-                            <div class="detail-section">
-                                <div class="detail-section-title">Kontakty</div>
-                                <ul id="companyContactsList" class="detail-list"></ul>
-                                <div id="companyContactsEmpty" class="detail-list-empty">
-                                    Brak kontaktów przypisanych do tej firmy.
+                            <div class="history-header">
+                                <div>
+                                    <h2 class="history-title">Historia klienta</h2>
+                                </div>
+                                <div class="history-controls">
+                                    <div class="history-tabs">
+                                        <button class="history-tab-btn active" data-entity="company" data-scope="notes">Notatki</button>
+                                        <button class="history-tab-btn" data-entity="company" data-scope="full">Full stream</button>
+                                    </div>
+                                    <button id="addCompanyNoteBtn" class="add-btn history-add-btn">
+                                        <span class="plus">+</span>
+                                        <span>Dodaj notatkę</span>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="detail-section">
-                                <div class="detail-section-title">Historia współpracy</div>
-                                <ul id="companyHistoryList" class="detail-list"></ul>
-                                <div id="companyHistoryEmpty" class="detail-list-empty">
-                                    Brak zapisanych zdarzeń powiązanych z tą firmą.
-                                </div>
+
+                            <div id="companyHistoryEmpty" class="empty-state small" style="display:none;">
+                                <h3>Brak historii</h3>
+                                <p>Nie dodano jeszcze żadnych notatek ani zdarzeń dla tej firmy.</p>
                             </div>
+                            <div id="companyHistoryList" class="history-list"></div>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
-</div>
 
-<!-- GOOGLE APIs -->
-<script src="https://apis.google.com/js/api.js" async defer onload="gapiLoaded()"></script>
-<script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
+    <!-- MODAL: ADD/EDIT COMPANY -->
+    <div id="companyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="companyModalTitle">Dodaj firmę</h2>
+                <button class="close-btn" id="closeCompanyModalBtn">&times;</button>
+            </div>
+            <form id="companyForm">
+                <div class="form-group">
+                    <label for="companyName">Nazwa firmy *</label>
+                    <input type="text" id="companyName" required>
+                </div>
+                <div class="form-group">
+                    <label for="companyIndustry">Branża <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyIndustry" placeholder="np. IT, Marketing, Finanse">
+                </div>
+                <div class="form-group">
+                    <label for="companyWebsite">Strona WWW <span class="optional">(opcjonalnie)</span></label>
+                    <input type="url" id="companyWebsite" placeholder="np. https://twojafirma.pl">
+                </div>
+                <div class="form-group">
+                    <label for="companyPhone">Telefon firmowy <span class="optional">(opcjonalnie)</span></label>
+                    <input type="tel" id="companyPhone" placeholder="np. +48 123 456 789">
+                </div>
+                <div class="form-group">
+                    <label for="companyCity">Miasto <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyCity" placeholder="np. Warszawa">
+                </div>
+                <div class="form-group">
+                    <label for="companyCountry">Kraj <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyCountry" placeholder="np. Polska">
+                </div>
+                <div class="form-group">
+                    <label for="companyNotes">Notatki <span class="optional">(opcjonalnie)</span></label>
+                    <textarea id="companyNotes" placeholder="Dodatkowe informacje o firmie"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelCompanyBtn">Anuluj</button>
+                    <button type="submit" class="btn btn-primary">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-<!-- CRM LOGIC -->
-<script>
+    <!-- MODAL: ADD/EDIT CONTACT -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="contactModalTitle">Dodaj kontakt</h2>
+                <button class="close-btn" id="closeContactModalBtn">&times;</button>
+            </div>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="contactName">Imię i nazwisko *</label>
+                    <input type="text" id="contactName" required>
+                </div>
+                <div class="form-group">
+                    <label for="contactCompanyInput">Firma <span class="optional">(opcjonalnie)</span></label>
+                    <div class="company-picker">
+                        <input type="text" id="contactCompanyInput" placeholder="Zacznij pisać nazwę firmy...">
+                        <input type="hidden" id="contactCompanyId">
+                        <div id="companySuggestions" class="company-suggestions"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="contactPosition">Stanowisko <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="contactPosition" placeholder="np. CEO, Marketing Manager">
+                </div>
+                <div class="form-group">
+                    <label for="contactEmail">Email <span class="optional">(opcjonalnie)</span></label>
+                    <input type="email" id="contactEmail">
+                </div>
+                <div class="form-group">
+                    <label for="contactPhone">Telefon <span class="optional">(opcjonalnie)</span></label>
+                    <input type="tel" id="contactPhone">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelContactBtn">Anuluj</button>
+                    <button type="submit" class="btn btn-primary">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD NOTE -->
+    <div id="noteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="noteModalTitle">Dodaj notatkę</h2>
+                <button class="close-btn" id="closeNoteModalBtn">&times;</button>
+            </div>
+            <form id="noteForm">
+                <input type="hidden" id="noteEntityType">
+                <input type="hidden" id="noteEntityId">
+                <div class="form-group">
+                    <label for="noteContent">Treść notatki *</label>
+                    <textarea id="noteContent" required placeholder="Wpisz notatkę dotyczącą tej firmy / kontaktu..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelNoteBtn">Anuluj</button>
+                    <button type="submit" class="btn btn-primary">Zapisz notatkę</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- GOOGLE API INIT -->
+    <script>
         const CONFIG = {
             CLIENT_ID: '567555578754-nsqdiab9suu01a9i1mdgc30vf5g9rq2k.apps.googleusercontent.com',
             SHEET_ID: '1A4vT2_sQnM48Q74jLPqGIT27P8NRdzKwiOsiDdMByJ0',
@@ -1803,149 +1629,103 @@
             try {
                 await gapi.client.init({
                     apiKey: '',
-                    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
+                    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
                 });
                 gapiInited = true;
+                console.log('✓ GAPI client initialized');
                 maybeEnableButtons();
             } catch (err) {
-                console.error(err);
-                showStatus('Nie udało się zainicjować Google API', 'error');
+                console.error('✗ Błąd inicjalizacji GAPI client:', err);
+                showStatus('Błąd inicjalizacji Google API', 'error');
             }
         }
 
         function gisLoaded() {
-            console.log('✓ Google Identity Services loaded');
-            gisInited = true;
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CONFIG.CLIENT_ID,
-                scope: CONFIG.SCOPES,
-                callback: (response) => {
-                    if (response.error) {
-                        console.error(response);
-                        showStatus('Błąd logowania', 'error');
-                        return;
-                    }
-                    accessToken = response.access_token;
-                    onLoginSuccess();
-                }
-            });
-            maybeEnableButtons();
+            console.log('✓ Google Identity Services (GIS) loaded');
+            try {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: CONFIG.CLIENT_ID,
+                    scope: CONFIG.SCOPES,
+                    callback: '',
+                });
+                gisInited = true;
+                console.log('✓ GIS token client initialized');
+                maybeEnableButtons();
+            } catch (err) {
+                console.error('✗ Błąd inicjalizacji GIS:', err);
+                showStatus('Błąd konfiguracji logowania', 'error');
+            }
         }
 
         function maybeEnableButtons() {
             if (gapiInited && gisInited) {
-                document.getElementById('loginBtn').disabled = false;
-                restoreSession();
+                const loginBtn = document.getElementById('loginBtn');
+                if (loginBtn) {
+                    loginBtn.disabled = false;
+                    console.log('✓ Wszystkie biblioteki gotowe');
+                }
+                restoreSessionIfPossible();
             }
         }
 
-        async function handleAuthClick() {
+        async function restoreSessionIfPossible() {
+            if (sessionRestored) return;
+            sessionRestored = true;
+
+            try {
+                const raw = localStorage.getItem(SESSION_KEY);
+                if (!raw) return;
+
+                const saved = JSON.parse(raw);
+                if (!saved || !saved.accessToken || !saved.email) {
+                    localStorage.removeItem(SESSION_KEY);
+                    return;
+                }
+
+                window.accessToken = saved.accessToken;
+                gapi.client.setToken({ access_token: saved.accessToken });
+
+                if (typeof showApp === 'function') {
+                    showApp(saved.email);
+                }
+
+                if (typeof loadData === 'function') {
+                    await loadData();
+                    showStatus('Przywrócono sesję', 'success');
+                }
+            } catch (e) {
+                console.error('Nie udało się odtworzyć sesji:', e);
+                localStorage.removeItem(SESSION_KEY);
+                showStatus('Sesja wygasła, zaloguj się ponownie', 'error');
+                if (typeof showLogin === 'function') {
+                    showLogin();
+                }
+            }
+        }
+
+        // Prostego timeoutu pilnującego ładowania bibliotek
+        setTimeout(() => {
             if (!gapiInited || !gisInited) {
-                showStatus('Trwa inicjalizacja połączenia...', 'error');
-                return;
-            }
-
-            try {
-                const response = await new Promise((resolve, reject) => {
-                    tokenClient.callback = (resp) => {
-                        if (resp.error) {
-                            reject(resp);
-                        } else {
-                            resolve(resp);
-                        }
-                    };
-                    tokenClient.requestAccessToken({ prompt: 'consent' });
-                });
-
-                if (response && response.access_token) {
-                    accessToken = response.access_token;
-                    console.log('✓ Access token acquired');
-                    await onLoginSuccess();
+                const loginBtn = document.getElementById('loginBtn');
+                if (loginBtn) {
+                    loginBtn.disabled = true;
+                    loginBtn.textContent = '⚠️ Błąd ładowania';
                 }
-            } catch (error) {
-                console.error(error);
-                showStatus('Nie udało się zalogować', 'error');
+                showStatus('Nie udało się załadować bibliotek Google. Sprawdź połączenie.', 'error');
             }
-        }
+        }, 10000);
+    </script>
 
-        async function handleSignoutClick() {
-            if (accessToken) {
-                try {
-                    await fetch(`https://oauth2.googleapis.com/revoke?token=${accessToken}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-type': 'application/x-www-form-urlencoded'
-                        }
-                    });
-                    console.log('✓ Token revoked');
-                } catch (err) {
-                    console.warn('Error revoking token', err);
-                }
-            }
+    <script src="https://apis.google.com/js/api.js" async defer onload="gapiLoaded()"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
 
-            localStorage.removeItem(SESSION_KEY);
-            accessToken = null;
-            document.getElementById('appMain').classList.remove('visible');
-            document.getElementById('loginView').style.display = 'flex';
-            document.getElementById('userEmail').textContent = '';
-            showStatus('Wylogowano z Simplify CRM', 'success');
-        }
-
-        async function onLoginSuccess() {
-            try {
-                const userInfoResp = await gapi.client.request({
-                    path: 'https://www.googleapis.com/oauth2/v2/userinfo',
-                    headers: {
-                        'Authorization': 'Bearer ' + accessToken
-                    }
-                });
-
-                const email = userInfoResp.result.email;
-                document.getElementById('userEmail').textContent = email || 'Zalogowany użytkownik';
-
-                localStorage.setItem(SESSION_KEY, JSON.stringify({
-                    email,
-                    timestamp: Date.now()
-                }));
-
-                document.getElementById('loginView').style.display = 'none';
-                document.getElementById('appMain').classList.add('visible');
-
-                await loadAllData();
-                showStatus('Zalogowano do Simplify CRM', 'success');
-            } catch (err) {
-                console.error(err);
-                showStatus('Nie udało się pobrać danych użytkownika', 'error');
-            }
-        }
-
-        function restoreSession() {
-            const saved = localStorage.getItem(SESSION_KEY);
-            if (!saved) return;
-
-            try {
-                const session = JSON.parse(saved);
-                if (!session || !session.email) return;
-
-                document.getElementById('userEmail').textContent = session.email;
-                document.getElementById('loginView').style.display = 'none';
-                document.getElementById('appMain').classList.add('visible');
-                sessionRestored = true;
-                showStatus('Przywrócono sesję użytkownika', 'success');
-                loadAllData();
-            } catch (err) {
-                console.warn('Failed to restore session', err);
-            }
-        }
-
+    <!-- CRM LOGIC -->
+    <script>
         let accessToken = null;
         let companies = [];
         let contacts = [];
         let companyHistory = [];
         let contactHistory = [];
-
-        let contactsViewMode = 'cards';
-        let companiesViewMode = 'cards';
 
         let editingCompanyIndex = null;
         let editingContactIndex = null;
@@ -1953,197 +1733,264 @@
         let currentContactId = null;
         let currentSearchTerm = '';
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+        let currentCompanyHistoryScope = 'notes';
+        let currentContactHistoryScope = 'notes';
+        let currentUserEmail = '';
+
+        let companyInputEl = null;
+        let companyIdEl = null;
+        let companySuggestionsEl = null;
+
+        let noteEntityTypeEl = null;
+        let noteEntityIdEl = null;
+        let noteContentEl = null;
+
+        // AUTH
+
+        function handleAuthClick() {
+            if (!tokenClient) {
+                showStatus('Błąd: Google nie załadowane', 'error');
+                return;
+            }
+
+            tokenClient.callback = async (resp) => {
+                if (resp.error !== undefined) {
+                    console.error('Błąd autoryzacji:', resp);
+                    showStatus('Błąd logowania: ' + resp.error, 'error');
+                    return;
+                }
+
+                try {
+                    if (resp && resp.access_token) {
+                        accessToken = resp.access_token;
+                        gapi.client.setToken({ access_token: accessToken });
+                    } else if (gapi.client.getToken()) {
+                        accessToken = gapi.client.getToken().access_token;
+                    }
+
+                    const userInfo = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                        headers: { Authorization: `Bearer ${accessToken}` }
+                    }).then(r => r.json());
+
+                    const email = userInfo.email || '';
+                    currentUserEmail = email;
+
+                    localStorage.setItem(SESSION_KEY, JSON.stringify({
+                        accessToken,
+                        email
+                    }));
+
+                    showApp(email);
+                    await loadData();
+                } catch (err) {
+                    console.error('Błąd pobierania danych użytkownika:', err);
+                    showStatus('Błąd pobierania danych użytkownika', 'error');
+                }
+            };
+
+            try {
+                if (gapi.client.getToken() === null) {
+                    tokenClient.requestAccessToken({ prompt: 'consent' });
+                } else {
+                    tokenClient.requestAccessToken({ prompt: '' });
+                }
+            } catch (err) {
+                console.error('Błąd requestAccessToken:', err);
+                showStatus('Błąd autoryzacji', 'error');
+            }
         }
 
-        async function loadAllData() {
+        function handleSignoutClick() {
+            const token = gapi.client.getToken();
+            if (token !== null) {
+                google.accounts.oauth2.revoke(token.access_token);
+                gapi.client.setToken(null);
+            }
+            accessToken = null;
+            companies = [];
+            contacts = [];
+            companyHistory = [];
+            contactHistory = [];
+            currentCompanyId = null;
+            currentContactId = null;
+            currentSearchTerm = '';
+            localStorage.removeItem(SESSION_KEY);
+            showLogin();
+        }
+
+        function showApp(email) {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appScreen').classList.add('active');
+            document.getElementById('userEmail').textContent = email;
+            currentUserEmail = email;
+        }
+
+        function showLogin() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appScreen').classList.remove('active');
+            const searchInput = document.getElementById('globalSearchInput');
+            if (searchInput) searchInput.value = '';
+        }
+
+        // DATA LOADING
+
+        async function loadData() {
+            if (!CONFIG.SHEET_ID || CONFIG.SHEET_ID === 'YOUR_SHEET_ID') {
+                showStatus('Błąd: ustaw SHEET_ID w konfiguracji', 'error');
+                return;
+            }
+            await Promise.all([loadCompanies(), loadContacts()]);
+            await Promise.all([loadCompanyHistory(), loadContactHistory()]);
+        }
+
+        async function loadCompanies() {
+            const loading = document.getElementById('companiesLoading');
+            const grid = document.getElementById('companiesGrid');
+            const empty = document.getElementById('companiesEmpty');
+
+            loading.style.display = 'block';
+            grid.innerHTML = '';
+            empty.style.display = 'none';
+
             try {
-                document.getElementById('companiesLoading').style.display = 'flex';
-                document.getElementById('contactsLoading').style.display = 'flex';
+                const response = await gapi.client.sheets.spreadsheets.values.get({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range: `${CONFIG.COMPANIES_SHEET}!A2:H`,
+                });
 
-                const [companiesResp, contactsResp, historyCompaniesResp, historyContactsResp] = await Promise.all([
-                    gapi.client.sheets.spreadsheets.values.get({
-                        spreadsheetId: CONFIG.SHEET_ID,
-                        range: CONFIG.COMPANIES_SHEET
-                    }),
-                    gapi.client.sheets.spreadsheets.values.get({
-                        spreadsheetId: CONFIG.SHEET_ID,
-                        range: CONFIG.CONTACTS_SHEET
-                    }),
-                    gapi.client.sheets.spreadsheets.values.get({
-                        spreadsheetId: CONFIG.SHEET_ID,
-                        range: CONFIG.HISTORY_COMPANIES_SHEET
-                    }),
-                    gapi.client.sheets.spreadsheets.values.get({
-                        spreadsheetId: CONFIG.SHEET_ID,
-                        range: CONFIG.HISTORY_CONTACTS_SHEET
-                    })
-                ]);
-
-                parseCompanies(companiesResp.result.values || []);
-                parseContacts(contactsResp.result.values || []);
-                parseCompanyHistory(historyCompaniesResp.result.values || []);
-                parseContactHistory(historyContactsResp.result.values || []);
+                const rows = response.result.values || [];
+                companies = rows.map(row => ({
+                    id: row[0] || generateId(),
+                    name: row[1] || '',
+                    industry: row[2] || '',
+                    notes: row[3] || '',
+                    website: row[4] || '',
+                    phone: row[5] || '',
+                    city: row[6] || '',
+                    country: row[7] || ''
+                })).filter(c => c.name);
 
                 renderCompanies();
+                renderAllContacts(); // żeby relacje firma–kontakt były od razu poprawne
+            } catch (err) {
+                console.error('Błąd ładowania firm:', err);
+                showStatus('Błąd ładowania firm (sprawdź arkusz "Firmy")', 'error');
+                empty.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        async function loadContacts() {
+            const loading = document.getElementById('contactsLoading');
+            const grid = document.getElementById('contactsGrid');
+            const empty = document.getElementById('contactsEmpty');
+
+            loading.style.display = 'block';
+            grid.innerHTML = '';
+            empty.style.display = 'none';
+
+            try {
+                const response = await gapi.client.sheets.spreadsheets.values.get({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range: `${CONFIG.CONTACTS_SHEET}!A2:F`,
+                });
+
+                const rows = response.result.values || [];
+                contacts = rows.map(row => ({
+                    id: row[0] || generateId(),
+                    companyId: row[1] || '',
+                    name: row[2] || '',
+                    position: row[3] || '',
+                    email: row[4] || '',
+                    phone: row[5] || ''
+                })).filter(c => c.name);
+
                 renderAllContacts();
             } catch (err) {
-                console.error(err);
-                showStatus('Nie udało się pobrać danych CRM', 'error');
+                console.error('Błąd ładowania kontaktów:', err);
+                showStatus('Błąd ładowania kontaktów (sprawdź arkusz "Kontakty")', 'error');
+                empty.style.display = 'block';
             } finally {
-                document.getElementById('companiesLoading').style.display = 'none';
-                document.getElementById('contactsLoading').style.display = 'none';
+                loading.style.display = 'none';
             }
         }
 
-        function parseCompanies(rows) {
-            companies = [];
-            if (!rows || rows.length < 2) return;
-
-            const headers = rows[0];
-            const idx = {
-                id: headers.indexOf('ID'),
-                name: headers.indexOf('Nazwa firmy'),
-                industry: headers.indexOf('Branża'),
-                notes: headers.indexOf('Notatki'),
-                website: headers.indexOf('Strona WWW'),
-                phone: headers.indexOf('Telefon'),
-                city: headers.indexOf('Miasto'),
-                country: headers.indexOf('Kraj')
-            };
-
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i];
-                if (!row[idx.id] && !row[idx.name]) continue;
-
-                companies.push({
-                    id: row[idx.id] || String(i),
-                    name: row[idx.name] || '',
-                    industry: row[idx.industry] || '',
-                    notes: row[idx.notes] || '',
-                    website: row[idx.website] || '',
-                    phone: row[idx.phone] || '',
-                    city: row[idx.city] || '',
-                    country: row[idx.country] || ''
-                });
-            }
-        }
-
-        function parseContacts(rows) {
-            contacts = [];
-            if (!rows || rows.length < 2) return;
-
-            const headers = rows[0];
-            const idx = {
-                id: headers.indexOf('ID'),
-                name: headers.indexOf('Imię i nazwisko'),
-                position: headers.indexOf('Stanowisko'),
-                email: headers.indexOf('Email'),
-                phone: headers.indexOf('Telefon'),
-                companyId: headers.indexOf('ID firmy')
-            };
-
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i];
-                if (!row[idx.id] && !row[idx.name]) continue;
-
-                contacts.push({
-                    id: row[idx.id] || String(i),
-                    name: row[idx.name] || '',
-                    position: row[idx.position] || '',
-                    email: row[idx.email] || '',
-                    phone: row[idx.phone] || '',
-                    companyId: row[idx.companyId] || ''
-                });
-            }
-        }
-
-        function parseCompanyHistory(rows) {
+        async function loadCompanyHistory() {
             companyHistory = [];
-            if (!rows || rows.length < 2) return;
+            if (!CONFIG.HISTORY_COMPANIES_SHEET) return;
 
-            const headers = rows[0];
-            const idx = {
-                companyId: headers.indexOf('ID firmy'),
-                date: headers.indexOf('Data'),
-                type: headers.indexOf('Typ'),
-                note: headers.indexOf('Opis')
-            };
-
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i];
-                if (!row[idx.companyId]) continue;
-
-                companyHistory.push({
-                    companyId: row[idx.companyId],
-                    date: row[idx.date] || '',
-                    type: row[idx.type] || '',
-                    note: row[idx.note] || ''
+            try {
+                const response = await gapi.client.sheets.spreadsheets.values.get({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range: `${CONFIG.HISTORY_COMPANIES_SHEET}!A2:G`,
                 });
+
+                const rows = response.result.values || [];
+                companyHistory = rows.map(row => ({
+                    id: row[0] || '',
+                    companyId: row[1] || '',
+                    type: row[2] || 'event',
+                    timestamp: row[3] || '',
+                    user: row[4] || '',
+                    content: row[5] || '',
+                    meta: row[6] || ''
+                })).filter(h => h.companyId);
+            } catch (err) {
+                console.warn('HistoriaFirm nie jest dostępna (utwórz arkusz "HistoriaFirm"):', err);
             }
         }
 
-        function parseContactHistory(rows) {
+        async function loadContactHistory() {
             contactHistory = [];
-            if (!rows || rows.length < 2) return;
+            if (!CONFIG.HISTORY_CONTACTS_SHEET) return;
 
-            const headers = rows[0];
-            const idx = {
-                contactId: headers.indexOf('ID kontaktu'),
-                date: headers.indexOf('Data'),
-                type: headers.indexOf('Typ'),
-                note: headers.indexOf('Opis')
-            };
-
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i];
-                if (!row[idx.contactId]) continue;
-
-                contactHistory.push({
-                    contactId: row[idx.contactId],
-                    date: row[idx.date] || '',
-                    type: row[idx.type] || '',
-                    note: row[idx.note] || ''
+            try {
+                const response = await gapi.client.sheets.spreadsheets.values.get({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range: `${CONFIG.HISTORY_CONTACTS_SHEET}!A2:G`,
                 });
+
+                const rows = response.result.values || [];
+                contactHistory = rows.map(row => ({
+                    id: row[0] || '',
+                    contactId: row[1] || '',
+                    type: row[2] || 'event',
+                    timestamp: row[3] || '',
+                    user: row[4] || '',
+                    content: row[5] || '',
+                    meta: row[6] || ''
+                })).filter(h => h.contactId);
+            } catch (err) {
+                console.warn('HistoriaKontaktow nie jest dostępna (utwórz arkusz "HistoriaKontaktow"):', err);
             }
         }
+
+        // FILTER HELPERS
 
         function getFilteredCompanies() {
             if (!currentSearchTerm) return companies;
-            const term = currentSearchTerm.toLowerCase();
+            const q = currentSearchTerm.toLowerCase();
             return companies.filter(c => {
-                return (
-                    (c.name && c.name.toLowerCase().includes(term)) ||
-                    (c.industry && c.industry.toLowerCase().includes(term)) ||
-                    (c.city && c.city.toLowerCase().includes(term)) ||
-                    (c.notes && c.notes.toLowerCase().includes(term))
-                );
+                const combined = `${c.name} ${c.industry} ${c.notes} ${c.website} ${c.phone} ${c.city} ${c.country}`.toLowerCase();
+                return combined.includes(q);
             });
         }
 
         function getFilteredContacts() {
             if (!currentSearchTerm) return contacts;
-            const term = currentSearchTerm.toLowerCase();
-            return contacts.filter(c => {
-                const company = companies.find(co => co.id === c.companyId);
-                return (
-                    (c.name && c.name.toLowerCase().includes(term)) ||
-                    (c.email && c.email.toLowerCase().includes(term)) ||
-                    (c.phone && c.phone.toLowerCase().includes(term)) ||
-                    (c.position && c.position.toLowerCase().includes(term)) ||
-                    (company && company.name && company.name.toLowerCase().includes(term))
-                );
+            const q = currentSearchTerm.toLowerCase();
+            return contacts.filter(contact => {
+                const company = companies.find(c => c.id === contact.companyId);
+                const companyText = company
+                    ? `${company.name} ${company.industry} ${company.city} ${company.country}`
+                    : '';
+                const combined = `${contact.name} ${contact.position} ${contact.email} ${contact.phone} ${companyText}`.toLowerCase();
+                return combined.includes(q);
             });
         }
 
-        /* RENDER COMPANIES */
+        // RENDER COMPANIES
 
         function renderCompanies() {
             const grid = document.getElementById('companiesGrid');
@@ -2167,56 +2014,6 @@
             }
 
             empty.style.display = 'none';
-
-            // LISTA
-            if (companiesViewMode === 'list') {
-                grid.innerHTML = `
-            <div class="list-wrapper">
-                <table class="list-table">
-                    <thead>
-                        <tr>
-                            <th>Firma</th>
-                            <th>Branża</th>
-                            <th>Miasto</th>
-                            <th>Telefon</th>
-                            <th>WWW</th>
-                            <th>Kontakty</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${list.map(company => {
-                            const idx = companies.indexOf(company);
-                            const companyContacts = contacts.filter(c => c.companyId === company.id);
-                            const loc = [company.city, company.country].filter(Boolean).join(', ');
-                            return `
-                                <tr class="list-row" onclick="viewCompanyDetail('${company.id}')">
-                                    <td>
-                                        <div class="list-cell-main">
-                                            <span class="list-primary">${escapeHtml(company.name)}</span>
-                                            ${company.notes ? `<span class="list-secondary">${escapeHtml(company.notes.substring(0, 80))}${company.notes.length > 80 ? '...' : ''}</span>` : ''}
-                                        </div>
-                                    </td>
-                                    <td>${company.industry ? escapeHtml(company.industry) : ''}</td>
-                                    <td>${loc ? escapeHtml(loc) : ''}</td>
-                                    <td>${company.phone ? escapeHtml(company.phone) : ''}</td>
-                                    <td>${company.website ? escapeHtml(company.website) : ''}</td>
-                                    <td>${companyContacts.length}</td>
-                                    <td class="list-cell-actions" onclick="event.stopPropagation()">
-                                        <button class="icon-btn" onclick="editCompany(${idx})" title="Edytuj">✏️</button>
-                                        <button class="icon-btn delete" onclick="deleteCompany(${idx})" title="Usuń">🗑️</button>
-                                    </td>
-                                </tr>
-                            `;
-                        }).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
-                return;
-            }
-
-            // KAFELKI (dotychczasowy widok)
             grid.innerHTML = list.map(company => {
                 const companyContacts = contacts.filter(c => c.companyId === company.id);
 
@@ -2224,66 +2021,66 @@
 
                 if (company.website) {
                     infoRows += `
-                <div class="card-info-row">
-                    <span class="emoji">🌐</span>
-                    <span>${escapeHtml(company.website)}</span>
-                </div>
-            `;
+                        <div class="card-info-row">
+                            <span class="emoji">🌐</span>
+                            <span>${escapeHtml(company.website)}</span>
+                        </div>
+                    `;
                 }
 
                 if (company.phone) {
                     infoRows += `
-                <div class="card-info-row">
-                    <span class="emoji">📞</span>
-                    <span>${escapeHtml(company.phone)}</span>
-                </div>
-            `;
+                        <div class="card-info-row">
+                            <span class="emoji">📞</span>
+                            <span>${escapeHtml(company.phone)}</span>
+                        </div>
+                    `;
                 }
 
                 if (company.city || company.country) {
                     const loc = [company.city, company.country].filter(Boolean).join(', ');
                     infoRows += `
-                <div class="card-info-row">
-                    <span class="emoji">📍</span>
-                    <span>${escapeHtml(loc)}</span>
-                </div>
-            `;
+                        <div class="card-info-row">
+                            <span class="emoji">📍</span>
+                            <span>${escapeHtml(loc)}</span>
+                        </div>
+                    `;
                 }
 
                 if (company.notes) {
                     infoRows += `
-                <div class="card-info-row">
-                    <span class="emoji">📝</span>
-                    <span>${escapeHtml(company.notes.substring(0, 100))}${company.notes.length > 100 ? '...' : ''}</span>
-                </div>
-            `;
+                        <div class="card-info-row">
+                            <span class="emoji">📝</span>
+                            <span>${escapeHtml(company.notes.substring(0, 100))}${company.notes.length > 100 ? '...' : ''}</span>
+                        </div>
+                    `;
                 }
 
                 const idx = companies.indexOf(company);
 
                 return `
-            <div class="card clickable" onclick="viewCompanyDetail('${company.id}')">
-                <div class="card-header">
-                    <div>
-                        <div class="card-title">${escapeHtml(company.name)}</div>
-                        ${company.industry ? `<div class="card-meta">${escapeHtml(company.industry)}</div>` : ''}
+                    <div class="card clickable" onclick="viewCompanyDetail('${company.id}')">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${escapeHtml(company.name)}</div>
+                                ${company.industry ? `<div class="card-meta">${escapeHtml(company.industry)}</div>` : ''}
+                            </div>
+                            <div class="card-actions" onclick="event.stopPropagation()">
+                                <button class="icon-btn" onclick="editCompany(${idx})" title="Edytuj">✏️</button>
+                                <button class="icon-btn delete" onclick="deleteCompany(${idx})" title="Usuń">🗑️</button>
+                            </div>
+                        </div>
+                        ${infoRows ? `<div class="card-body">${infoRows}</div>` : ''}
+                        <div class="card-badge">
+                            <span>👥</span>
+                            <span>${companyContacts.length} ${companyContacts.length === 1 ? 'kontakt' : companyContacts.length < 5 ? 'kontakty' : 'kontaktów'}</span>
+                        </div>
                     </div>
-                    <div class="card-actions" onclick="event.stopPropagation()">
-                        <button class="icon-btn" onclick="editCompany(${idx})" title="Edytuj">✏️</button>
-                        <button class="icon-btn delete" onclick="deleteCompany(${idx})" title="Usuń">🗑️</button>
-                    </div>
-                </div>
-                ${infoRows ? `<div class="card-body">${infoRows}</div>` : ''}
-                <div class="card-badge">
-                    <span>👥</span>
-                    <span>${companyContacts.length} ${companyContacts.length === 1 ? 'kontakt' : companyContacts.length < 5 ? 'kontakty' : 'kontaktów'}</span>
-                </div>
-            </div>
-        `;
+                `;
             }).join('');
         }
 
-        /* RENDER CONTACTS */
+        // RENDER CONTACTS (LIST)
 
         function renderAllContacts() {
             const grid = document.getElementById('contactsGrid');
@@ -2307,174 +2104,51 @@
             }
 
             empty.style.display = 'none';
-
-            // LISTA
-            if (contactsViewMode === 'list') {
-                grid.innerHTML = `
-            <div class="list-wrapper">
-                <table class="list-table">
-                    <thead>
-                        <tr>
-                            <th>Kontakt</th>
-                            <th>Firma</th>
-                            <th>Email</th>
-                            <th>Telefon</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${list.map(contact => {
-                            const index = contacts.findIndex(c => c.id === contact.id);
-                            const company = companies.find(c => c.id === contact.companyId);
-                            return `
-                                <tr class="list-row" onclick="viewContactDetail('${contact.id}')">
-                                    <td>
-                                        <div class="list-cell-main">
-                                            <span class="list-primary">${escapeHtml(contact.name)}</span>
-                                            ${contact.position ? `<span class="list-secondary">${escapeHtml(contact.position)}</span>` : ''}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        ${company ? escapeHtml(company.name) : '<span class="list-badge-warning">Brak firmy</span>'}
-                                    </td>
-                                    <td>${contact.email ? escapeHtml(contact.email) : ''}</td>
-                                    <td>${contact.phone ? escapeHtml(contact.phone) : ''}</td>
-                                    <td class="list-cell-actions" onclick="event.stopPropagation()">
-                                        <button class="icon-btn" onclick="editContact(${index})" title="Edytuj">✏️</button>
-                                        <button class="icon-btn delete" onclick="deleteContact(${index})" title="Usuń">🗑️</button>
-                                    </td>
-                                </tr>
-                            `;
-                        }).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
-                return;
-            }
-
-            // KAFELKI (dotychczasowy widok)
             grid.innerHTML = list.map(contact => {
                 const index = contacts.findIndex(c => c.id === contact.id);
                 const company = companies.find(c => c.id === contact.companyId);
                 return `
-            <div class="card clickable" onclick="viewContactDetail('${contact.id}')">
-                <div class="card-header">
-                    <div>
-                        <div class="card-title">${escapeHtml(contact.name)}</div>
-                        ${contact.position ? `<div class="card-meta">${escapeHtml(contact.position)}</div>` : ''}
+                    <div class="card clickable" onclick="viewContactDetail('${contact.id}')">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${escapeHtml(contact.name)}</div>
+                                ${contact.position ? `<div class="card-meta">${escapeHtml(contact.position)}</div>` : ''}
+                            </div>
+                            <div class="card-actions" onclick="event.stopPropagation()">
+                                <button class="icon-btn" onclick="editContact(${index})" title="Edytuj">✏️</button>
+                                <button class="icon-btn delete" onclick="deleteContact(${index})" title="Usuń">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            ${company ? `
+                                <div class="card-info-row">
+                                    <span class="emoji">🏢</span>
+                                    <span onclick="viewCompanyDetail('${company.id}')" style="cursor:pointer;text-decoration:underline;">${escapeHtml(company.name)}</span>
+                                </div>
+                            ` : `
+                                <div class="card-badge no-company">
+                                    <span>⚠️</span><span>Brak firmy</span>
+                                </div>
+                            `}
+                            ${contact.email ? `
+                                <div class="card-info-row">
+                                    <span class="emoji">📧</span>
+                                    <span>${escapeHtml(contact.email)}</span>
+                                </div>
+                            ` : ''}
+                            ${contact.phone ? `
+                                <div class="card-info-row">
+                                    <span class="emoji">📱</span>
+                                    <span>${escapeHtml(contact.phone)}</span>
+                                </div>
+                            ` : ''}
+                        </div>
                     </div>
-                    <div class="card-actions" onclick="event.stopPropagation()">
-                        <button class="icon-btn" onclick="editContact(${index})" title="Edytuj">✏️</button>
-                        <button class="icon-btn delete" onclick="deleteContact(${index})" title="Usuń">🗑️</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    ${company ? `
-                        <div class="card-info-row">
-                            <span class="emoji">🏢</span>
-                            <span onclick="viewCompanyDetail('${company.id}')" style="cursor:pointer;text-decoration:underline;">${escapeHtml(company.name)}</span>
-                        </div>
-                    ` : `
-                        <div class="card-badge no-company">
-                            <span>⚠️</span><span>Brak firmy</span>
-                        </div>
-                    `}
-                    ${contact.email ? `
-                        <div class="card-info-row">
-                            <span class="emoji">📧</span>
-                            <span>${escapeHtml(contact.email)}</span>
-                        </div>
-                    ` : ''}
-                    ${contact.phone ? `
-                        <div class="card-info-row">
-                            <span class="emoji">📱</span>
-                            <span>${escapeHtml(contact.phone)}</span>
-                        </div>
-                    ` : ''}
-                </div>
-            </div>
-        `;
+                `;
             }).join('');
         }
 
-        function renderCompanyContacts(companyId) {
-            const companyContacts = contacts.filter(c => c.companyId === companyId);
-            const list = document.getElementById('companyContactsList');
-            const empty = document.getElementById('companyContactsEmpty');
-            if (!list || !empty) return;
-
-            if (companyContacts.length === 0) {
-                list.innerHTML = '';
-                empty.style.display = 'block';
-                return;
-            }
-
-            empty.style.display = 'none';
-            list.innerHTML = companyContacts.map(c => `
-                <li class="detail-list-item">
-                    <div><strong>${escapeHtml(c.name)}</strong></div>
-                    <div class="meta">
-                        ${c.email ? escapeHtml(c.email) : 'Brak maila'}
-                        ${c.phone ? ' • ' + escapeHtml(c.phone) : ''}
-                    </div>
-                </li>
-            `).join('');
-        }
-
-        function renderCompanyHistory(companyId) {
-            const list = document.getElementById('companyHistoryList');
-            const empty = document.getElementById('companyHistoryEmpty');
-            if (!list || !empty) return;
-
-            const all = companyHistory
-                .filter(h => h.companyId === companyId)
-                .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-
-            if (all.length === 0) {
-                list.innerHTML = '';
-                empty.style.display = 'block';
-                return;
-            }
-
-            empty.style.display = 'none';
-            list.innerHTML = all.map(h => `
-                <li class="detail-list-item">
-                    <div><strong>${escapeHtml(h.type || 'Zdarzenie')}</strong></div>
-                    <div class="meta">
-                        ${h.date ? escapeHtml(h.date) + ' • ' : ''}${escapeHtml(h.note || '')}
-                    </div>
-                </li>
-            `).join('');
-        }
-
-        function renderContactHistory(contactId) {
-            const list = document.getElementById('contactHistoryList');
-            const empty = document.getElementById('contactHistoryEmpty');
-            if (!list || !empty) return;
-
-            const all = contactHistory
-                .filter(h => h.contactId === contactId)
-                .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-
-            if (all.length === 0) {
-                list.innerHTML = '';
-                empty.style.display = 'block';
-                return;
-            }
-
-            empty.style.display = 'none';
-            list.innerHTML = all.map(h => `
-                <li class="detail-list-item">
-                    <div><strong>${escapeHtml(h.type || 'Zdarzenie')}</strong></div>
-                    <div class="meta">
-                        ${h.date ? escapeHtml(h.date) + ' • ' : ''}${escapeHtml(h.note || '')}
-                    </div>
-                </li>
-            `).join('');
-        }
-
-        /* DETAIL NAVIGATION */
+        // COMPANY DETAIL
 
         function viewCompanyDetail(companyId) {
             // przełącz zakładkę
@@ -2539,20 +2213,9 @@
                 `;
             }
 
-            const companyIndex = companies.indexOf(company);
-
             document.getElementById('companyDetailContent').innerHTML = `
-                <div class="detail-header">
-                    <div>
-                        <div class="detail-title">${escapeHtml(company.name)}</div>
-                        ${company.industry ? `<div class="detail-meta">${escapeHtml(company.industry)}</div>` : ''}
-                    </div>
-                    <div class="detail-actions">
-                        <button class="detail-edit-btn" onclick="editCompany(${companyIndex})">
-                            ✏️ <span>Edytuj dane</span>
-                        </button>
-                    </div>
-                </div>
+                <div class="detail-title">${escapeHtml(company.name)}</div>
+                ${company.industry ? `<div class="detail-meta">${escapeHtml(company.industry)}</div>` : ''}
                 <div class="detail-info">
                     ${infoHtml}
                 </div>
@@ -2567,6 +2230,53 @@
             document.getElementById('companiesListView').style.display = 'block';
             currentCompanyId = null;
         }
+
+        function renderCompanyContacts(companyId) {
+            const companyContacts = contacts.filter(c => c.companyId === companyId);
+            const list = document.getElementById('companyContactsList');
+            const empty = document.getElementById('companyContactsEmpty');
+
+            if (companyContacts.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            list.innerHTML = companyContacts.map(contact => {
+                const index = contacts.findIndex(c => c.id === contact.id);
+                return `
+                    <div class="card clickable" onclick="viewContactDetail('${contact.id}')">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${escapeHtml(contact.name)}</div>
+                                ${contact.position ? `<div class="card-meta">${escapeHtml(contact.position)}</div>` : ''}
+                            </div>
+                            <div class="card-actions" onclick="event.stopPropagation()">
+                                <button class="icon-btn" onclick="editContact(${index})" title="Edytuj">✏️</button>
+                                <button class="icon-btn delete" onclick="deleteContact(${index})" title="Usuń">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            ${contact.email ? `
+                                <div class="card-info-row">
+                                    <span class="emoji">📧</span>
+                                    <span>${escapeHtml(contact.email)}</span>
+                                </div>
+                            ` : ''}
+                            ${contact.phone ? `
+                                <div class="card-info-row">
+                                    <span class="emoji">📱</span>
+                                    <span>${escapeHtml(contact.phone)}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // CONTACT DETAIL
 
         function viewContactDetail(contactId) {
             // przełącz zakładkę
@@ -2626,20 +2336,9 @@
                 `;
             }
 
-            const contactIndex = contacts.findIndex(c => c.id === contactId);
-
             document.getElementById('contactDetailContent').innerHTML = `
-                <div class="detail-header">
-                    <div>
-                        <div class="detail-title">${escapeHtml(contact.name)}</div>
-                        ${contact.position ? `<div class="detail-meta">${escapeHtml(contact.position)}</div>` : ''}
-                    </div>
-                    <div class="detail-actions">
-                        <button class="detail-edit-btn" onclick="editContact(${contactIndex})">
-                            ✏️ <span>Edytuj dane</span>
-                        </button>
-                    </div>
-                </div>
+                <div class="detail-title">${escapeHtml(contact.name)}</div>
+                ${contact.position ? `<div class="detail-meta">${escapeHtml(contact.position)}</div>` : ''}
                 <div class="detail-info">
                     ${infoHtml}
                 </div>
@@ -2658,21 +2357,24 @@
                                 <div class="card-title">${escapeHtml(company.name)}</div>
                                 ${company.industry ? `<div class="card-meta">${escapeHtml(company.industry)}</div>` : ''}
                             </div>
-                            <div class="card-actions">
-                                <span class="history-chip">👥 Firma kontaktu</span>
-                            </div>
                         </div>
                         <div class="card-body">
-                            ${company.city || company.country ? `
-                                <div class="card-info-row">
-                                    <span class="emoji">📍</span>
-                                    <span>${escapeHtml([company.city, company.country].filter(Boolean).join(', '))}</span>
-                                </div>
-                            ` : ''}
                             ${company.website ? `
                                 <div class="card-info-row">
                                     <span class="emoji">🌐</span>
                                     <span>${escapeHtml(company.website)}</span>
+                                </div>
+                            ` : ''}
+                            ${company.phone ? `
+                                <div class="card-info-row">
+                                    <span class="emoji">📞</span>
+                                    <span>${escapeHtml(company.phone)}</span>
+                                </div>
+                            ` : ''}
+                            ${(company.city || company.country) ? `
+                                <div class="card-info-row">
+                                    <span class="emoji">📍</span>
+                                    <span>${escapeHtml([company.city, company.country].filter(Boolean).join(', '))}</span>
                                 </div>
                             ` : ''}
                         </div>
@@ -2692,288 +2394,670 @@
             currentContactId = null;
         }
 
-        /* ADD / EDIT COMPANY */
+        // COMPANY CRUD
 
-        async function openCompanyModal(index = null) {
-            editingCompanyIndex = index;
-            const modal = document.getElementById('companyModal');
-            const titleEl = document.getElementById('companyModalTitle');
-            const submitBtn = document.getElementById('companyModalSubmit');
-
-            const form = {
-                name: document.getElementById('companyName'),
-                industry: document.getElementById('companyIndustry'),
-                website: document.getElementById('companyWebsite'),
-                phone: document.getElementById('companyPhone'),
-                city: document.getElementById('companyCity'),
-                country: document.getElementById('companyCountry'),
-                notes: document.getElementById('companyNotes')
-            };
-
-            if (index !== null && companies[index]) {
-                const c = companies[index];
-                titleEl.textContent = 'Edytuj firmę';
-                submitBtn.textContent = 'Zapisz zmiany';
-                form.name.value = c.name || '';
-                form.industry.value = c.industry || '';
-                form.website.value = c.website || '';
-                form.phone.value = c.phone || '';
-                form.city.value = c.city || '';
-                form.country.value = c.country || '';
-                form.notes.value = c.notes || '';
-            } else {
-                titleEl.textContent = 'Dodaj firmę';
-                submitBtn.textContent = 'Dodaj firmę';
-                Object.values(form).forEach(input => input.value = '');
-            }
-
-            modal.classList.add('visible');
-        }
-
-        function closeCompanyModal() {
-            document.getElementById('companyModal').classList.remove('visible');
-        }
-
-        async function saveCompany(event) {
-            event.preventDefault();
-
-            const form = {
-                name: document.getElementById('companyName'),
-                industry: document.getElementById('companyIndustry'),
-                website: document.getElementById('companyWebsite'),
-                phone: document.getElementById('companyPhone'),
-                city: document.getElementById('companyCity'),
-                country: document.getElementById('companyCountry'),
-                notes: document.getElementById('companyNotes')
-            };
-
-            const newCompany = {
-                id: editingCompanyIndex !== null && companies[editingCompanyIndex]
-                    ? companies[editingCompanyIndex].id
-                    : String(Date.now()),
-                name: form.name.value.trim(),
-                industry: form.industry.value.trim(),
-                notes: form.notes.value.trim(),
-                website: form.website.value.trim(),
-                phone: form.phone.value.trim(),
-                city: form.city.value.trim(),
-                country: form.country.value.trim()
-            };
-
-            if (!newCompany.name) {
-                showStatus('Nazwa firmy jest wymagana', 'error');
-                return;
-            }
-
-            try {
-                const values = [
-                    [
-                        newCompany.id,
-                        newCompany.name,
-                        newCompany.industry,
-                        newCompany.notes,
-                        newCompany.website,
-                        newCompany.phone,
-                        newCompany.city,
-                        newCompany.country
-                    ]
-                ];
-
-                if (editingCompanyIndex !== null && companies[editingCompanyIndex]) {
-                    await gapi.client.sheets.spreadsheets.values.update({
-                        spreadsheetId: CONFIG.SHEET_ID,
-                        range: `${CONFIG.COMPANIES_SHEET}!A${editingCompanyIndex + 2}:H${editingCompanyIndex + 2}`,
-                        valueInputOption: 'RAW',
-                        resource: { values }
-                    });
-                    companies[editingCompanyIndex] = newCompany;
-                    showStatus('Zaktualizowano firmę', 'success');
-                } else {
-                    await gapi.client.sheets.spreadsheets.values.append({
-                        spreadsheetId: CONFIG.SHEET_ID,
-                        range: CONFIG.COMPANIES_SHEET,
-                        valueInputOption: 'RAW',
-                        insertDataOption: 'INSERT_ROWS',
-                        resource: { values }
-                    });
-                    companies.push(newCompany);
-                    showStatus('Dodano nową firmę', 'success');
-                }
-
-                renderCompanies();
-                closeCompanyModal();
-            } catch (err) {
-                console.error(err);
-                showStatus('Nie udało się zapisać firmy', 'error');
-            }
+        function openCompanyModal() {
+            editingCompanyIndex = null;
+            document.getElementById('companyModalTitle').textContent = 'Dodaj firmę';
+            document.getElementById('companyForm').reset();
+            document.getElementById('companyModal').classList.add('active');
         }
 
         function editCompany(index) {
-            openCompanyModal(index);
-        }
-
-        async function deleteCompany(index) {
+            editingCompanyIndex = index;
             const company = companies[index];
-            if (!company) return;
-
-            if (!confirm(`Czy na pewno chcesz usunąć firmę "${company.name}"?`)) {
-                return;
-            }
-
-            try {
-                await gapi.client.sheets.spreadsheets.values.update({
-                    spreadsheetId: CONFIG.SHEET_ID,
-                    range: `${CONFIG.COMPANIES_SHEET}!A${index + 2}:H${index + 2}`,
-                    valueInputOption: 'RAW',
-                    resource: { values: [['', '', '', '', '', '', '', '']] }
-                });
-
-                companies.splice(index, 1);
-                showStatus('Usunięto firmę', 'success');
-                renderCompanies();
-            } catch (err) {
-                console.error(err);
-                showStatus('Nie udało się usunąć firmy', 'error');
-            }
+            document.getElementById('companyModalTitle').textContent = 'Edytuj firmę';
+            document.getElementById('companyName').value = company.name;
+            document.getElementById('companyIndustry').value = company.industry || '';
+            document.getElementById('companyWebsite').value = company.website || '';
+            document.getElementById('companyPhone').value = company.phone || '';
+            document.getElementById('companyCity').value = company.city || '';
+            document.getElementById('companyCountry').value = company.country || '';
+            document.getElementById('companyNotes').value = company.notes || '';
+            document.getElementById('companyModal').classList.add('active');
         }
 
-        /* ADD / EDIT CONTACT */
+        async function saveCompany(e) {
+            e.preventDefault();
 
-        async function openContactModal(index = null) {
-            editingContactIndex = index;
-            const modal = document.getElementById('contactModal');
-            const titleEl = document.getElementById('contactModalTitle');
-            const submitBtn = document.getElementById('contactModalSubmit');
-
-            const form = {
-                name: document.getElementById('contactName'),
-                position: document.getElementById('contactPosition'),
-                email: document.getElementById('contactEmail'),
-                phone: document.getElementById('contactPhone'),
-                companyId: document.getElementById('contactCompanyId')
+            const company = {
+                id: editingCompanyIndex !== null ? companies[editingCompanyIndex].id : generateId(),
+                name: document.getElementById('companyName').value,
+                industry: document.getElementById('companyIndustry').value,
+                website: document.getElementById('companyWebsite').value,
+                phone: document.getElementById('companyPhone').value,
+                city: document.getElementById('companyCity').value,
+                country: document.getElementById('companyCountry').value,
+                notes: document.getElementById('companyNotes').value
             };
-
-            form.companyId.innerHTML = '<option value="">Brak przypisanej firmy</option>' +
-                companies.map(c => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`).join('');
-
-            if (index !== null && contacts[index]) {
-                const c = contacts[index];
-                titleEl.textContent = 'Edytuj kontakt';
-                submitBtn.textContent = 'Zapisz zmiany';
-                form.name.value = c.name || '';
-                form.position.value = c.position || '';
-                form.email.value = c.email || '';
-                form.phone.value = c.phone || '';
-                form.companyId.value = c.companyId || '';
-            } else {
-                titleEl.textContent = 'Dodaj kontakt';
-                submitBtn.textContent = 'Dodaj kontakt';
-                Object.values(form).forEach(input => input.value = '');
-            }
-
-            modal.classList.add('visible');
-        }
-
-        function closeContactModal() {
-            document.getElementById('contactModal').classList.remove('visible');
-        }
-
-        async function saveContact(event) {
-            event.preventDefault();
-
-            const form = {
-                name: document.getElementById('contactName'),
-                position: document.getElementById('contactPosition'),
-                email: document.getElementById('contactEmail'),
-                phone: document.getElementById('contactPhone'),
-                companyId: document.getElementById('contactCompanyId')
-            };
-
-            const newContact = {
-                id: editingContactIndex !== null && contacts[editingContactIndex]
-                    ? contacts[editingContactIndex].id
-                    : String(Date.now()),
-                name: form.name.value.trim(),
-                position: form.position.value.trim(),
-                email: form.email.value.trim(),
-                phone: form.phone.value.trim(),
-                companyId: form.companyId.value.trim()
-            };
-
-            if (!newContact.name) {
-                showStatus('Imię i nazwisko są wymagane', 'error');
-                return;
-            }
 
             try {
                 const values = [[
-                    newContact.id,
-                    newContact.name,
-                    newContact.position,
-                    newContact.email,
-                    newContact.phone,
-                    newContact.companyId
+                    company.id,
+                    company.name,
+                    company.industry,
+                    company.notes,
+                    company.website,
+                    company.phone,
+                    company.city,
+                    company.country
                 ]];
 
-                if (editingContactIndex !== null && contacts[editingContactIndex]) {
+                if (editingCompanyIndex !== null) {
+                    const rowNumber = editingCompanyIndex + 2;
+                    const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:H${rowNumber}`;
                     await gapi.client.sheets.spreadsheets.values.update({
                         spreadsheetId: CONFIG.SHEET_ID,
-                        range: `${CONFIG.CONTACTS_SHEET}!A${editingContactIndex + 2}:F${editingContactIndex + 2}`,
-                        valueInputOption: 'RAW',
+                        range,
+                        valueInputOption: 'USER_ENTERED',
                         resource: { values }
                     });
-                    contacts[editingContactIndex] = newContact;
-                    showStatus('Zaktualizowano kontakt', 'success');
+                    companies[editingCompanyIndex] = company;
+                    await logCompanyHistory(company.id, 'event', 'Firma zaktualizowana');
+                    showStatus('Firma zaktualizowana', 'success');
                 } else {
                     await gapi.client.sheets.spreadsheets.values.append({
                         spreadsheetId: CONFIG.SHEET_ID,
-                        range: CONFIG.CONTACTS_SHEET,
-                        valueInputOption: 'RAW',
-                        insertDataOption: 'INSERT_ROWS',
+                        range: `${CONFIG.COMPANIES_SHEET}!A:H`,
+                        valueInputOption: 'USER_ENTERED',
                         resource: { values }
                     });
-                    contacts.push(newContact);
-                    showStatus('Dodano nowy kontakt', 'success');
+                    companies.push(company);
+                    await logCompanyHistory(company.id, 'event', 'Firma utworzona');
+                    showStatus('Firma dodana', 'success');
                 }
 
-                renderAllContacts();
-                closeContactModal();
+                renderCompanies();
+                if (currentCompanyId === company.id) {
+                    viewCompanyDetail(company.id);
+                }
+                closeCompanyModal();
             } catch (err) {
-                console.error(err);
-                showStatus('Nie udało się zapisać kontaktu', 'error');
+                console.error('Błąd zapisu firmy:', err);
+                showStatus('Błąd zapisu firmy', 'error');
             }
         }
 
+        async function deleteCompany(index) {
+            if (!confirm('Czy na pewno chcesz usunąć tę firmę?\n\nKontakty przypisane do tej firmy pozostaną, ale stracą powiązanie z firmą.')) return;
+
+            try {
+                const companyId = companies[index].id;
+                const rowNumber = index + 2;
+                const range = `${CONFIG.COMPANIES_SHEET}!A${rowNumber}:H${rowNumber}`;
+
+                await logCompanyHistory(companyId, 'event', 'Firma usunięta');
+
+                // wyczyść wiersz firmy
+                await gapi.client.sheets.spreadsheets.values.clear({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range
+                });
+
+                // odpięcie kontaktów
+                const detachPromises = [];
+                contacts.forEach((contact, cIndex) => {
+                    if (contact.companyId === companyId) {
+                        const prevName = contact.name;
+                        contact.companyId = '';
+                        const values = [[
+                            contact.id,
+                            '',
+                            contact.name,
+                            contact.position,
+                            contact.email,
+                            contact.phone
+                        ]];
+                        const contactRange = `${CONFIG.CONTACTS_SHEET}!A${cIndex + 2}:F${cIndex + 2}`;
+                        detachPromises.push(
+                            gapi.client.sheets.spreadsheets.values.update({
+                                spreadsheetId: CONFIG.SHEET_ID,
+                                range: contactRange,
+                                valueInputOption: 'USER_ENTERED',
+                                resource: { values }
+                            })
+                        );
+                        logContactHistory(contact.id, 'event', `Kontakt "${prevName}" odpięty od usuniętej firmy`);
+                    }
+                });
+
+                if (detachPromises.length) {
+                    await Promise.all(detachPromises);
+                }
+
+                companies.splice(index, 1);
+                renderCompanies();
+                renderAllContacts();
+
+                if (currentCompanyId === companyId) {
+                    backToCompaniesList();
+                } else if (currentCompanyId) {
+                    renderCompanyContacts(currentCompanyId);
+                }
+
+                showStatus('Firma usunięta', 'success');
+            } catch (err) {
+                console.error('Błąd usuwania firmy:', err);
+                showStatus('Błąd usuwania firmy', 'error');
+            }
+        }
+
+        function closeCompanyModal() {
+            document.getElementById('companyModal').classList.remove('active');
+            document.getElementById('companyForm').reset();
+            editingCompanyIndex = null;
+        }
+
+        // CONTACT CRUD
+
+        function fillCompanyField(companyId) {
+            if (!companyInputEl || !companyIdEl) return;
+            if (!companyId) {
+                companyInputEl.value = '';
+                companyIdEl.value = '';
+                return;
+            }
+            const company = companies.find(c => c.id === companyId);
+            if (company) {
+                companyInputEl.value = company.name;
+                companyIdEl.value = company.id;
+            } else {
+                companyInputEl.value = '';
+                companyIdEl.value = '';
+            }
+        }
+
+        function openContactModal(preselectedCompanyId = null) {
+            editingContactIndex = null;
+            document.getElementById('contactModalTitle').textContent = 'Dodaj kontakt';
+            document.getElementById('contactForm').reset();
+            fillCompanyField(preselectedCompanyId);
+            hideCompanySuggestions();
+            document.getElementById('contactModal').classList.add('active');
+        }
+
         function editContact(index) {
-            openContactModal(index);
+            editingContactIndex = index;
+            const contact = contacts[index];
+            document.getElementById('contactModalTitle').textContent = 'Edytuj kontakt';
+            document.getElementById('contactName').value = contact.name;
+            document.getElementById('contactPosition').value = contact.position;
+            document.getElementById('contactEmail').value = contact.email;
+            document.getElementById('contactPhone').value = contact.phone;
+            fillCompanyField(contact.companyId || null);
+            hideCompanySuggestions();
+            document.getElementById('contactModal').classList.add('active');
+        }
+
+        async function saveContact(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('contactName').value;
+            const position = document.getElementById('contactPosition').value;
+            const email = document.getElementById('contactEmail').value;
+            const phone = document.getElementById('contactPhone').value;
+            const typedCompanyName = (companyInputEl?.value || '').trim();
+            let selectedCompanyId = companyIdEl?.value || '';
+
+            const oldContact = editingContactIndex !== null ? contacts[editingContactIndex] : null;
+            const oldCompanyId = oldContact ? oldContact.companyId : '';
+
+            try {
+                // Jeżeli wpisano nazwę firmy, ale nie wybrano jej z listy → sprawdź czy istnieje, w razie czego utwórz
+                if (typedCompanyName && !selectedCompanyId) {
+                    const existing = companies.find(
+                        c => c.name && c.name.toLowerCase() === typedCompanyName.toLowerCase()
+                    );
+
+                    if (existing) {
+                        selectedCompanyId = existing.id;
+                    } else {
+                        const newCompany = {
+                            id: generateId(),
+                            name: typedCompanyName,
+                            industry: '',
+                            notes: '',
+                            website: '',
+                            phone: '',
+                            city: '',
+                            country: ''
+                        };
+
+                        const valuesCompany = [[
+                            newCompany.id,
+                            newCompany.name,
+                            newCompany.industry,
+                            newCompany.notes,
+                            newCompany.website,
+                            newCompany.phone,
+                            newCompany.city,
+                            newCompany.country
+                        ]];
+
+                        await gapi.client.sheets.spreadsheets.values.append({
+                            spreadsheetId: CONFIG.SHEET_ID,
+                            range: `${CONFIG.COMPANIES_SHEET}!A:H`,
+                            valueInputOption: 'USER_ENTERED',
+                            resource: { values: valuesCompany }
+                        });
+
+                        companies.push(newCompany);
+                        selectedCompanyId = newCompany.id;
+                        await logCompanyHistory(newCompany.id, 'event', 'Firma utworzona (z poziomu kontaktu)');
+                        showStatus(`Utworzono nową firmę "${newCompany.name}"`, 'success');
+                        renderCompanies();
+                    }
+                }
+
+                const contact = {
+                    id: editingContactIndex !== null ? contacts[editingContactIndex].id : generateId(),
+                    companyId: selectedCompanyId || '',
+                    name,
+                    position,
+                    email,
+                    phone
+                };
+
+                const values = [[
+                    contact.id,
+                    contact.companyId,
+                    contact.name,
+                    contact.position,
+                    contact.email,
+                    contact.phone
+                ]];
+
+                if (editingContactIndex !== null) {
+                    const rowNumber = editingContactIndex + 2;
+                    const range = `${CONFIG.CONTACTS_SHEET}!A${rowNumber}:F${rowNumber}`;
+                    await gapi.client.sheets.spreadsheets.values.update({
+                        spreadsheetId: CONFIG.SHEET_ID,
+                        range,
+                        valueInputOption: 'USER_ENTERED',
+                        resource: { values }
+                    });
+                    contacts[editingContactIndex] = contact;
+
+                    await logContactHistory(contact.id, 'event', 'Kontakt zaktualizowany');
+
+                    if (oldCompanyId !== contact.companyId) {
+                        if (oldCompanyId) {
+                            await logCompanyHistory(oldCompanyId, 'event', `Kontakt "${contact.name}" odpięty od firmy`);
+                        }
+                        if (contact.companyId) {
+                            await logCompanyHistory(contact.companyId, 'event', `Kontakt "${contact.name}" powiązany z firmą`);
+                        }
+                    }
+
+                    showStatus('Kontakt zaktualizowany', 'success');
+                } else {
+                    await gapi.client.sheets.spreadsheets.values.append({
+                        spreadsheetId: CONFIG.SHEET_ID,
+                        range: `${CONFIG.CONTACTS_SHEET}!A:F`,
+                        valueInputOption: 'USER_ENTERED',
+                        resource: { values }
+                    });
+                    contacts.push(contact);
+
+                    await logContactHistory(contact.id, 'event', 'Kontakt utworzony');
+                    if (contact.companyId) {
+                        await logCompanyHistory(contact.companyId, 'event', `Kontakt "${contact.name}" powiązany z firmą`);
+                    }
+
+                    showStatus('Kontakt dodany', 'success');
+                }
+
+                renderAllContacts();
+                renderCompanies();
+
+                if (currentCompanyId) {
+                    renderCompanyContacts(currentCompanyId);
+                    renderCompanyHistory(currentCompanyId);
+                }
+                if (currentContactId === contact.id) {
+                    viewContactDetail(contact.id);
+                }
+
+                closeContactModal();
+            } catch (err) {
+                console.error('Błąd zapisu kontaktu:', err);
+                showStatus('Błąd zapisu kontaktu', 'error');
+            }
         }
 
         async function deleteContact(index) {
-            const contact = contacts[index];
-            if (!contact) return;
+            if (!confirm('Czy na pewno chcesz usunąć ten kontakt?')) return;
 
-            if (!confirm(`Czy na pewno chcesz usunąć kontakt "${contact.name}"?`)) {
+            try {
+                const contact = contacts[index];
+                const rowNumber = index + 2;
+                const range = `${CONFIG.CONTACTS_SHEET}!A${rowNumber}:F${rowNumber}`;
+
+                await logContactHistory(contact.id, 'event', 'Kontakt usunięty');
+                if (contact.companyId) {
+                    await logCompanyHistory(contact.companyId, 'event', `Kontakt "${contact.name}" usunięty`);
+                }
+
+                await gapi.client.sheets.spreadsheets.values.clear({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range
+                });
+
+                contacts.splice(index, 1);
+                renderAllContacts();
+                renderCompanies();
+
+                if (currentCompanyId) {
+                    renderCompanyContacts(currentCompanyId);
+                    renderCompanyHistory(currentCompanyId);
+                }
+                if (currentContactId === contact.id) {
+                    backToContactsList();
+                }
+
+                showStatus('Kontakt usunięty', 'success');
+            } catch (err) {
+                console.error('Błąd usuwania kontaktu:', err);
+                showStatus('Błąd usuwania kontaktu', 'error');
+            }
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.remove('active');
+            document.getElementById('contactForm').reset();
+            hideCompanySuggestions();
+            editingContactIndex = null;
+        }
+
+        // COMPANY PICKER
+
+        function showCompanySuggestions(query) {
+            if (!companySuggestionsEl || !companyInputEl) return;
+            const q = (query || '').trim().toLowerCase();
+
+            let filtered = companies;
+            if (q) {
+                filtered = companies.filter(c => (c.name || '').toLowerCase().includes(q));
+            }
+
+            let html = '';
+            filtered.slice(0, 8).forEach(c => {
+                const metaParts = [];
+                if (c.industry) metaParts.push(c.industry);
+                if (c.city) metaParts.push(c.city);
+                const meta = metaParts.join(' • ');
+
+                html += `
+                    <div class="company-suggestion-item" data-id="${c.id}">
+                        <span>${escapeHtml(c.name)}</span>
+                        ${meta ? `<span class="suggestion-meta">${escapeHtml(meta)}</span>` : ''}
+                    </div>
+                `;
+            });
+
+            const exactExists = companies.some(
+                c => c.name && c.name.toLowerCase() === q && q.length > 0
+            );
+
+            if (q && !exactExists) {
+                html += `
+                    <div class="company-suggestion-item company-suggestion-new">
+                        <span>➕ Utwórz nową firmę "<strong>${escapeHtml(query.trim())}</strong>" (NEW)</span>
+                    </div>
+                `;
+            }
+
+            if (!html) {
+                companySuggestionsEl.innerHTML = '';
+                companySuggestionsEl.classList.remove('visible');
+                return;
+            }
+
+            companySuggestionsEl.innerHTML = html;
+            companySuggestionsEl.classList.add('visible');
+        }
+
+        function hideCompanySuggestions() {
+            if (companySuggestionsEl) {
+                companySuggestionsEl.classList.remove('visible');
+                companySuggestionsEl.innerHTML = '';
+            }
+        }
+
+        // HISTORY RENDERING
+
+        function renderCompanyHistory(companyId) {
+            const list = document.getElementById('companyHistoryList');
+            const empty = document.getElementById('companyHistoryEmpty');
+            if (!list || !empty) return;
+
+            const all = companyHistory
+                .filter(h => h.companyId === companyId)
+                .sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+
+            const scope = currentCompanyHistoryScope;
+            const shown = scope === 'notes' ? all.filter(h => h.type === 'note') : all;
+
+            if (all.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak historii';
+                empty.querySelector('p').textContent = 'Nie dodano jeszcze żadnych notatek ani zdarzeń dla tej firmy.';
+                return;
+            }
+
+            if (shown.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak wpisów';
+                empty.querySelector('p').textContent = scope === 'notes'
+                    ? 'Brak notatek dla tej firmy.'
+                    : 'Brak zdarzeń dla tej firmy.';
+                return;
+            }
+
+            empty.style.display = 'none';
+            list.innerHTML = shown.map(entry => `
+                <div class="history-item ${entry.type === 'note' ? 'note' : 'event'}">
+                    <div class="history-item-header">
+                        <span class="history-item-type">${entry.type === 'note' ? 'NOTATKA' : 'ZDARZENIE'}</span>
+                        <span class="history-item-meta">${formatDateTime(entry.timestamp)}${entry.user ? ' • ' + escapeHtml(entry.user) : ''}</span>
+                    </div>
+                    <div class="history-item-body">${escapeHtml(entry.content || '')}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderContactHistory(contactId) {
+            const list = document.getElementById('contactHistoryList');
+            const empty = document.getElementById('contactHistoryEmpty');
+            if (!list || !empty) return;
+
+            const all = contactHistory
+                .filter(h => h.contactId === contactId)
+                .sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+
+            const scope = currentContactHistoryScope;
+            const shown = scope === 'notes' ? all.filter(h => h.type === 'note') : all;
+
+            if (all.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak historii';
+                empty.querySelector('p').textContent = 'Nie dodano jeszcze żadnych notatek ani zdarzeń dla tego kontaktu.';
+                return;
+            }
+
+            if (shown.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak wpisów';
+                empty.querySelector('p').textContent = scope === 'notes'
+                    ? 'Brak notatek dla tego kontaktu.'
+                    : 'Brak zdarzeń dla tego kontaktu.';
+                return;
+            }
+
+            empty.style.display = 'none';
+            list.innerHTML = shown.map(entry => `
+                <div class="history-item ${entry.type === 'note' ? 'note' : 'event'}">
+                    <div class="history-item-header">
+                        <span class="history-item-type">${entry.type === 'note' ? 'NOTATKA' : 'ZDARZENIE'}</span>
+                        <span class="history-item-meta">${formatDateTime(entry.timestamp)}${entry.user ? ' • ' + escapeHtml(entry.user) : ''}</span>
+                    </div>
+                    <div class="history-item-body">${escapeHtml(entry.content || '')}</div>
+                </div>
+            `).join('');
+        }
+
+        // HISTORY LOG HELPERS
+
+        async function logCompanyHistory(companyId, type, content, meta = '') {
+            if (!companyId || !CONFIG.HISTORY_COMPANIES_SHEET) return;
+            try {
+                const entry = {
+                    id: generateId(),
+                    companyId,
+                    type,
+                    timestamp: new Date().toISOString(),
+                    user: currentUserEmail || document.getElementById('userEmail').textContent || '',
+                    content,
+                    meta
+                };
+
+                const values = [[
+                    entry.id,
+                    entry.companyId,
+                    entry.type,
+                    entry.timestamp,
+                    entry.user,
+                    entry.content,
+                    entry.meta
+                ]];
+
+                await gapi.client.sheets.spreadsheets.values.append({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range: `${CONFIG.HISTORY_COMPANIES_SHEET}!A:G`,
+                    valueInputOption: 'USER_ENTERED',
+                    resource: { values }
+                });
+
+                companyHistory.push(entry);
+            } catch (err) {
+                console.error('Błąd zapisu historii firmy:', err);
+            }
+        }
+
+        async function logContactHistory(contactId, type, content, meta = '') {
+            if (!contactId || !CONFIG.HISTORY_CONTACTS_SHEET) return;
+            try {
+                const entry = {
+                    id: generateId(),
+                    contactId,
+                    type,
+                    timestamp: new Date().toISOString(),
+                    user: currentUserEmail || document.getElementById('userEmail').textContent || '',
+                    content,
+                    meta
+                };
+
+                const values = [[
+                    entry.id,
+                    entry.contactId,
+                    entry.type,
+                    entry.timestamp,
+                    entry.user,
+                    entry.content,
+                    entry.meta
+                ]];
+
+                await gapi.client.sheets.spreadsheets.values.append({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range: `${CONFIG.HISTORY_CONTACTS_SHEET}!A:G`,
+                    valueInputOption: 'USER_ENTERED',
+                    resource: { values }
+                });
+
+                contactHistory.push(entry);
+            } catch (err) {
+                console.error('Błąd zapisu historii kontaktu:', err);
+            }
+        }
+
+        function formatDateTime(isoString) {
+            if (!isoString) return '';
+            const d = new Date(isoString);
+            if (Number.isNaN(d.getTime())) return isoString;
+            return d.toLocaleString('pl-PL', {
+                dateStyle: 'short',
+                timeStyle: 'short'
+            });
+        }
+
+        // NOTE MODAL
+
+        function openNoteModal(entityType, entityId) {
+            if (!entityId) {
+                showStatus('Najpierw wybierz rekord', 'error');
+                return;
+            }
+            noteEntityTypeEl.value = entityType;
+            noteEntityIdEl.value = entityId;
+            noteContentEl.value = '';
+            document.getElementById('noteModalTitle').textContent =
+                entityType === 'company' ? 'Nowa notatka – firma' : 'Nowa notatka – kontakt';
+            document.getElementById('noteModal').classList.add('active');
+            noteContentEl.focus();
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.remove('active');
+            noteContentEl.value = '';
+        }
+
+        async function saveNote(e) {
+            e.preventDefault();
+            const entityType = noteEntityTypeEl.value;
+            const entityId = noteEntityIdEl.value;
+            const content = noteContentEl.value.trim();
+            if (!content) {
+                noteContentEl.focus();
                 return;
             }
 
             try {
-                await gapi.client.sheets.spreadsheets.values.update({
-                    spreadsheetId: CONFIG.SHEET_ID,
-                    range: `${CONFIG.CONTACTS_SHEET}!A${index + 2}:F${index + 2}`,
-                    valueInputOption: 'RAW',
-                    resource: { values: [['', '', '', '', '', '']] }
-                });
-
-                contacts.splice(index, 1);
-                showStatus('Usunięto kontakt', 'success');
-                renderAllContacts();
+                if (entityType === 'company') {
+                    await logCompanyHistory(entityId, 'note', content);
+                    if (currentCompanyId === entityId) {
+                        renderCompanyHistory(entityId);
+                    }
+                } else if (entityType === 'contact') {
+                    await logContactHistory(entityId, 'note', content);
+                    if (currentContactId === entityId) {
+                        renderContactHistory(entityId);
+                    }
+                }
+                showStatus('Notatka dodana', 'success');
+                closeNoteModal();
             } catch (err) {
-                console.error(err);
-                showStatus('Nie udało się usunąć kontaktu', 'error');
+                console.error('Błąd dodawania notatki:', err);
+                showStatus('Błąd dodawania notatki', 'error');
             }
         }
 
-        /* GLOBAL SEARCH & EVENTS */
+        // HELPERS
+
+        function generateId() {
+            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text == null ? '' : text;
+            return div.innerHTML;
+        }
+
+        // INIT
 
         document.addEventListener('DOMContentLoaded', () => {
             // auth
@@ -2995,10 +3079,11 @@
             const clearSearchBtn = document.getElementById('clearSearchBtn');
 
             if (globalSearchInput) {
-                globalSearchInput.addEventListener('input', () => {
-                    currentSearchTerm = globalSearchInput.value.trim();
+                globalSearchInput.addEventListener('input', (e) => {
+                    currentSearchTerm = e.target.value || '';
                     renderAllContacts();
                     renderCompanies();
+                    if (currentCompanyId) renderCompanyContacts(currentCompanyId);
                 });
             }
 
@@ -3012,143 +3097,109 @@
                 });
             }
 
-            // view toggle (cards / list)
-            document.querySelectorAll('.view-toggle-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const parent = btn.closest('.view-toggle');
-                    if (!parent) return;
-                    const entity = parent.dataset.entity;
-                    const view = btn.dataset.view || 'cards';
+            // companies
+            document.getElementById('addCompanyBtn').addEventListener('click', openCompanyModal);
+            document.getElementById('closeCompanyModalBtn').addEventListener('click', closeCompanyModal);
+            document.getElementById('cancelCompanyBtn').addEventListener('click', closeCompanyModal);
+            document.getElementById('companyForm').addEventListener('submit', saveCompany);
+            document.getElementById('backToCompaniesBtn').addEventListener('click', backToCompaniesList);
 
-                    parent.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+            // contacts
+            document.getElementById('addContactBtn').addEventListener('click', () => openContactModal());
+            document.getElementById('addCompanyContactBtn').addEventListener('click', () => {
+                openContactModal(currentCompanyId);
+            });
+            document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
+            document.getElementById('cancelContactBtn').addEventListener('click', closeContactModal);
+            document.getElementById('contactForm').addEventListener('submit', saveContact);
+            document.getElementById('backToContactsBtn').addEventListener('click', backToContactsList);
+
+            // company picker
+            companyInputEl = document.getElementById('contactCompanyInput');
+            companyIdEl = document.getElementById('contactCompanyId');
+            companySuggestionsEl = document.getElementById('companySuggestions');
+
+            if (companyInputEl) {
+                const onInput = () => {
+                    companyIdEl.value = '';
+                    showCompanySuggestions(companyInputEl.value);
+                };
+                companyInputEl.addEventListener('input', onInput);
+                companyInputEl.addEventListener('focus', onInput);
+            }
+
+            if (companySuggestionsEl) {
+                companySuggestionsEl.addEventListener('click', (e) => {
+                    const item = e.target.closest('.company-suggestion-item');
+                    if (!item) return;
+
+                    if (item.dataset.id) {
+                        const company = companies.find(c => c.id === item.dataset.id);
+                        if (company) {
+                            companyInputEl.value = company.name;
+                            companyIdEl.value = company.id;
+                        }
+                    } else if (item.classList.contains('company-suggestion-new')) {
+                        // nic – tworzenie firmy nastąpi przy zapisie kontaktu
+                    }
+
+                    hideCompanySuggestions();
+                });
+            }
+
+            // note modal
+            noteEntityTypeEl = document.getElementById('noteEntityType');
+            noteEntityIdEl = document.getElementById('noteEntityId');
+            noteContentEl = document.getElementById('noteContent');
+
+            document.getElementById('closeNoteModalBtn').addEventListener('click', closeNoteModal);
+            document.getElementById('cancelNoteBtn').addEventListener('click', closeNoteModal);
+            document.getElementById('noteForm').addEventListener('submit', saveNote);
+
+            document.getElementById('addCompanyNoteBtn').addEventListener('click', () => {
+                openNoteModal('company', currentCompanyId);
+            });
+            document.getElementById('addContactNoteBtn').addEventListener('click', () => {
+                openNoteModal('contact', currentContactId);
+            });
+
+            // history tabs
+            document.querySelectorAll('.history-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const entity = btn.dataset.entity;
+                    const scope = btn.dataset.scope;
+
+                    document.querySelectorAll(`.history-tab-btn[data-entity="${entity}"]`).forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
 
-                    if (entity === 'contacts') {
-                        contactsViewMode = view;
-                        renderAllContacts();
-                    } else if (entity === 'companies') {
-                        companiesViewMode = view;
-                        renderCompanies();
+                    if (entity === 'company') {
+                        currentCompanyHistoryScope = scope;
+                        if (currentCompanyId) renderCompanyHistory(currentCompanyId);
+                    } else if (entity === 'contact') {
+                        currentContactHistoryScope = scope;
+                        if (currentContactId) renderContactHistory(currentContactId);
                     }
                 });
             });
 
-            // companies
-            document.getElementById('addCompanyBtn').addEventListener('click', openCompanyModal);
-            document.getElementById('closeCompanyModalBtn').addEventListener('click', closeCompanyModal);
-            document.getElementById('companyForm').addEventListener('submit', saveCompany);
+            // close modals on background click
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            });
 
-            // contacts
-            document.getElementById('addContactBtn').addEventListener('click', openContactModal);
-            document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
-            document.getElementById('contactForm').addEventListener('submit', saveContact);
-
-            // detail back buttons
-            document.getElementById('backToCompaniesBtn').addEventListener('click', backToCompaniesList);
-            document.getElementById('backToContactsBtn').addEventListener('click', backToContactsList);
+            // hide company suggestions when clicking outside
+            document.addEventListener('click', (e) => {
+                if (companyInputEl && companyInputEl.closest('.company-picker') && companySuggestionsEl) {
+                    if (!companyInputEl.closest('.company-picker').contains(e.target)) {
+                        hideCompanySuggestions();
+                    }
+                }
+            });
         });
     </script>
-
-<!-- MODALS -->
-
-<!-- COMPANY MODAL -->
-<div id="companyModal" class="modal-backdrop">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 id="companyModalTitle">Dodaj firmę</h2>
-            <button id="closeCompanyModalBtn" class="close-btn">&times;</button>
-        </div>
-        <p class="modal-description">
-            Uzupełnij podstawowe dane firmy. Te informacje będą widoczne zarówno w liście firm, jak i w szczegółach kontaktów.
-        </p>
-        <form id="companyForm">
-            <div class="modal-scroll">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="companyName">Nazwa firmy</label>
-                        <input type="text" id="companyName" required placeholder="np. DigitPoint Sp. z o.o.">
-                    </div>
-                    <div class="form-group">
-                        <label for="companyIndustry">Branża <span class="optional">(opcjonalnie)</span></label>
-                        <input type="text" id="companyIndustry" placeholder="np. IT, Marketing, Finanse">
-                    </div>
-                    <div class="form-group">
-                        <label for="companyWebsite">Strona WWW <span class="optional">(opcjonalnie)</span></label>
-                        <input type="url" id="companyWebsite" placeholder="np. https://twojafirma.pl">
-                    </div>
-                    <div class="form-group">
-                        <label for="companyPhone">Telefon firmowy <span class="optional">(opcjonalnie)</span></label>
-                        <input type="tel" id="companyPhone" placeholder="np. +48 123 456 789">
-                    </div>
-                    <div class="form-group">
-                        <label for="companyCity">Miasto <span class="optional">(opcjonalnie)</span></label>
-                        <input type="text" id="companyCity" placeholder="np. Warszawa">
-                    </div>
-                    <div class="form-group">
-                        <label for="companyCountry">Kraj <span class="optional">(opcjonalnie)</span></label>
-                        <input type="text" id="companyCountry" placeholder="np. Polska">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="companyNotes">Notatki o firmie <span class="optional">(opcjonalnie)</span></label>
-                    <textarea id="companyNotes" placeholder="np. status współpracy, ważne informacje, preferencje"></textarea>
-                </div>
-            </div>
-            <div class="form-footer">
-                <button type="button" class="btn-ghost" onclick="closeCompanyModal()">Anuluj</button>
-                <button type="submit" id="companyModalSubmit" class="btn-primary">Dodaj firmę</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- CONTACT MODAL -->
-<div id="contactModal" class="modal-backdrop">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 id="contactModalTitle">Dodaj kontakt</h2>
-            <button id="closeContactModalBtn" class="close-btn">&times;</button>
-        </div>
-        <p class="modal-description">
-            Dodaj nową osobę kontaktową, a następnie przypisz ją do odpowiedniej firmy.
-        </p>
-        <form id="contactForm">
-            <div class="modal-scroll">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="contactName">Imię i nazwisko</label>
-                        <input type="text" id="contactName" required placeholder="np. Jan Kowalski">
-                    </div>
-                    <div class="form-group">
-                        <label for="contactPosition">Stanowisko <span class="optional">(opcjonalnie)</span></label>
-                        <input type="text" id="contactPosition" placeholder="np. Sales Manager">
-                    </div>
-                    <div class="form-group">
-                        <label for="contactEmail">Email <span class="optional">(opcjonalnie)</span></label>
-                        <input type="email" id="contactEmail" placeholder="np. jan.kowalski@firma.pl">
-                    </div>
-                    <div class="form-group">
-                        <label for="contactPhone">Telefon <span class="optional">(opcjonalnie)</span></label>
-                        <input type="tel" id="contactPhone" placeholder="np. +48 987 654 321">
-                    </div>
-                    <div class="form-group">
-                        <label for="contactCompanyId">Firma <span class="optional">(opcjonalnie)</span></label>
-                        <select id="contactCompanyId"></select>
-                    </div>
-                </div>
-            </div>
-            <div class="form-footer">
-                <button type="button" class="btn-ghost" onclick="closeContactModal()">Anuluj</button>
-                <button type="submit" id="contactModalSubmit" class="btn-primary">Dodaj kontakt</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- GLOBAL SEARCH INPUT (INSIDE APP) -->
-<div style="display:none">
-    <input id="globalSearchInput" type="text">
-    <button id="clearSearchBtn" type="button"></button>
-</div>
 </body>
 </html>
