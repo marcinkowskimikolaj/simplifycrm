@@ -1449,166 +1449,6 @@
             border-top: 1px solid var(--border-subtle);
         }
 
-        /* Tags Section in Detail View */
-        .detail-tags-section {
-            background: var(--surface);
-            border-radius: var(--radius-card);
-            border: 1px solid var(--border-subtle);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-card);
-        }
-
-        .detail-tags-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.2rem;
-        }
-
-        .detail-tags-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.7rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-        }
-
-        .add-tag-btn {
-            width: 32px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: var(--accent);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 1.3rem;
-            transition: all 0.18s ease;
-        }
-
-        .add-tag-btn:hover {
-            background: #1d4ed8;
-            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
-            transform: translateY(-1px);
-        }
-
-        .tag-selector-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 0.5rem;
-            background: var(--surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 0.5rem;
-            min-width: 220px;
-            max-height: 300px;
-            overflow-y: auto;
-            box-shadow: var(--shadow-soft);
-            z-index: 100;
-            display: none;
-        }
-
-        .tag-selector-dropdown.active {
-            display: block;
-        }
-
-        .tag-selector-item {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.6rem 0.8rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.18s ease;
-        }
-
-        .tag-selector-item:hover {
-            background: rgba(15,23,42,0.04);
-        }
-
-        .tag-selector-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            flex-shrink: 0;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .tag-selector-name {
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .assigned-tags-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .assigned-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 0.8rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: white;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .remove-tag-btn {
-            width: 16px;
-            height: 16px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            cursor: pointer;
-            transition: all 0.18s ease;
-            font-size: 0.7rem;
-            line-height: 1;
-        }
-
-        .remove-tag-btn:hover {
-            background: rgba(255,255,255,0.35);
-        }
-
-        /* Filter indicator */
-        .tag-filter-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: var(--surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: 999px;
-            font-size: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .clear-filter-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            transition: background 0.18s ease;
-        }
-
-        .clear-filter-btn:hover {
-            background: rgba(15,23,42,0.08);
-        }
-
 </style>
 </head>
 <body>
@@ -2053,14 +1893,13 @@
         }
 
         // ============= VARIABLES =============
-        
-        // ============= TAGS DATA =============
+                // Tags variables
         let companyTags = [];
         let contactTags = [];
         let companyTagRelations = [];
         let contactTagRelations = [];
         let currentTagFilter = null;
-        let currentTagType = 'companies'; // 'companies' lub 'contacts'
+        let currentTagType = 'companies';
 
         let companies = [];
         let contacts = [];
@@ -2205,25 +2044,55 @@
 
         // ============= FILTER HELPERS =============
         function getFilteredCompanies() {
-            if (!currentSearchTerm) return companies;
-            const q = currentSearchTerm.toLowerCase();
-            return companies.filter(c => {
-                const combined = `${c.name} ${c.industry} ${c.notes} ${c.website} ${c.phone} ${c.city} ${c.country}`.toLowerCase();
-                return combined.includes(q);
-            });
+            let result = companies;
+            
+            // Search filter
+            if (currentSearchTerm) {
+                const q = currentSearchTerm.toLowerCase();
+                result = result.filter(c => {
+                    const combined = `${c.name} ${c.industry} ${c.notes} ${c.website} ${c.phone} ${c.city} ${c.country}`.toLowerCase();
+                    return combined.includes(q);
+                });
+            }
+            
+            // Tag filter
+            if (currentTagFilter && currentTagFilter.type === 'company') {
+                result = DataService.getCompaniesByTag(
+                    currentTagFilter.id,
+                    result,
+                    companyTagRelations
+                );
+            }
+            
+            return result;
         }
 
         function getFilteredContacts() {
-            if (!currentSearchTerm) return contacts;
-            const q = currentSearchTerm.toLowerCase();
-            return contacts.filter(contact => {
-                const company = companies.find(c => c.id === contact.companyId);
-                const companyText = company
-                    ? `${company.name} ${company.industry} ${company.city} ${company.country}`
-                    : '';
-                const combined = `${contact.name} ${contact.position} ${contact.email} ${contact.phone} ${companyText}`.toLowerCase();
-                return combined.includes(q);
-            });
+            let result = contacts;
+            
+            // Search filter
+            if (currentSearchTerm) {
+                const q = currentSearchTerm.toLowerCase();
+                result = result.filter(contact => {
+                    const company = companies.find(c => c.id === contact.companyId);
+                    const companyText = company
+                        ? `${company.name} ${company.industry} ${company.city} ${company.country}`
+                        : '';
+                    const combined = `${contact.name} ${contact.position} ${contact.email} ${contact.phone} ${companyText}`.toLowerCase();
+                    return combined.includes(q);
+                });
+            }
+            
+            // Tag filter
+            if (currentTagFilter && currentTagFilter.type === 'contact') {
+                result = DataService.getContactsByTag(
+                    currentTagFilter.id,
+                    result,
+                    contactTagRelations
+                );
+            }
+            
+            return result;
         }
 
         // ============= RENDER COMPANIES =============
@@ -2317,7 +2186,8 @@
                                 </div>
                             </div>
                             ${infoRows ? `<div class="card-body">${infoRows}</div>` : ''}
-                            ${renderEntityTags(company.id, 'company')}
+                            
+                            ${renderEntityTags(company.id, \'company\')}
                             <div class="card-badge"><span>👥</span><span>${companyContacts.length} kontaktów</span></div>
                         </div>
                     `;
@@ -2406,8 +2276,9 @@
                                 ${company ? `<div class="card-info-row"><span class="emoji">🏢</span><span>${escapeHtml(company.name)}</span></div>` : `<div class="card-badge no-company"><span>⚠️</span><span>Brak firmy</span></div>`}
                                 ${contact.email ? `<div class="card-info-row"><span class="emoji">📧</span><span>${escapeHtml(contact.email)}</span></div>` : ''}
                                 ${contact.phone ? `<div class="card-info-row"><span class="emoji">📱</span><span>${escapeHtml(contact.phone)}</span></div>` : ''}
-                            </div>
-                            ${renderEntityTags(contact.id, 'contact')}
+                            
+                            ${renderEntityTags(contact.id, \'contact\')}
+                        </div>
                         </div>
                     `;
                 }).join('');
@@ -2489,8 +2360,7 @@
                             ${contact.email ? `<div class="card-info-row"><span class="emoji">📧</span><span>${escapeHtml(contact.email)}</span></div>` : ''}
                             ${contact.phone ? `<div class="card-info-row"><span class="emoji">📱</span><span>${escapeHtml(contact.phone)}</span></div>` : ''}
                         </div>
-                            ${renderEntityTags(contact.id, 'contact')}
-                        </div>
+                    </div>
                 `;
             }).join('');
         }
@@ -2991,178 +2861,8 @@
             return div.innerHTML;
         }
 
-        // Make functions global for onclick handlers
-        window.viewCompanyDetail = viewCompanyDetail;
-        window.viewContactDetail = viewContactDetail;
-        window.editCompany = editCompany;
-        window.editContact = editContact;
-        window.deleteCompany = deleteCompany;
-        window.deleteContact = deleteContact;
-        window.editCompanyFromDetail = editCompanyFromDetail;
-        window.editContactFromDetail = editContactFromDetail;
-        window.closeDuplicateModal = () => document.getElementById('duplicateModal').classList.remove('active');
-
-        // ============= EVENT LISTENERS =============
-        document.addEventListener('DOMContentLoaded', () => {
-            // Logout
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                if (confirm('Czy na pewno chcesz się wylogować?')) {
-                    AuthService.logout();
-                }
-            });
-
-            // Tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (btn.dataset.tab === 'contacts') backToContactsList();
-                    else if (btn.dataset.tab === 'companies') backToCompaniesList();
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                    btn.classList.add('active');
-                    document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
-                });
-            });
-
-            // Search
-            const globalSearchInput = document.getElementById('globalSearchInput');
-            const clearSearchBtn = document.getElementById('clearSearchBtn');
-            if (globalSearchInput) {
-                globalSearchInput.addEventListener('input', (e) => {
-                    currentSearchTerm = e.target.value || '';
-                    renderAllContacts();
-                    renderCompanies();
-                    if (currentCompanyId) renderCompanyContacts(currentCompanyId);
-                });
-            }
-            if (clearSearchBtn) {
-                clearSearchBtn.addEventListener('click', () => {
-                    currentSearchTerm = '';
-                    if (globalSearchInput) globalSearchInput.value = '';
-                    renderAllContacts();
-                    renderCompanies();
-                });
-            }
-
-            // Companies
-            document.getElementById('addCompanyBtn').addEventListener('click', openCompanyModal);
-            document.getElementById('closeCompanyModalBtn').addEventListener('click', closeCompanyModal);
-            document.getElementById('cancelCompanyBtn').addEventListener('click', closeCompanyModal);
-            document.getElementById('companyForm').addEventListener('submit', saveCompany);
-            document.getElementById('backToCompaniesBtn').addEventListener('click', backToCompaniesList);
-
-            // Contacts
-            document.getElementById('addContactBtn').addEventListener('click', () => openContactModal());
-            document.getElementById('addCompanyContactBtn').addEventListener('click', () => openContactModal(currentCompanyId));
-            document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
-            document.getElementById('cancelContactBtn').addEventListener('click', closeContactModal);
-            document.getElementById('contactForm').addEventListener('submit', saveContact);
-            document.getElementById('backToContactsBtn').addEventListener('click', backToContactsList);
-
-            // Company picker
-            companyInputEl = document.getElementById('contactCompanyInput');
-            companyIdEl = document.getElementById('contactCompanyId');
-            companySuggestionsEl = document.getElementById('companySuggestions');
-
-            if (companyInputEl) {
-                const onInput = () => {
-                    companyIdEl.value = '';
-                    showCompanySuggestions(companyInputEl.value);
-                };
-                companyInputEl.addEventListener('input', onInput);
-                companyInputEl.addEventListener('focus', onInput);
-            }
-
-            if (companySuggestionsEl) {
-                companySuggestionsEl.addEventListener('click', (e) => {
-                    const item = e.target.closest('.company-suggestion-item');
-                    if (!item) return;
-                    if (item.dataset.id) {
-                        const company = companies.find(c => c.id === item.dataset.id);
-                        if (company) {
-                            companyInputEl.value = company.name;
-                            companyIdEl.value = company.id;
-                        }
-                    }
-                    hideCompanySuggestions();
-                });
-            }
-
-            // Auto-match company by email domain
-            const contactEmailEl = document.getElementById('contactEmail');
-            if (contactEmailEl && companyInputEl && companyIdEl) {
-                contactEmailEl.addEventListener('blur', () => {
-                    const email = contactEmailEl.value.trim();
-                    if (!email || !email.includes('@')) return;
-                    if (companyInputEl.value.trim() || companyIdEl.value) return;
-                    const domain = DataService.extractDomain(email);
-                    const matchedCompany = DataService.findCompanyByDomain(companies, domain);
-                    if (matchedCompany) {
-                        companyInputEl.value = matchedCompany.name;
-                        companyIdEl.value = matchedCompany.id;
-                        showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
-                    }
-                });
-            }
-
-            // Note modal
-            noteEntityTypeEl = document.getElementById('noteEntityType');
-            noteEntityIdEl = document.getElementById('noteEntityId');
-            noteContentEl = document.getElementById('noteContent');
-
-            document.getElementById('closeNoteModalBtn').addEventListener('click', closeNoteModal);
-            document.getElementById('cancelNoteBtn').addEventListener('click', closeNoteModal);
-            document.getElementById('noteForm').addEventListener('submit', saveNote);
-
-            document.getElementById('addCompanyNoteBtn').addEventListener('click', () => openNoteModal('company', currentCompanyId));
-            document.getElementById('addContactNoteBtn').addEventListener('click', () => openNoteModal('contact', currentContactId));
-
-            // History tabs
-            document.querySelectorAll('.history-tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const entity = btn.dataset.entity;
-                    const scope = btn.dataset.scope;
-                    document.querySelectorAll(`.history-tab-btn[data-entity="${entity}"]`).forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    if (entity === 'company') {
-                        currentCompanyHistoryScope = scope;
-                        if (currentCompanyId) renderCompanyHistory(currentCompanyId);
-                    } else if (entity === 'contact') {
-                        currentContactHistoryScope = scope;
-                        if (currentContactId) renderContactHistory(currentContactId);
-                    }
-                });
-            });
-
-            // Close modals on background click
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) modal.classList.remove('active');
-                });
-            });
-
-            // Hide company suggestions when clicking outside
-            document.addEventListener('click', (e) => {
-                if (companyInputEl && companyInputEl.closest('.company-picker') && companySuggestionsEl) {
-                    if (!companyInputEl.closest('.company-picker').contains(e.target)) {
-                        hideCompanySuggestions();
-                    }
-                }
-            });
-        });
-
-        // ============= START =============
-        if (typeof gapi !== 'undefined') {
-            init();
-        } else {
-            window.addEventListener('load', () => {
-                setTimeout(init, 1000);
-            });
-        }
-    
-
         // ============= TAGS JAVASCRIPT =============
-// Ten kod należy dodać do relationships.html w sekcji <script>
-
+// Ten kod należy dodać do relationships.html w sekcji 
 // ========== TAGS MANAGER MODAL ==========
 
 function openTagsManager(initialType = 'companies') {
@@ -3592,6 +3292,198 @@ async function loadTagsData() {
     }
 }
 
+
+        
+
+        
+        // ============= MAKE FUNCTIONS GLOBAL =============
+        // Make all functions available for onclick handlers
+        
+        // Basic functions
+        window.viewCompanyDetail = viewCompanyDetail;
+        window.viewContactDetail = viewContactDetail;
+        window.editCompany = editCompany;
+        window.editContact = editContact;
+        window.deleteCompany = deleteCompany;
+        window.deleteContact = deleteContact;
+        window.editCompanyFromDetail = editCompanyFromDetail;
+        window.editContactFromDetail = editContactFromDetail;
+        window.closeDuplicateModal = () => document.getElementById('duplicateModal').classList.remove('active');
+        
+        // ============= EXPOSE FUNCTIONS TO WINDOW =============
+        // To jest konieczne, aby przyciski w HTML (onclick=...) widziały te funkcje
+        
+        // Tags functions
+        window.openTagsManager = openTagsManager;
+        window.closeTagsManager = closeTagsManager;
+        window.switchTagsTab = switchTagsTab;
+        window.selectColor = selectColor;
+        window.saveCompanyTag = saveCompanyTag;
+        window.editCompanyTag = editCompanyTag;
+        window.deleteCompanyTag = deleteCompanyTag;
+        window.saveContactTag = saveContactTag;
+        window.editContactTag = editContactTag;
+        window.deleteContactTag = deleteContactTag;
+        window.filterByTag = filterByTag;
+        window.clearTagFilter = clearTagFilter;
+
+
+        // ============= EVENT LISTENERS =============
+        document.addEventListener('DOMContentLoaded', () => {
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                if (confirm('Czy na pewno chcesz się wylogować?')) {
+                    AuthService.logout();
+                }
+            });
+
+            // Tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.dataset.tab === 'contacts') backToContactsList();
+                    else if (btn.dataset.tab === 'companies') backToCompaniesList();
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
+                });
+            });
+
+            // Search
+            const globalSearchInput = document.getElementById('globalSearchInput');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+            if (globalSearchInput) {
+                globalSearchInput.addEventListener('input', (e) => {
+                    currentSearchTerm = e.target.value || '';
+                    renderAllContacts();
+                    renderCompanies();
+                    if (currentCompanyId) renderCompanyContacts(currentCompanyId);
+                });
+            }
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', () => {
+                    currentSearchTerm = '';
+                    if (globalSearchInput) globalSearchInput.value = '';
+                    renderAllContacts();
+                    renderCompanies();
+                });
+            }
+
+            // Companies
+            document.getElementById('addCompanyBtn').addEventListener('click', openCompanyModal);
+            document.getElementById('closeCompanyModalBtn').addEventListener('click', closeCompanyModal);
+            document.getElementById('cancelCompanyBtn').addEventListener('click', closeCompanyModal);
+            document.getElementById('companyForm').addEventListener('submit', saveCompany);
+            document.getElementById('backToCompaniesBtn').addEventListener('click', backToCompaniesList);
+
+            // Contacts
+            document.getElementById('addContactBtn').addEventListener('click', () => openContactModal());
+            document.getElementById('addCompanyContactBtn').addEventListener('click', () => openContactModal(currentCompanyId));
+            document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
+            document.getElementById('cancelContactBtn').addEventListener('click', closeContactModal);
+            document.getElementById('contactForm').addEventListener('submit', saveContact);
+            document.getElementById('backToContactsBtn').addEventListener('click', backToContactsList);
+
+            // Company picker
+            companyInputEl = document.getElementById('contactCompanyInput');
+            companyIdEl = document.getElementById('contactCompanyId');
+            companySuggestionsEl = document.getElementById('companySuggestions');
+
+            if (companyInputEl) {
+                const onInput = () => {
+                    companyIdEl.value = '';
+                    showCompanySuggestions(companyInputEl.value);
+                };
+                companyInputEl.addEventListener('input', onInput);
+                companyInputEl.addEventListener('focus', onInput);
+            }
+
+            if (companySuggestionsEl) {
+                companySuggestionsEl.addEventListener('click', (e) => {
+                    const item = e.target.closest('.company-suggestion-item');
+                    if (!item) return;
+                    if (item.dataset.id) {
+                        const company = companies.find(c => c.id === item.dataset.id);
+                        if (company) {
+                            companyInputEl.value = company.name;
+                            companyIdEl.value = company.id;
+                        }
+                    }
+                    hideCompanySuggestions();
+                });
+            }
+
+            // Auto-match company by email domain
+            const contactEmailEl = document.getElementById('contactEmail');
+            if (contactEmailEl && companyInputEl && companyIdEl) {
+                contactEmailEl.addEventListener('blur', () => {
+                    const email = contactEmailEl.value.trim();
+                    if (!email || !email.includes('@')) return;
+                    if (companyInputEl.value.trim() || companyIdEl.value) return;
+                    const domain = DataService.extractDomain(email);
+                    const matchedCompany = DataService.findCompanyByDomain(companies, domain);
+                    if (matchedCompany) {
+                        companyInputEl.value = matchedCompany.name;
+                        companyIdEl.value = matchedCompany.id;
+                        showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
+                    }
+                });
+            }
+
+            // Note modal
+            noteEntityTypeEl = document.getElementById('noteEntityType');
+            noteEntityIdEl = document.getElementById('noteEntityId');
+            noteContentEl = document.getElementById('noteContent');
+
+            document.getElementById('closeNoteModalBtn').addEventListener('click', closeNoteModal);
+            document.getElementById('cancelNoteBtn').addEventListener('click', closeNoteModal);
+            document.getElementById('noteForm').addEventListener('submit', saveNote);
+
+            document.getElementById('addCompanyNoteBtn').addEventListener('click', () => openNoteModal('company', currentCompanyId));
+            document.getElementById('addContactNoteBtn').addEventListener('click', () => openNoteModal('contact', currentContactId));
+
+            // History tabs
+            document.querySelectorAll('.history-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const entity = btn.dataset.entity;
+                    const scope = btn.dataset.scope;
+                    document.querySelectorAll(`.history-tab-btn[data-entity="${entity}"]`).forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    if (entity === 'company') {
+                        currentCompanyHistoryScope = scope;
+                        if (currentCompanyId) renderCompanyHistory(currentCompanyId);
+                    } else if (entity === 'contact') {
+                        currentContactHistoryScope = scope;
+                        if (currentContactId) renderContactHistory(currentContactId);
+                    }
+                });
+            });
+
+            // Close modals on background click
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.classList.remove('active');
+                });
+            });
+
+            // Hide company suggestions when clicking outside
+            document.addEventListener('click', (e) => {
+                if (companyInputEl && companyInputEl.closest('.company-picker') && companySuggestionsEl) {
+                    if (!companyInputEl.closest('.company-picker').contains(e.target)) {
+                        hideCompanySuggestions();
+                    }
+                }
+            });
+        });
+
+        // ============= START =============
+        if (typeof gapi !== 'undefined') {
+            init();
+        } else {
+            window.addEventListener('load', () => {
+                setTimeout(init, 1000);
+            });
+        }
     </script>
 
     <!-- Tags Manager Modal -->
@@ -3599,7 +3491,7 @@ async function loadTagsData() {
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Zarządzanie etykietami</h2>
-                <button class="close-btn" id="closeTagsManagerBtn" onclick="closeTagsManager()">×</button>
+                <button class="close-btn" onclick="closeTagsManager()">×</button>
             </div>
 
             <!-- Tabs -->
@@ -3614,34 +3506,28 @@ async function loadTagsData() {
 
             <!-- Companies Tags Section -->
             <div id="companiesTagsSection" class="tags-section active">
-                <!-- Tag Form -->
                 <div class="tag-form-section">
-                    <form id="companyTagForm" onsubmit="saveCompanyTag(event)">
+                    <form id="companyTagForm" onsubmit="return saveCompanyTag(event)">
                         <div class="form-group">
                             <label>Nazwa etykiety</label>
                             <input type="text" id="companyTagName" placeholder="np. VIP Klient" required>
                             <input type="hidden" id="companyTagId">
                             <input type="hidden" id="companyTagRowIndex">
                         </div>
-
                         <div class="form-group">
                             <label>Kolor</label>
                             <div class="color-picker-grid" id="companyTagColorPicker"></div>
                             <input type="hidden" id="companyTagColor" value="#3b82f6">
                         </div>
-
                         <div class="form-group">
                             <label>Opis <span class="optional">(opcjonalnie)</span></label>
                             <textarea id="companyTagDescription" placeholder="Opis etykiety..." rows="2"></textarea>
                         </div>
-
                         <button type="submit" class="btn btn-primary" style="width: 100%;">
                             <span id="companyTagSubmitText">Dodaj etykietę</span>
                         </button>
                     </form>
                 </div>
-
-                <!-- Tags List -->
                 <div class="tags-list-section">
                     <h3>Istniejące etykiety</h3>
                     <div id="companyTagsList" class="tags-list"></div>
@@ -3650,34 +3536,28 @@ async function loadTagsData() {
 
             <!-- Contacts Tags Section -->
             <div id="contactsTagsSection" class="tags-section" style="display: none;">
-                <!-- Tag Form -->
                 <div class="tag-form-section">
-                    <form id="contactTagForm" onsubmit="saveContactTag(event)">
+                    <form id="contactTagForm" onsubmit="return saveContactTag(event)">
                         <div class="form-group">
                             <label>Nazwa etykiety</label>
                             <input type="text" id="contactTagName" placeholder="np. Decydent" required>
                             <input type="hidden" id="contactTagId">
                             <input type="hidden" id="contactTagRowIndex">
                         </div>
-
                         <div class="form-group">
                             <label>Kolor</label>
                             <div class="color-picker-grid" id="contactTagColorPicker"></div>
                             <input type="hidden" id="contactTagColor" value="#3b82f6">
                         </div>
-
                         <div class="form-group">
                             <label>Opis <span class="optional">(opcjonalnie)</span></label>
                             <textarea id="contactTagDescription" placeholder="Opis etykiety..." rows="2"></textarea>
                         </div>
-
                         <button type="submit" class="btn btn-primary" style="width: 100%;">
                             <span id="contactTagSubmitText">Dodaj etykietę</span>
                         </button>
                     </form>
                 </div>
-
-                <!-- Tags List -->
                 <div class="tags-list-section">
                     <h3>Istniejące etykiety</h3>
                     <div id="contactTagsList" class="tags-list"></div>
