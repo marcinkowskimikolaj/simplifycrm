@@ -1442,6 +1442,47 @@
             margin-top: 0.6rem;
         }
 
+        /* Empty state for tags */
+        .empty-state-small {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-style: italic;
+            padding: 0.5rem 0;
+        }
+
+        /* Tag assignment section */
+        .tag-assignment {
+            display: flex;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+
+        .tag-assignment select {
+            flex: 1;
+        }
+
+        /* Detail section styles */
+        .detail-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .detail-section-header {
+            margin-bottom: 1rem;
+        }
+
+        .detail-section-header h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+
         /* Tags in Card */
         .card .tags-container {
             margin-top: 0.8rem;
@@ -2318,6 +2359,28 @@
                 </div>
                 ${company.industry ? `<div class="detail-meta">${escapeHtml(company.industry)}</div>` : ''}
                 <div class="detail-info">${infoHtml || '<div class="detail-info-row"><div class="detail-info-label">Informacje</div><div class="detail-info-value">Brak dodatkowych informacji.</div></div>'}</div>
+            
+                
+                <!-- Tags Section -->
+                <div class="detail-section">
+                    <div class="detail-section-header">
+                        <h3>Etykiety</h3>
+                    </div>
+                    <div class="tags-container" id="companyDetailTags">
+                        ${renderDetailTags(company.id, 'company')}
+                    </div>
+                    <div class="tag-assignment" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <select id="companyTagSelect" class="form-input" style="flex: 1;">
+                            <option value="">Wybierz etykietę...</option>
+                            ${companyTags.map(tag => `
+                                <option value="${tag.id}">${escapeHtml(tag.name)}</option>
+                            `).join('')}
+                        </select>
+                        <button onclick="assignTagToCompanyDetail()" class="btn btn-secondary" style="white-space: nowrap;">
+                            + Dodaj
+                        </button>
+                    </div>
+                </div>
             `;
 
             renderCompanyContacts(companyId);
@@ -2411,7 +2474,29 @@
                             ${company.phone ? `<div class="card-info-row"><span class="emoji">📞</span><span>${escapeHtml(company.phone)}</span></div>` : ''}
                         </div>
                     </div>
-                `;
+                
+                
+                <!-- Tags Section -->
+                <div class="detail-section">
+                    <div class="detail-section-header">
+                        <h3>Etykiety</h3>
+                    </div>
+                    <div class="tags-container" id="contactDetailTags">
+                        ${renderDetailTags(contact.id, 'contact')}
+                    </div>
+                    <div class="tag-assignment" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <select id="contactTagSelect" class="form-input" style="flex: 1;">
+                            <option value="">Wybierz etykietę...</option>
+                            ${contactTags.map(tag => `
+                                <option value="${tag.id}">${escapeHtml(tag.name)}</option>
+                            `).join('')}
+                        </select>
+                        <button onclick="assignTagToContactDetail()" class="btn btn-secondary" style="white-space: nowrap;">
+                            + Dodaj
+                        </button>
+                    </div>
+                </div>
+            `;
             } else {
                 companyContainer.innerHTML = '';
                 companyEmpty.style.display = 'block';
@@ -3227,6 +3312,151 @@ async function assignTagToEntity(entityId, tagId, type) {
         } else if (type === 'contact' && currentContactId === entityId) {
             viewContactDetail(entityId);
         }
+    }
+
+    /**
+     * Render tags in detail view (with remove buttons)
+     */
+    function renderDetailTags(entityId, type) {
+        const allTags = type === 'company' ? companyTags : contactTags;
+        const allRelations = type === 'company' ? companyTagRelations : contactTagRelations;
+        
+        const entityTags = type === 'company' 
+            ? DataService.getCompanyTags(entityId, allTags, allRelations)
+            : DataService.getContactTags(entityId, allTags, allRelations);
+        
+        if (entityTags.length === 0) {
+            return '<div class="empty-state-small">Brak etykiet</div>';
+        }
+        
+        return entityTags.map(tag => `
+            <div class="tag-badge" style="background-color: ${tag.color}; position: relative; padding-right: 2rem;">
+                ${escapeHtml(tag.name)}
+                <button 
+                    class="remove-tag-btn" 
+                    onclick="removeTagFromDetail('${entityId}', '${tag.id}', '${type}')"
+                    style="position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: white; cursor: pointer; font-size: 1rem; padding: 0; width: 1.2rem; height: 1.2rem; display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s;"
+                    onmouseover="this.style.opacity='1'"
+                    onmouseout="this.style.opacity='0.8'"
+                    title="Usuń etykietę"
+                >×</button>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Assign tag to company from detail view
+     */
+    async function assignTagToCompanyDetail() {
+        const select = document.getElementById('companyTagSelect');
+        const tagId = select.value;
+        
+        if (!tagId) {
+            showStatus('Wybierz etykietę', 'error');
+            return;
+        }
+        
+        if (!currentCompanyId) {
+            showStatus('Błąd: brak ID firmy', 'error');
+            return;
+        }
+        
+        try {
+            await assignTagToEntity(currentCompanyId, tagId, 'company');
+            
+            // Reload tags
+            await loadTagsData();
+            
+            // Refresh detail view
+            viewCompanyDetail(currentCompanyId);
+            
+            // Reset select
+            select.value = '';
+            
+            showStatus('Etykieta przypisana', 'success');
+        } catch (error) {
+            console.error('Błąd przypisywania etykiety:', error);
+            showStatus('Błąd przypisywania etykiety', 'error');
+        }
+    }
+
+    /**
+     * Assign tag to contact from detail view
+     */
+    async function assignTagToContactDetail() {
+        const select = document.getElementById('contactTagSelect');
+        const tagId = select.value;
+        
+        if (!tagId) {
+            showStatus('Wybierz etykietę', 'error');
+            return;
+        }
+        
+        if (!currentContactId) {
+            showStatus('Błąd: brak ID kontaktu', 'error');
+            return;
+        }
+        
+        try {
+            await assignTagToEntity(currentContactId, tagId, 'contact');
+            
+            // Reload tags
+            await loadTagsData();
+            
+            // Refresh detail view
+            viewContactDetail(currentContactId);
+            
+            // Reset select
+            select.value = '';
+            
+            showStatus('Etykieta przypisana', 'success');
+        } catch (error) {
+            console.error('Błąd przypisywania etykiety:', error);
+            showStatus('Błąd przypisywania etykiety', 'error');
+        }
+    }
+
+    /**
+     * Remove tag from entity in detail view
+     */
+    async function removeTagFromDetail(entityId, tagId, type) {
+        if (!confirm('Czy na pewno chcesz usunąć tę etykietę?')) {
+            return;
+        }
+        
+        try {
+            // Find relation
+            const allRelations = type === 'company' ? companyTagRelations : contactTagRelations;
+            const relation = allRelations.find(r => 
+                (type === 'company' ? r.companyId : r.contactId) === entityId && 
+                r.tagId === tagId
+            );
+            
+            if (!relation) {
+                showStatus('Nie znaleziono relacji', 'error');
+                return;
+            }
+            
+            // Find row index
+            const rowIndex = allRelations.indexOf(relation) + 1; // +1 bo nagłówek
+            
+            await removeTagFromEntity(entityId, tagId, type);
+            
+            // Reload tags
+            await loadTagsData();
+            
+            // Refresh detail view
+            if (type === 'company') {
+                viewCompanyDetail(entityId);
+            } else {
+                viewContactDetail(entityId);
+            }
+            
+            showStatus('Etykieta usunięta', 'success');
+        } catch (error) {
+            console.error('Błąd usuwania etykiety:', error);
+            showStatus('Błąd usuwania etykiety', 'error');
+        }
     } catch (error) {
         console.error('Error assigning tag:', error);
         showStatus('Błąd przy przypisywaniu etykiety', 'error');
@@ -3325,6 +3555,10 @@ async function loadTagsData() {
         window.editContactTag = editContactTag;
         window.deleteContactTag = deleteContactTag;
         window.filterByTag = filterByTag;
+        window.renderDetailTags = renderDetailTags;
+        window.assignTagToCompanyDetail = assignTagToCompanyDetail;
+        window.assignTagToContactDetail = assignTagToContactDetail;
+        window.removeTagFromDetail = removeTagFromDetail;
         window.clearTagFilter = clearTagFilter;
 
 
