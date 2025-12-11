@@ -2144,8 +2144,92 @@
             if (index !== -1) editCompany(index);
         }
 
-        async function saveCompany(e) {
+async function saveCompany(e) {
             e.preventDefault();
+
+            // Pobieramy wartości do sprawdzenia
+            const name = document.getElementById('companyName').value.trim();
+            const website = document.getElementById('companyWebsite').value.trim();
+            const domain = document.getElementById('companyDomain').value.trim();
+            const phone = document.getElementById('companyPhone').value.trim();
+
+            // Helper do czyszczenia URL
+            const cleanUrl = (url) => {
+                if (!url) return '';
+                return url.toLowerCase()
+                    .replace(/^(?:https?:\/\/)?(?:www\.)?/i, '')
+                    .replace(/\/$/, '');
+            };
+
+            // Helper do czyszczenia telefonu
+            const cleanPhone = (ph) => (ph || '').replace(/[\s-]/g, '');
+
+            // === DETEKCJA DUPLIKATÓW FIRM ===
+            if (!window.skipDuplicateCheck) {
+                const currentId = editingCompanyIndex !== null ? companies[editingCompanyIndex].id : null;
+                const inputCleanWeb = cleanUrl(website);
+                const inputCleanDomain = cleanUrl(domain);
+                const inputCleanPhone = cleanPhone(phone);
+
+                const duplicate = companies.find(c => {
+                    if (c.id === currentId) return false; // Pomiń edytowaną firmę
+
+                    // 1. Nazwa (ścisłe dopasowanie case-insensitive)
+                    const matchName = c.name && c.name.toLowerCase() === name.toLowerCase();
+
+                    // 2. WWW lub Domena (porównujemy krzyżowo)
+                    const storedWeb = cleanUrl(c.website);
+                    const storedDomain = cleanUrl(c.domain);
+                    
+                    const matchWeb = (inputCleanWeb && (inputCleanWeb === storedWeb || inputCleanWeb === storedDomain)) ||
+                                     (inputCleanDomain && (inputCleanDomain === storedWeb || inputCleanDomain === storedDomain));
+
+                    // 3. Telefon
+                    const matchPhone = inputCleanPhone && cleanPhone(c.phone) === inputCleanPhone;
+
+                    return matchName || matchWeb || matchPhone;
+                });
+
+                if (duplicate) {
+                    const modal = document.getElementById('duplicateModal');
+                    const content = document.getElementById('duplicateContent');
+                    const saveAnywayBtn = document.getElementById('saveAnywayBtn');
+                    const backBtn = document.getElementById('backToEditBtn');
+
+                    // Treść ostrzeżenia dla firmy
+                    content.innerHTML = `
+                        <div>Znaleziono firmę o podobnych danych:</div>
+                        <div style="background:rgba(15,23,42,0.05); padding:12px; border-radius:8px; margin-top:10px; border:1px solid var(--border-subtle);">
+                            <div style="font-size:1.1em; font-weight:600;">🏢 ${escapeHtml(duplicate.name)}</div>
+                            ${duplicate.industry ? `<div style="font-size:0.8em; color:var(--text-secondary); margin-bottom:4px;">${escapeHtml(duplicate.industry)}</div>` : ''}
+                            ${duplicate.website ? `<div>🌐 ${escapeHtml(duplicate.website)}</div>` : ''}
+                            ${duplicate.phone ? `<div>📞 ${escapeHtml(duplicate.phone)}</div>` : ''}
+                        </div>
+                        <div style="margin-top:15px; font-size:0.9rem;">
+                            Możesz anulować i edytować istniejącą firmę, lub utworzyć nową mimo to.
+                        </div>
+                    `;
+
+                    modal.classList.add('active');
+
+                    // Obsługa przycisków
+                    saveAnywayBtn.onclick = () => {
+                        window.skipDuplicateCheck = true;
+                        modal.classList.remove('active');
+                        document.getElementById('companyForm').requestSubmit(); 
+                    };
+
+                    backBtn.onclick = () => {
+                        modal.classList.remove('active');
+                        window.skipDuplicateCheck = false;
+                    };
+
+                    return; // STOP
+                }
+            }
+            window.skipDuplicateCheck = false;
+            // === KONIEC DETEKCJI ===
+
             const company = {
                 id: editingCompanyIndex !== null ? companies[editingCompanyIndex].id : DataService.generateId(),
                 name: document.getElementById('companyName').value,
