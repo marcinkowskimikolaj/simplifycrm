@@ -1196,7 +1196,420 @@
                 width: 100%;
             }
         }
-    </style>
+    
+        /* ============= TAGS SYSTEM ============= */
+        
+        /* Tag Manager Icon */
+        .tags-manager-icon {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.18s ease;
+            margin-right: 0.8rem;
+        }
+
+        .tags-manager-icon:hover {
+            background: rgba(15,23,42,0.04);
+            border-color: var(--border-strong);
+            box-shadow: 0 4px 10px rgba(15,23,42,0.16);
+            transform: translateY(-1px);
+        }
+
+        .tags-manager-icon svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        /* Tags Modal */
+        .tags-modal .modal-content {
+            max-width: 680px;
+        }
+
+        .tags-modal-tabs {
+            display: inline-flex;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.04);
+            padding: 0.25rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .tags-modal-tab {
+            border: none;
+            background: transparent;
+            border-radius: 999px;
+            padding: 0.45rem 1.2rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.18s ease;
+        }
+
+        .tags-modal-tab.active {
+            background: #ffffff;
+            color: var(--text-primary);
+            box-shadow: 0 4px 10px rgba(15,23,42,0.12);
+        }
+
+        /* Tag Form */
+        .tag-form-section {
+            background: var(--surface-soft);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .color-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .color-option {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            position: relative;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .color-option.selected {
+            border-color: var(--text-primary);
+            transform: scale(1.15);
+        }
+
+        .color-option.selected::after {
+            content: '✓';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Tags List */
+        .tags-list-section {
+            margin-top: 1.5rem;
+        }
+
+        .tags-list-section h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .tags-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .tag-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            transition: all 0.18s ease;
+        }
+
+        .tag-list-item:hover {
+            border-color: var(--border-strong);
+            box-shadow: 0 2px 8px rgba(15,23,42,0.08);
+        }
+
+        .tag-list-item-left {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tag-list-item-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .tag-list-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tag-list-item-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .tag-list-item-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tag-list-item-actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-shrink: 0;
+        }
+
+        .tag-action-btn {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .tag-action-btn:hover {
+            background: rgba(15,23,42,0.04);
+            border-color: var(--border-strong);
+        }
+
+        .tag-action-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Tag Badge (display in cards/lists) */
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: white;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .tag-badge:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.6rem;
+        }
+
+        /* Tags in Card */
+        .card .tags-container {
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* Tags Section in Detail View */
+        .detail-tags-section {
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border-subtle);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .detail-tags-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.2rem;
+        }
+
+        .detail-tags-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .add-tag-btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: all 0.18s ease;
+        }
+
+        .add-tag-btn:hover {
+            background: #1d4ed8;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+            transform: translateY(-1px);
+        }
+
+        .tag-selector-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 0.5rem;
+            min-width: 220px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-soft);
+            z-index: 100;
+            display: none;
+        }
+
+        .tag-selector-dropdown.active {
+            display: block;
+        }
+
+        .tag-selector-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .tag-selector-item:hover {
+            background: rgba(15,23,42,0.04);
+        }
+
+        .tag-selector-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .tag-selector-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .assigned-tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .assigned-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .remove-tag-btn {
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            font-size: 0.7rem;
+            line-height: 1;
+        }
+
+        .remove-tag-btn:hover {
+            background: rgba(255,255,255,0.35);
+        }
+
+        /* Filter indicator */
+        .tag-filter-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 999px;
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .clear-filter-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            transition: background 0.18s ease;
+        }
+
+        .clear-filter-btn:hover {
+            background: rgba(15,23,42,0.08);
+        }
+
+</style>
 </head>
 <body>
     <!-- HEADER -->
@@ -1489,21 +1902,18 @@
                 <h2 id="companyModalTitle">Dodaj firmę</h2>
                 <button class="close-btn" id="closeCompanyModalBtn">&times;</button>
             </div>
-<form id="companyForm">
+            <form id="companyForm">
                 <div class="form-group">
                     <label for="companyName">Nazwa firmy *</label>
                     <input type="text" id="companyName" required>
                 </div>
                 <div class="form-group">
-                    <label for="companyDomain">Domena <span class="optional">(opcjonalnie)</span></label>
-                    <input type="text" id="companyDomain" placeholder="np. techcorp.pl">
-                    <small style="display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">
-                        💡 Strona WWW zostanie utworzona automatycznie na podstawie domeny.
-                    </small>
-                </div>
-                <div class="form-group">
                     <label for="companyIndustry">Branża <span class="optional">(opcjonalnie)</span></label>
                     <input type="text" id="companyIndustry" placeholder="np. IT, Marketing, Finanse">
+                </div>
+                <div class="form-group">
+                    <label for="companyWebsite">Strona WWW <span class="optional">(opcjonalnie)</span></label>
+                    <input type="url" id="companyWebsite" placeholder="np. https://twojafirma.pl">
                 </div>
                 <div class="form-group">
                     <label for="companyPhone">Telefon firmowy <span class="optional">(opcjonalnie)</span></label>
@@ -1516,6 +1926,13 @@
                 <div class="form-group">
                     <label for="companyCountry">Kraj <span class="optional">(opcjonalnie)</span></label>
                     <input type="text" id="companyCountry" placeholder="np. Polska">
+                </div>
+                <div class="form-group">
+                    <label for="companyDomain">Domena <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyDomain" placeholder="np. techcorp.pl">
+                    <small style="display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">
+                        💡 Służy do automatycznego przypisywania kontaktów po domenie email
+                    </small>
                 </div>
                 <div class="form-group">
                     <label for="companyNotes">Notatki <span class="optional">(opcjonalnie)</span></label>
@@ -1622,6 +2039,15 @@
         }
 
         // ============= VARIABLES =============
+        
+        // ============= TAGS DATA =============
+        let companyTags = [];
+        let contactTags = [];
+        let companyTagRelations = [];
+        let contactTagRelations = [];
+        let currentTagFilter = null;
+        let currentTagType = 'companies'; // 'companies' lub 'contacts'
+
         let companies = [];
         let contacts = [];
         let companyHistory = [];
@@ -1876,6 +2302,7 @@
                                 </div>
                             </div>
                             ${infoRows ? `<div class="card-body">${infoRows}</div>` : ''}
+                            \${renderEntityTags(company.id, \'company\')}
                             <div class="card-badge"><span>👥</span><span>${companyContacts.length} kontaktów</span></div>
                         </div>
                     `;
@@ -2120,13 +2547,13 @@
             document.getElementById('companyModal').classList.add('active');
         }
 
-function editCompany(index) {
+        function editCompany(index) {
             editingCompanyIndex = index;
             const company = companies[index];
             document.getElementById('companyModalTitle').textContent = 'Edytuj firmę';
             document.getElementById('companyName').value = company.name;
             document.getElementById('companyIndustry').value = company.industry || '';
-            // USUNIĘTO: document.getElementById('companyWebsite').value = ...
+            document.getElementById('companyWebsite').value = company.website || '';
             document.getElementById('companyPhone').value = company.phone || '';
             document.getElementById('companyCity').value = company.city || '';
             document.getElementById('companyCountry').value = company.country || '';
@@ -2140,97 +2567,13 @@ function editCompany(index) {
             if (index !== -1) editCompany(index);
         }
 
-async function saveCompany(e) {
+        async function saveCompany(e) {
             e.preventDefault();
-
-            // Pobieramy wartości
-            const name = document.getElementById('companyName').value.trim();
-            const domain = document.getElementById('companyDomain').value.trim(); // Domena jest teraz kluczowa
-            const phone = document.getElementById('companyPhone').value.trim();
-            
-            // AUTOMATYCZNE GENEROWANIE WWW Z DOMENY
-            let website = '';
-            if (domain) {
-                // Jeśli domena nie ma protokołu, dodaj https://
-                website = domain.startsWith('http') ? domain : `https://${domain}`;
-            }
-
-            // 1. Helper: Czyści URL
-            const cleanUrl = (url) => {
-                if (!url) return '';
-                return url.toLowerCase().replace(/^(?:https?:\/\/)?(?:www\.)?/i, '').replace(/\/$/, '');
-            };
-
-            // 2. Helper: Czyści telefon
-            const cleanPhone = (ph) => (ph || '').replace(/[\s-]/g, '');
-
-            // 3. Helper: Czyści nazwę firmy
-            const cleanCompanyName = (str) => {
-                if (!str) return '';
-                return str.toLowerCase()
-                    .replace(/\b(sp\.? ?z ?o\.?o\.?|s\.?a\.?|inc\.?|ltd\.?|gmbh)\b/g, '')
-                    .replace(/[.,"\-]/g, '')
-                    .replace(/\s+/g, ' ')
-                    .trim();
-            };
-
-            // === DETEKCJA DUPLIKATÓW ===
-            if (!window.skipDuplicateCheck) {
-                const currentId = editingCompanyIndex !== null ? companies[editingCompanyIndex].id : null;
-                
-                const inputCleanWeb = cleanUrl(website); // Używamy wygenerowanego WWW
-                const inputCleanDomain = cleanUrl(domain);
-                const inputCleanPhone = cleanPhone(phone);
-                const inputCleanName = cleanCompanyName(name);
-
-                const duplicate = companies.find(c => {
-                    if (c.id === currentId) return false;
-
-                    // A. Nazwa
-                    const storedCleanName = cleanCompanyName(c.name);
-                    const matchName = inputCleanName && storedCleanName && inputCleanName === storedCleanName;
-
-                    // B. WWW / Domena
-                    const storedWeb = cleanUrl(c.website);
-                    const storedDomain = cleanUrl(c.domain);
-                    const matchWeb = (inputCleanWeb && (inputCleanWeb === storedWeb || inputCleanWeb === storedDomain)) ||
-                                     (inputCleanDomain && (inputCleanDomain === storedWeb || inputCleanDomain === storedDomain));
-
-                    // C. Telefon
-                    const matchPhone = inputCleanPhone && cleanPhone(c.phone) === inputCleanPhone;
-
-                    return matchName || matchWeb || matchPhone;
-                });
-
-                if (duplicate) {
-                    // ... (Kod modala bez zmian - skopiuj go z poprzedniej odpowiedzi lub zostaw jeśli masz) ...
-                    // Dla kompletności, wklejam skróconą obsługę modala, aby kod był spójny:
-                    const modal = document.getElementById('duplicateModal');
-                    const content = document.getElementById('duplicateContent');
-                    const saveAnywayBtn = document.getElementById('saveAnywayBtn');
-                    const backBtn = document.getElementById('backToEditBtn');
-
-                    content.innerHTML = `
-                        <div>Znaleziono firmę o podobnych danych:</div>
-                        <div style="background:rgba(15,23,42,0.05); padding:12px; border-radius:8px; margin-top:10px; border:1px solid var(--border-subtle);">
-                            <div style="font-size:1.1em; font-weight:600;">🏢 ${escapeHtml(duplicate.name)}</div>
-                            ${duplicate.domain ? `<div>🌐 ${escapeHtml(duplicate.domain)}</div>` : ''}
-                        </div>
-                        <div style="margin-top:15px; font-size:0.9rem;">Czy zapisać mimo to?</div>
-                    `;
-                    modal.classList.add('active');
-                    saveAnywayBtn.onclick = () => { window.skipDuplicateCheck = true; modal.classList.remove('active'); document.getElementById('companyForm').requestSubmit(); };
-                    backBtn.onclick = () => { modal.classList.remove('active'); window.skipDuplicateCheck = false; };
-                    return;
-                }
-            }
-            window.skipDuplicateCheck = false;
-
-const company = {
+            const company = {
                 id: editingCompanyIndex !== null ? companies[editingCompanyIndex].id : DataService.generateId(),
                 name: document.getElementById('companyName').value,
                 industry: document.getElementById('companyIndustry').value,
-                website: website, // <--- POPRAWKA: Używamy zmiennej wyliczonej wcześniej
+                website: document.getElementById('companyWebsite').value,
                 phone: document.getElementById('companyPhone').value,
                 city: document.getElementById('companyCity').value,
                 country: document.getElementById('companyCountry').value,
@@ -2338,78 +2681,13 @@ const company = {
             }
         }
 
-async function saveContact(e) {
+        async function saveContact(e) {
             e.preventDefault();
             const typedCompanyName = (companyInputEl?.value || '').trim();
             let selectedCompanyId = companyIdEl?.value || '';
-            
-            // Pobieramy wartości do sprawdzenia (Imie, Email, Telefon)
-            const name = document.getElementById('contactName').value.trim();
-            const email = document.getElementById('contactEmail').value.trim();
-            const phone = document.getElementById('contactPhone').value.trim();
+            const email = document.getElementById('contactEmail').value;
 
-            // === DETEKCJA DUPLIKATÓW ===
-            if (!window.skipDuplicateCheck) {
-                const currentId = editingContactIndex !== null ? contacts[editingContactIndex].id : null;
-                
-                // Szukamy duplikatu
-                const duplicate = contacts.find(c => {
-                    if (c.id === currentId) return false; // Pomiń edytowany rekord
-                    
-                    // 1. Sprawdzenie po Imieniu i Nazwisku (case-insensitive)
-                    const matchName = name && c.name && c.name.toLowerCase() === name.toLowerCase();
-
-                    // 2. Sprawdzenie po Email
-                    const matchEmail = email && c.email && c.email.toLowerCase() === email.toLowerCase();
-                    
-                    // 3. Sprawdzenie po Telefonie (czyścimy spacje i myślniki)
-                    const cleanPhoneInput = phone.replace(/[\s-]/g, '');
-                    const cleanPhoneStored = (c.phone || '').replace(/[\s-]/g, '');
-                    const matchPhone = cleanPhoneInput && cleanPhoneStored && cleanPhoneInput === cleanPhoneStored;
-                    
-                    // Jeśli cokolwiek pasuje -> to duplikat
-                    return matchName || matchEmail || matchPhone;
-                });
-
-                if (duplicate) {
-                    const modal = document.getElementById('duplicateModal');
-                    const content = document.getElementById('duplicateContent');
-                    const saveAnywayBtn = document.getElementById('saveAnywayBtn');
-                    const backBtn = document.getElementById('backToEditBtn');
-
-                    // Treść ostrzeżenia
-                    content.innerHTML = `
-                        <div>Znaleziono kontakt o podobnych danych (nazwa, email lub telefon):</div>
-                        <div style="background:rgba(15,23,42,0.05); padding:12px; border-radius:8px; margin-top:10px; border:1px solid var(--border-subtle);">
-                            <div style="font-size:1.1em; font-weight:600;">${escapeHtml(duplicate.name)}</div>
-                            ${duplicate.position ? `<div style="font-size:0.8em; color:var(--text-secondary); margin-bottom:4px;">${escapeHtml(duplicate.position)}</div>` : ''}
-                            ${duplicate.email ? `<div>📧 ${escapeHtml(duplicate.email)}</div>` : ''}
-                            ${duplicate.phone ? `<div>📱 ${escapeHtml(duplicate.phone)}</div>` : ''}
-                        </div>
-                        <div style="margin-top:15px; font-size:0.9rem;">Czy na pewno chcesz utworzyć ten kontakt?</div>
-                    `;
-
-                    modal.classList.add('active');
-
-                    // Obsługa przycisków
-                    saveAnywayBtn.onclick = () => {
-                        window.skipDuplicateCheck = true;
-                        modal.classList.remove('active');
-                        document.getElementById('contactForm').requestSubmit(); 
-                    };
-
-                    backBtn.onclick = () => {
-                        modal.classList.remove('active');
-                        window.skipDuplicateCheck = false;
-                    };
-
-                    return; // STOP - nie zapisuj
-                }
-            }
-            window.skipDuplicateCheck = false;
-            // === KONIEC DETEKCJI DUPLIKATÓW ===
-
-            // Auto-match by domain (dalsza część oryginalnego kodu...)
+            // Auto-match by domain
             if (!typedCompanyName && !selectedCompanyId && email) {
                 const domain = DataService.extractDomain(email);
                 const matchedCompany = DataService.findCompanyByDomain(companies, domain);
@@ -2425,42 +2703,15 @@ async function saveContact(e) {
                     if (existing) {
                         selectedCompanyId = existing.id;
                     } else {
-                        // LOGIKA AUTOMATYCZNEGO TWORZENIA FIRMY Z KONTAKTU
-                        
-                        // 1. Spróbuj wyciągnąć domenę z maila kontaktu
-                        let newCompanyDomain = '';
-                        let newCompanyWebsite = '';
-                        
-                        if (email && email.includes('@')) {
-                            const extracted = DataService.extractDomain(email);
-                            // Ignoruj popularne domeny publiczne (gmail, onet itp.) - opcjonalne, ale zalecane
-                            const publicDomains = ['gmail.com', 'wp.pl', 'onet.pl', 'interia.pl', 'outlook.com', 'yahoo.com'];
-                            if (!publicDomains.includes(extracted)) {
-                                newCompanyDomain = extracted;
-                                newCompanyWebsite = `https://${extracted}`;
-                            }
-                        }
-
                         const newCompany = {
                             id: DataService.generateId(),
                             name: typedCompanyName,
-                            industry: '', 
-                            notes: '', // <--- Teraz pole jest czyste
-                            phone: '', 
-                            city: '', 
-                            country: '', 
-                            domain: newCompanyDomain,
-                            website: newCompanyWebsite
+                            industry: '', notes: '', website: '', phone: '', city: '', country: '', domain: ''
                         };
-                        
                         await DataService.saveCompany(newCompany);
                         companies.push(newCompany);
                         selectedCompanyId = newCompany.id;
                         await DataService.logCompanyHistory(newCompany.id, 'event', 'Firma utworzona (z poziomu kontaktu)');
-                        
-                        // DODANO: Pobierz świeżą historię firm, aby zdarzenie pojawiło się w streamie
-                        await loadCompanyHistory(); 
-                        
                         showStatus(`Utworzono nową firmę "${newCompany.name}"`, 'success');
                         renderCompanies();
                     }
@@ -2890,6 +3141,534 @@ async function saveContact(e) {
                 setTimeout(init, 1000);
             });
         }
+    
+
+        // ============= TAGS JAVASCRIPT =============
+// Ten kod należy dodać do relationships.html w sekcji <script>
+
+// ========== TAGS MANAGER MODAL ==========
+
+function openTagsManager(initialType = 'companies') {
+    currentTagType = initialType;
+    renderColorPickers();
+    renderCompanyTagsList();
+    renderContactTagsList();
+    switchTagsTab(initialType);
+    document.getElementById('tagsManagerModal').classList.add('active');
+}
+
+function closeTagsManager() {
+    document.getElementById('tagsManagerModal').classList.remove('active');
+    resetCompanyTagForm();
+    resetContactTagForm();
+}
+
+function switchTagsTab(type) {
+    currentTagType = type;
+    
+    // Update tabs
+    document.querySelectorAll('.tags-modal-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.type === type);
+    });
+    
+    // Update sections
+    document.getElementById('companiesTagsSection').style.display = 
+        type === 'companies' ? 'block' : 'none';
+    document.getElementById('contactsTagsSection').style.display = 
+        type === 'contacts' ? 'block' : 'none';
+}
+
+// ========== COLOR PICKER ==========
+
+function renderColorPickers() {
+    const colors = CONFIG.TAGS.DEFAULT_COLORS;
+    
+    // Company tags color picker
+    const companyPicker = document.getElementById('companyTagColorPicker');
+    companyPicker.innerHTML = colors.map(color => `
+        <div class="color-option" 
+             style="background-color: ${color}" 
+             data-color="${color}"
+             onclick="selectColor('company', '${color}')">
+        </div>
+    `).join('');
+    
+    // Contact tags color picker
+    const contactPicker = document.getElementById('contactTagColorPicker');
+    contactPicker.innerHTML = colors.map(color => `
+        <div class="color-option" 
+             style="background-color: ${color}" 
+             data-color="${color}"
+             onclick="selectColor('contact', '${color}')">
+        </div>
+    `).join('');
+    
+    // Select default color
+    selectColor('company', '#3b82f6');
+    selectColor('contact', '#3b82f6');
+}
+
+function selectColor(type, color) {
+    const pickerId = type === 'company' ? 'companyTagColorPicker' : 'contactTagColorPicker';
+    const inputId = type === 'company' ? 'companyTagColor' : 'contactTagColor';
+    
+    // Update hidden input
+    document.getElementById(inputId).value = color;
+    
+    // Update visual selection
+    const picker = document.getElementById(pickerId);
+    picker.querySelectorAll('.color-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.color === color);
+    });
+}
+
+// ========== COMPANY TAGS ==========
+
+async function saveCompanyTag(event) {
+    event.preventDefault();
+    
+    const tagId = document.getElementById('companyTagId').value;
+    const rowIndex = document.getElementById('companyTagRowIndex').value;
+    
+    const tag = {
+        id: tagId || DataService.generateId(),
+        name: document.getElementById('companyTagName').value.trim(),
+        color: document.getElementById('companyTagColor').value,
+        description: document.getElementById('companyTagDescription').value.trim()
+    };
+    
+    try {
+        await DataService.saveCompanyTag(tag, rowIndex ? parseInt(rowIndex) : null);
+        showStatus(tagId ? 'Etykieta zaktualizowana' : 'Etykieta dodana', 'success');
+        
+        // Reload
+        await loadTagsData();
+        renderCompanyTagsList();
+        renderCompanies();
+        
+        // Reset form
+        resetCompanyTagForm();
+    } catch (error) {
+        console.error('Error saving company tag:', error);
+        showStatus('Błąd przy zapisie etykiety', 'error');
+    }
+}
+
+function resetCompanyTagForm() {
+    document.getElementById('companyTagForm').reset();
+    document.getElementById('companyTagId').value = '';
+    document.getElementById('companyTagRowIndex').value = '';
+    document.getElementById('companyTagSubmitText').textContent = 'Dodaj etykietę';
+    selectColor('company', '#3b82f6');
+}
+
+function editCompanyTag(tag, rowIndex) {
+    document.getElementById('companyTagId').value = tag.id;
+    document.getElementById('companyTagRowIndex').value = rowIndex;
+    document.getElementById('companyTagName').value = tag.name;
+    document.getElementById('companyTagDescription').value = tag.description || '';
+    document.getElementById('companyTagSubmitText').textContent = 'Zapisz zmiany';
+    selectColor('company', tag.color);
+    
+    // Scroll to form
+    document.querySelector('#companiesTagsSection .tag-form-section').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+    });
+}
+
+async function deleteCompanyTag(tagId, rowIndex) {
+    if (!confirm('Czy na pewno chcesz usunąć tę etykietę? Zostanie ona usunięta ze wszystkich firm.')) {
+        return;
+    }
+    
+    try {
+        await DataService.deleteCompanyTag(rowIndex);
+        showStatus('Etykieta usunięta', 'success');
+        
+        // Reload
+        await loadTagsData();
+        renderCompanyTagsList();
+        renderCompanies();
+    } catch (error) {
+        console.error('Error deleting company tag:', error);
+        showStatus('Błąd przy usuwaniu etykiety', 'error');
+    }
+}
+
+function renderCompanyTagsList() {
+    const container = document.getElementById('companyTagsList');
+    
+    if (!companyTags || companyTags.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state small">
+                <p>Brak etykiet dla firm. Dodaj pierwszą etykietę używając formularza powyżej.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = companyTags.map((tag, index) => `
+        <div class="tag-list-item">
+            <div class="tag-list-item-left">
+                <div class="tag-list-item-color" style="background-color: ${tag.color}"></div>
+                <div class="tag-list-item-info">
+                    <div class="tag-list-item-name">${escapeHtml(tag.name)}</div>
+                    ${tag.description ? `<div class="tag-list-item-desc">${escapeHtml(tag.description)}</div>` : ''}
+                </div>
+            </div>
+            <div class="tag-list-item-actions">
+                <button class="tag-action-btn" onclick='editCompanyTag(${JSON.stringify(tag)}, ${index})' title="Edytuj">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </button>
+                <button class="tag-action-btn" onclick="deleteCompanyTag('${tag.id}', ${index})" title="Usuń">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ========== CONTACT TAGS ==========
+
+async function saveContactTag(event) {
+    event.preventDefault();
+    
+    const tagId = document.getElementById('contactTagId').value;
+    const rowIndex = document.getElementById('contactTagRowIndex').value;
+    
+    const tag = {
+        id: tagId || DataService.generateId(),
+        name: document.getElementById('contactTagName').value.trim(),
+        color: document.getElementById('contactTagColor').value,
+        description: document.getElementById('contactTagDescription').value.trim()
+    };
+    
+    try {
+        await DataService.saveContactTag(tag, rowIndex ? parseInt(rowIndex) : null);
+        showStatus(tagId ? 'Etykieta zaktualizowana' : 'Etykieta dodana', 'success');
+        
+        // Reload
+        await loadTagsData();
+        renderContactTagsList();
+        renderAllContacts();
+        
+        // Reset form
+        resetContactTagForm();
+    } catch (error) {
+        console.error('Error saving contact tag:', error);
+        showStatus('Błąd przy zapisie etykiety', 'error');
+    }
+}
+
+function resetContactTagForm() {
+    document.getElementById('contactTagForm').reset();
+    document.getElementById('contactTagId').value = '';
+    document.getElementById('contactTagRowIndex').value = '';
+    document.getElementById('contactTagSubmitText').textContent = 'Dodaj etykietę';
+    selectColor('contact', '#3b82f6');
+}
+
+function editContactTag(tag, rowIndex) {
+    document.getElementById('contactTagId').value = tag.id;
+    document.getElementById('contactTagRowIndex').value = rowIndex;
+    document.getElementById('contactTagName').value = tag.name;
+    document.getElementById('contactTagDescription').value = tag.description || '';
+    document.getElementById('contactTagSubmitText').textContent = 'Zapisz zmiany';
+    selectColor('contact', tag.color);
+    
+    // Scroll to form
+    document.querySelector('#contactsTagsSection .tag-form-section').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+    });
+}
+
+async function deleteContactTag(tagId, rowIndex) {
+    if (!confirm('Czy na pewno chcesz usunąć tę etykietę? Zostanie ona usunięta ze wszystkich kontaktów.')) {
+        return;
+    }
+    
+    try {
+        await DataService.deleteContactTag(rowIndex);
+        showStatus('Etykieta usunięta', 'success');
+        
+        // Reload
+        await loadTagsData();
+        renderContactTagsList();
+        renderAllContacts();
+    } catch (error) {
+        console.error('Error deleting contact tag:', error);
+        showStatus('Błąd przy usuwaniu etykiety', 'error');
+    }
+}
+
+function renderContactTagsList() {
+    const container = document.getElementById('contactTagsList');
+    
+    if (!contactTags || contactTags.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state small">
+                <p>Brak etykiet dla osób. Dodaj pierwszą etykietę używając formularza powyżej.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = contactTags.map((tag, index) => `
+        <div class="tag-list-item">
+            <div class="tag-list-item-left">
+                <div class="tag-list-item-color" style="background-color: ${tag.color}"></div>
+                <div class="tag-list-item-info">
+                    <div class="tag-list-item-name">${escapeHtml(tag.name)}</div>
+                    ${tag.description ? `<div class="tag-list-item-desc">${escapeHtml(tag.description)}</div>` : ''}
+                </div>
+            </div>
+            <div class="tag-list-item-actions">
+                <button class="tag-action-btn" onclick='editContactTag(${JSON.stringify(tag)}, ${index})' title="Edytuj">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </button>
+                <button class="tag-action-btn" onclick="deleteContactTag('${tag.id}', ${index})" title="Usuń">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ========== TAG FILTERING ==========
+
+function filterByTag(tagId, tagName, tagColor, type) {
+    currentTagFilter = { id: tagId, name: tagName, color: tagColor, type: type };
+    
+    if (type === 'company') {
+        renderCompanies();
+    } else {
+        renderAllContacts();
+    }
+}
+
+function clearTagFilter() {
+    currentTagFilter = null;
+    renderCompanies();
+    renderAllContacts();
+}
+
+// ========== RENDER TAGS IN VIEWS ==========
+
+function renderEntityTags(entityId, type) {
+    const tags = type === 'company' 
+        ? DataService.getCompanyTags(entityId, companyTags, companyTagRelations)
+        : DataService.getContactTags(entityId, contactTags, contactTagRelations);
+    
+    if (!tags || tags.length === 0) return '';
+    
+    return `
+        <div class="tags-container">
+            ${tags.map(tag => `
+                <span class="tag-badge" 
+                      style="background-color: ${tag.color}"
+                      onclick="filterByTag('${tag.id}', '${escapeHtml(tag.name)}', '${tag.color}', '${type}')"
+                      title="${escapeHtml(tag.description || tag.name)}">
+                    ${escapeHtml(tag.name)}
+                </span>
+            `).join('')}
+        </div>
+    `;
+}
+
+// ========== ASSIGN/REMOVE TAGS ==========
+
+async function assignTagToEntity(entityId, tagId, type) {
+    try {
+        if (type === 'company') {
+            await DataService.assignTagToCompany(entityId, tagId);
+        } else {
+            await DataService.assignTagToContact(entityId, tagId);
+        }
+        
+        showStatus('Etykieta przypisana', 'success');
+        
+        // Reload
+        await loadTagsData();
+        
+        // Refresh current view
+        if (type === 'company' && currentCompanyId === entityId) {
+            viewCompanyDetail(entityId);
+        } else if (type === 'contact' && currentContactId === entityId) {
+            viewContactDetail(entityId);
+        }
+    } catch (error) {
+        console.error('Error assigning tag:', error);
+        showStatus('Błąd przy przypisywaniu etykiety', 'error');
+    }
+}
+
+async function removeTagFromEntity(entityId, tagId, type) {
+    try {
+        // Find relation
+        const relations = type === 'company' ? companyTagRelations : contactTagRelations;
+        const relation = relations.find(r => 
+            (type === 'company' ? r.companyId : r.contactId) === entityId && r.tagId === tagId
+        );
+        
+        if (!relation) {
+            showStatus('Nie znaleziono relacji', 'error');
+            return;
+        }
+        
+        const rowIndex = relations.indexOf(relation);
+        
+        if (type === 'company') {
+            await DataService.removeTagFromCompany(relation.id, rowIndex);
+        } else {
+            await DataService.removeTagFromContact(relation.id, rowIndex);
+        }
+        
+        showStatus('Etykieta usunięta', 'success');
+        
+        // Reload
+        await loadTagsData();
+        
+        // Refresh current view
+        if (type === 'company' && currentCompanyId === entityId) {
+            viewCompanyDetail(entityId);
+        } else if (type === 'contact' && currentContactId === entityId) {
+            viewContactDetail(entityId);
+        }
+    } catch (error) {
+        console.error('Error removing tag:', error);
+        showStatus('Błąd przy usuwaniu etykiety', 'error');
+    }
+}
+
+// ========== LOAD TAGS DATA ==========
+
+async function loadTagsData() {
+    try {
+        [companyTags, contactTags, companyTagRelations, contactTagRelations] = await Promise.all([
+            DataService.loadCompanyTags(),
+            DataService.loadContactTags(),
+            DataService.loadCompanyTagRelations(),
+            DataService.loadContactTagRelations()
+        ]);
+        console.log('✓ Etykiety załadowane:', {
+            companyTags: companyTags.length,
+            contactTags: contactTags.length,
+            companyRelations: companyTagRelations.length,
+            contactRelations: contactTagRelations.length
+        });
+    } catch (error) {
+        console.error('Error loading tags:', error);
+    }
+}
+
     </script>
+
+    <!-- Tags Manager Modal -->
+    <div id="tagsManagerModal" class="modal tags-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Zarządzanie etykietami</h2>
+                <button class="close-btn" id="closeTagsManagerBtn" onclick="closeTagsManager()">×</button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tags-modal-tabs">
+                <button class="tags-modal-tab active" data-type="companies" onclick="switchTagsTab('companies')">
+                    Etykiety firm
+                </button>
+                <button class="tags-modal-tab" data-type="contacts" onclick="switchTagsTab('contacts')">
+                    Etykiety osób
+                </button>
+            </div>
+
+            <!-- Companies Tags Section -->
+            <div id="companiesTagsSection" class="tags-section active">
+                <!-- Tag Form -->
+                <div class="tag-form-section">
+                    <form id="companyTagForm" onsubmit="saveCompanyTag(event)">
+                        <div class="form-group">
+                            <label>Nazwa etykiety</label>
+                            <input type="text" id="companyTagName" placeholder="np. VIP Klient" required>
+                            <input type="hidden" id="companyTagId">
+                            <input type="hidden" id="companyTagRowIndex">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Kolor</label>
+                            <div class="color-picker-grid" id="companyTagColorPicker"></div>
+                            <input type="hidden" id="companyTagColor" value="#3b82f6">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Opis <span class="optional">(opcjonalnie)</span></label>
+                            <textarea id="companyTagDescription" placeholder="Opis etykiety..." rows="2"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <span id="companyTagSubmitText">Dodaj etykietę</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tags List -->
+                <div class="tags-list-section">
+                    <h3>Istniejące etykiety</h3>
+                    <div id="companyTagsList" class="tags-list"></div>
+                </div>
+            </div>
+
+            <!-- Contacts Tags Section -->
+            <div id="contactsTagsSection" class="tags-section" style="display: none;">
+                <!-- Tag Form -->
+                <div class="tag-form-section">
+                    <form id="contactTagForm" onsubmit="saveContactTag(event)">
+                        <div class="form-group">
+                            <label>Nazwa etykiety</label>
+                            <input type="text" id="contactTagName" placeholder="np. Decydent" required>
+                            <input type="hidden" id="contactTagId">
+                            <input type="hidden" id="contactTagRowIndex">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Kolor</label>
+                            <div class="color-picker-grid" id="contactTagColorPicker"></div>
+                            <input type="hidden" id="contactTagColor" value="#3b82f6">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Opis <span class="optional">(opcjonalnie)</span></label>
+                            <textarea id="contactTagDescription" placeholder="Opis etykiety..." rows="2"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <span id="contactTagSubmitText">Dodaj etykietę</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tags List -->
+                <div class="tags-list-section">
+                    <h3>Istniejące etykiety</h3>
+                    <div id="contactTagsList" class="tags-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
+            await loadTagsData();
