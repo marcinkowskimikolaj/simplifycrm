@@ -2152,7 +2152,12 @@
                 // Set user email in header
                 const email = AuthService.getUserEmail();
                 if (email) {
-                    document.getElementById('userEmail').textContent = email;
+                    // Load user preferences
+                    await loadUserPreferences(email);
+                    
+                    // Display name or email
+                    const displayText = AuthService.getUserDisplayText();
+                    document.getElementById('userEmail').textContent = displayText;
                 }
 
                 // Initialize GAPI
@@ -3002,7 +3007,7 @@
                 <div class="history-item ${entry.type === 'note' ? 'note' : 'event'}">
                     <div class="history-item-header">
                         <span class="history-item-type">${entry.type === 'note' ? 'NOTATKA' : 'ZDARZENIE'}</span>
-                        <span class="history-item-meta">${DataService.formatDateTime(entry.timestamp)}${entry.user ? ' • ' + escapeHtml(entry.user) : ''}</span>
+                        <span class="history-item-meta">${DataService.formatDateTime(entry.timestamp)}${entry.user ? ' • ' + escapeHtml(formatUserName(entry.user)) : ''}</span>
                     </div>
                     <div class="history-item-body">${escapeHtml(entry.content || '')}</div>
                 </div>
@@ -3029,7 +3034,7 @@
                 <div class="history-item ${entry.type === 'note' ? 'note' : 'event'}">
                     <div class="history-item-header">
                         <span class="history-item-type">${entry.type === 'note' ? 'NOTATKA' : 'ZDARZENIE'}</span>
-                        <span class="history-item-meta">${DataService.formatDateTime(entry.timestamp)}${entry.user ? ' • ' + escapeHtml(entry.user) : ''}</span>
+                        <span class="history-item-meta">${DataService.formatDateTime(entry.timestamp)}${entry.user ? ' • ' + escapeHtml(formatUserName(entry.user)) : ''}</span>
                     </div>
                     <div class="history-item-body">${escapeHtml(entry.content || '')}</div>
                 </div>
@@ -3134,6 +3139,43 @@
             const div = document.createElement('div');
             div.textContent = text == null ? '' : text;
             return div.innerHTML;
+        }
+
+        // ============= USER PREFERENCES =============
+        async function loadUserPreferences(email) {
+            try {
+                const prefs = await DataService.loadUserPreferences(email);
+                if (prefs && prefs.displayName) {
+                    AuthService.saveDisplayName(prefs.displayName);
+                    console.log('✓ Załadowano preferencje użytkownika:', prefs.displayName);
+                }
+            } catch (error) {
+                console.warn('Nie udało się załadować preferencji użytkownika:', error);
+                // Nie blokuj działania aplikacji
+            }
+        }
+
+        /**
+         * Konwertuje email na display name jeśli to jest aktualny użytkownik
+         */
+        function formatUserName(userName) {
+            if (!userName) return '';
+            
+            const currentEmail = AuthService.getUserEmail();
+            const displayName = AuthService.getDisplayName();
+            
+            // Jeśli userName to email aktualnego użytkownika i mamy display name
+            if (userName === currentEmail && displayName) {
+                return displayName;
+            }
+            
+            // Jeśli userName to email aktualnego użytkownika ale nie ma display name
+            if (userName === currentEmail) {
+                return currentEmail.split('@')[0];
+            }
+            
+            // Dla innych użytkowników - zwróć jak jest (może być email lub już display name)
+            return userName;
         }
 
         // ============= TAGS JAVASCRIPT =============
