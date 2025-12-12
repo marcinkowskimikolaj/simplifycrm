@@ -43,7 +43,7 @@
         .app-header {
             background: var(--surface);
             border-bottom: 1px solid var(--border-subtle);
-            padding: 1.4rem 2rem;
+            padding: 1rem 2rem;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -60,7 +60,7 @@
 
         .app-logo {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.9rem;
+            font-size: 1.6rem;
             letter-spacing: 0.18em;
             text-transform: uppercase;
             cursor: pointer;
@@ -74,24 +74,24 @@
         .app-header-right {
             display: flex;
             align-items: center;
-            gap: 1.2rem;
+            gap: 1rem;
         }
 
         .user-email {
             font-family: 'Outfit', sans-serif;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.12em;
             color: var(--text-secondary);
-            max-width: 220px;
+            max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         .icon-btn {
-            width: 38px;
-            height: 38px;
+            width: 32px;
+            height: 32px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -116,9 +116,9 @@
             border-radius: var(--radius-chip);
             border: 1px solid var(--border-strong);
             background: transparent;
-            padding: 0.55rem 0.95rem;
+            padding: 0.45rem 0.85rem;
             font-family: 'Outfit', sans-serif;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.12em;
             font-weight: 600;
@@ -137,156 +137,165 @@
         .main-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2.5rem 2rem 3rem;
+            padding: 1.5rem 2rem 2rem;
         }
 
-        /* ============= WELCOME SECTION ============= */
-        .welcome-section {
-            margin-bottom: 2.5rem;
+        /* ============= WELCOME HEADER ============= */
+        .welcome-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            gap: 1.5rem;
+        }
+
+        .welcome-left {
+            flex: 1;
+            min-width: 0;
         }
 
         .welcome-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.8rem;
+            font-size: 2rem;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.2rem;
         }
 
         .welcome-date {
             font-family: 'Outfit', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
             letter-spacing: 0.08em;
         }
 
-        /* ============= QUICK ACTIONS ============= */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2.5rem;
+        .quick-actions-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
         }
 
-        .quick-action-btn {
-            display: flex;
-            flex-direction: column;
+        .quick-action-btn-header {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 0.8rem;
-            padding: 1.8rem 1.5rem;
+            gap: 0.4rem;
+            padding: 0.6rem 1rem;
             background: var(--surface);
             border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-card);
+            border-radius: var(--radius-chip);
             cursor: pointer;
             transition: all 0.2s ease;
-            text-align: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
-        .quick-action-btn:not(.disabled):hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-card);
+        .quick-action-btn-header:not(.disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(15,23,42,0.12);
             border-color: var(--border-strong);
         }
 
-        .quick-action-btn.disabled {
-            opacity: 0.5;
+        .quick-action-btn-header.disabled {
+            opacity: 0.4;
             cursor: not-allowed;
         }
 
-        .quick-action-icon {
-            font-size: 2.5rem;
+        .quick-action-btn-header .icon {
+            font-size: 1.1rem;
         }
 
-        .quick-action-label {
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
+        /* ============= DASHBOARD GRID ============= */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        .quick-action-sublabel {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            margin-top: -0.4rem;
-        }
-
-        /* ============= TODAY'S TASKS ============= */
-        .tasks-section {
+        .dashboard-card {
             background: var(--surface);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-card);
-            padding: 2rem;
-            margin-bottom: 2.5rem;
+            padding: 1.3rem;
             box-shadow: var(--shadow-card);
         }
 
-        .section-header {
+        .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1.8rem;
+            margin-bottom: 1rem;
         }
 
-        .section-title {
+        .card-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.8rem;
+            font-size: 1.3rem;
             letter-spacing: 0.14em;
             text-transform: uppercase;
         }
 
-        .section-count {
+        .card-count {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 28px;
-            height: 28px;
-            padding: 0 0.6rem;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 0.5rem;
             background: rgba(37, 99, 235, 0.1);
             color: var(--accent);
             border-radius: 999px;
             font-family: 'Outfit', sans-serif;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
         }
 
+        /* ============= TASKS LIST ============= */
         .tasks-list {
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
-            max-height: 500px;
+            gap: 0.6rem;
+            max-height: 480px;
             overflow-y: auto;
         }
 
         .task-item {
             display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1.2rem;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem;
             background: rgba(17, 24, 39, 0.02);
-            border-radius: 12px;
-            border: 1px solid transparent;
+            border-radius: 10px;
+            border-left: 3px solid var(--border-subtle);
             transition: all 0.15s ease;
             cursor: pointer;
-            border-left: 3px solid var(--border-subtle);
         }
 
         .task-item:hover {
             background: rgba(17, 24, 39, 0.04);
-            border-color: var(--border-subtle);
-            transform: translateX(4px);
+            border-color: var(--text-primary);
+            transform: translateX(3px);
         }
 
         .task-item.email { border-left-color: #3b82f6; }
         .task-item.phone { border-left-color: #10b981; }
         .task-item.meeting { border-left-color: #8b5cf6; }
         .task-item.task { border-left-color: #f59e0b; }
+        .task-item.overdue { border-left-color: #dc2626; }
+
+        .task-time {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            min-width: 42px;
+        }
 
         .task-icon {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             flex-shrink: 0;
-            margin-top: 0.1rem;
         }
 
         .task-content {
@@ -294,78 +303,44 @@
             min-width: 0;
         }
 
-        .task-header {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            margin-bottom: 0.4rem;
-            flex-wrap: wrap;
-        }
-
-        .task-type {
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            padding: 0.25rem 0.6rem;
-            border-radius: 999px;
-        }
-
-        .task-type.email { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-        .task-type.phone { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-        .task-type.meeting { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
-        .task-type.task { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-
         .task-title {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .task-meta {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            margin-top: 0.5rem;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
-            flex-wrap: wrap;
-        }
-
-        .task-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .task-time {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .task-notes {
-            margin-top: 0.6rem;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: var(--text-secondary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .task-actions {
             display: flex;
-            gap: 0.5rem;
-            margin-top: 0.8rem;
+            gap: 0.3rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .task-item:hover .task-actions {
+            opacity: 1;
         }
 
         .task-action-btn {
-            padding: 0.4rem 0.9rem;
-            border-radius: 999px;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
             border: 1px solid var(--border-subtle);
-            background: transparent;
+            background: var(--surface);
             font-family: 'Outfit', sans-serif;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
             cursor: pointer;
             transition: all 0.15s ease;
         }
@@ -383,116 +358,187 @@
 
         .task-action-btn.primary:hover {
             background: #15803d;
-            border-color: #15803d;
         }
 
         /* Empty state */
         .empty-state {
             text-align: center;
-            padding: 3.5rem 2rem;
+            padding: 2rem 1rem;
             color: var(--text-secondary);
         }
 
         .empty-state-icon {
-            font-size: 3.5rem;
-            margin-bottom: 1.2rem;
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
             opacity: 0.3;
         }
 
         .empty-state h3 {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 0.12em;
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.4rem;
         }
 
         .empty-state p {
-            font-size: 0.85rem;
-            line-height: 1.6;
-            max-width: 400px;
-            margin: 0 auto;
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+
+        /* ============= UPCOMING SECTION ============= */
+        .upcoming-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .upcoming-card {
+            background: rgba(17, 24, 39, 0.02);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .upcoming-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.6rem;
+            color: var(--text-secondary);
+        }
+
+        .upcoming-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .upcoming-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            padding: 0.4rem;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+
+        .upcoming-item:hover {
+            background: rgba(17, 24, 39, 0.04);
+        }
+
+        .upcoming-item .icon {
+            font-size: 1rem;
+        }
+
+        .upcoming-item .text {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .upcoming-item .time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Stats summary */
+        .stats-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            padding: 0.8rem;
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+        }
+
+        .stat-item .icon {
+            font-size: 1rem;
+        }
+
+        .stat-item .value {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-item .label {
+            color: var(--text-secondary);
         }
 
         /* ============= MODULES GRID ============= */
         .modules-section {
-            margin-bottom: 2rem;
-        }
-
-        .section-header-simple {
-            margin-bottom: 1.8rem;
-        }
-
-        .section-title-simple {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.8rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            margin-bottom: 0.35rem;
-        }
-
-        .section-underline {
-            width: 72px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--text-primary), transparent);
-            margin-bottom: 0.8rem;
+            margin-top: 1.5rem;
         }
 
         .modules-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.3rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
         }
 
         .module-card {
             background: var(--surface);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-card);
-            padding: 2rem;
+            padding: 1.3rem;
             cursor: pointer;
             transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
+            text-align: center;
         }
 
         .module-card:not(.disabled):hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             box-shadow: var(--shadow-card);
             border-color: var(--border-strong);
         }
 
         .module-card.disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
         .module-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+            font-size: 2rem;
+            margin-bottom: 0.6rem;
         }
 
         .module-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.8rem;
+            font-size: 1.3rem;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
 
         .module-description {
-            font-size: 0.85rem;
-            line-height: 1.6;
+            font-size: 0.75rem;
+            line-height: 1.5;
             color: var(--text-secondary);
-            margin-bottom: 1.2rem;
+            margin-bottom: 0.8rem;
         }
 
         .module-badge {
             display: inline-flex;
             align-items: center;
-            padding: 0.35rem 0.8rem;
+            padding: 0.25rem 0.6rem;
             border-radius: var(--radius-chip);
             font-family: 'Outfit', sans-serif;
-            font-size: 0.68rem;
+            font-size: 0.6rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -808,6 +854,12 @@
         }
 
         /* ============= RESPONSIVE ============= */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
             .app-header-inner {
                 flex-direction: column;
@@ -821,25 +873,27 @@
             }
 
             .main-container {
-                padding: 2rem 1.4rem;
+                padding: 1.5rem 1rem;
             }
 
-            .welcome-title {
-                font-size: 2.2rem;
+            .welcome-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
 
-            .quick-actions {
-                grid-template-columns: 1fr;
+            .quick-actions-header {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .quick-action-btn-header {
+                flex: 1;
+                min-width: 0;
+                justify-content: center;
             }
 
             .modules-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .task-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.4rem;
             }
         }
     </style>
@@ -853,8 +907,8 @@
             </div>
             <div class="app-header-right">
                 <span class="user-email" id="userEmail">Ładowanie...</span>
-                <button id="profileBtn" class="icon-btn" title="Personalizacja konta" style="margin-right: 0.8rem;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button id="profileBtn" class="icon-btn" title="Personalizacja konta">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
@@ -866,12 +920,6 @@
 
     <!-- MAIN CONTENT -->
     <main class="main-container">
-        <!-- WELCOME SECTION -->
-        <section class="welcome-section">
-            <h1 class="welcome-title" id="welcomeTitle">Witaj! 👋</h1>
-            <p class="welcome-date" id="welcomeDate"></p>
-        </section>
-
         <!-- LOADING STATE -->
         <div id="loadingState" class="loading">
             <div class="spinner"></div>
@@ -881,85 +929,138 @@
         <!-- MAIN DASHBOARD (hidden until loaded) -->
         <div id="dashboardContent" style="display: none;">
             
-            <!-- QUICK ACTIONS -->
-            <section class="quick-actions">
-                <button class="quick-action-btn" onclick="openAddContactModal()">
-                    <div class="quick-action-icon">👤</div>
-                    <div class="quick-action-label">Dodaj kontakt</div>
-                </button>
-
-                <button class="quick-action-btn" onclick="openAddCompanyModal()">
-                    <div class="quick-action-icon">🏢</div>
-                    <div class="quick-action-label">Dodaj firmę</div>
-                </button>
-
-                <button class="quick-action-btn disabled">
-                    <div class="quick-action-icon">💼</div>
-                    <div class="quick-action-label">Dodaj deal</div>
-                    <div class="quick-action-sublabel">Dostępne wkrótce</div>
-                </button>
-            </section>
-
-            <!-- TODAY'S TASKS -->
-            <section class="tasks-section">
-                <div class="section-header">
-                    <h2 class="section-title">Dzisiejsze zadania</h2>
-                    <span class="section-count" id="tasksCount">0</span>
+            <!-- WELCOME HEADER -->
+            <div class="welcome-header">
+                <div class="welcome-left">
+                    <h1 class="welcome-title" id="welcomeTitle">Witaj! 👋</h1>
+                    <p class="welcome-date" id="welcomeDate"></p>
                 </div>
+                <div class="quick-actions-header">
+                    <button class="quick-action-btn-header" onclick="openAddContactModal()">
+                        <span class="icon">👤</span>
+                        <span>Kontakt</span>
+                    </button>
+                    <button class="quick-action-btn-header" onclick="openAddCompanyModal()">
+                        <span class="icon">🏢</span>
+                        <span>Firma</span>
+                    </button>
+                    <button class="quick-action-btn-header disabled">
+                        <span class="icon">💼</span>
+                        <span>Deal</span>
+                    </button>
+                </div>
+            </div>
 
-                <div id="tasksList" class="tasks-list"></div>
+            <!-- DASHBOARD GRID -->
+            <div class="dashboard-grid">
                 
-                <div id="tasksEmpty" class="empty-state" style="display: none;">
-                    <div class="empty-state-icon">✨</div>
-                    <h3>Brak zadań</h3>
-                    <p>Nie masz zaplanowanych zadań na dziś. Świetna robota!</p>
+                <!-- LEFT: TODAY'S TASKS -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Dzisiaj</h2>
+                        <span class="card-count" id="todayCount">0</span>
+                    </div>
+
+                    <div id="tasksList" class="tasks-list"></div>
+                    
+                    <div id="tasksEmpty" class="empty-state" style="display: none;">
+                        <div class="empty-state-icon">✨</div>
+                        <h3>Brak zadań</h3>
+                        <p>Nie masz zaplanowanych zadań na dziś.</p>
+                    </div>
                 </div>
-            </section>
+
+                <!-- RIGHT: UPCOMING & STATS -->
+                <div class="upcoming-section">
+                    
+                    <!-- Stats Summary -->
+                    <div class="dashboard-card">
+                        <div class="stats-summary" id="statsSummary">
+                            <div class="stat-item">
+                                <span class="icon">⚠️</span>
+                                <span class="value" id="overdueCount">0</span>
+                                <span class="label">przeterminowane</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="icon">📅</span>
+                                <span class="value" id="tomorrowCount">0</span>
+                                <span class="label">jutro</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="icon">📆</span>
+                                <span class="value" id="weekCount">0</span>
+                                <span class="label">ten tydzień</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overdue Tasks -->
+                    <div class="dashboard-card" id="overdueSection" style="display: none;">
+                        <div class="card-header">
+                            <h2 class="card-title" style="color: var(--error);">⚠️ Wymagają uwagi</h2>
+                            <span class="card-count" id="overdueCardCount" style="background: rgba(220, 38, 38, 0.1); color: var(--error);">0</span>
+                        </div>
+                        <div id="overdueList" class="tasks-list" style="max-height: 200px;"></div>
+                    </div>
+
+                    <!-- Tomorrow -->
+                    <div class="upcoming-card">
+                        <div class="upcoming-card-title">Jutro</div>
+                        <div id="tomorrowList" class="upcoming-list">
+                            <div class="empty-state" style="padding: 1rem;">
+                                <p style="font-size: 0.75rem;">Brak zadań</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- This Week -->
+                    <div class="upcoming-card">
+                        <div class="upcoming-card-title">Ten tydzień</div>
+                        <div id="weekList" class="upcoming-list">
+                            <div class="empty-state" style="padding: 1rem;">
+                                <p style="font-size: 0.75rem;">Brak zadań</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
 
             <!-- MODULES SECTION -->
             <section class="modules-section">
-                <div class="section-header-simple">
-                    <h2 class="section-title-simple">Moduły CRM</h2>
-                    <div class="section-underline"></div>
-                </div>
-
                 <div class="modules-grid">
-                    <!-- RELATIONSHIPS MODULE -->
                     <div class="module-card" onclick="window.location.href='./modules/relationships.html'">
                         <div class="module-icon">👥</div>
                         <div class="module-title">Relacje</div>
                         <div class="module-description">
-                            Zarządzaj firmami i osobami kontaktowymi. Dodawaj kontakty i śledź historię współpracy.
+                            Zarządzaj firmami i kontaktami
                         </div>
                         <span class="module-badge active">✓ Dostępny</span>
                     </div>
 
-                    <!-- PIPELINE MODULE (Coming Soon) -->
                     <div class="module-card disabled">
                         <div class="module-icon">📈</div>
                         <div class="module-title">Pipeline</div>
                         <div class="module-description">
-                            Śledź opportunities i zarządzaj lejkiem sprzedażowym.
+                            Śledź opportunities
                         </div>
                         <span class="module-badge soon">Wkrótce</span>
                     </div>
 
-                    <!-- TASKS MODULE (Coming Soon) -->
                     <div class="module-card disabled">
                         <div class="module-icon">✅</div>
                         <div class="module-title">Zadania</div>
                         <div class="module-description">
-                            Organizuj pracę z kalendarzem i automatycznymi przypomnieniami.
+                            Kalendarz i przypomnienia
                         </div>
                         <span class="module-badge soon">Wkrótce</span>
                     </div>
 
-                    <!-- ANALYTICS MODULE (Coming Soon) -->
                     <div class="module-card disabled">
                         <div class="module-icon">📊</div>
                         <div class="module-title">Raporty</div>
                         <div class="module-description">
-                            Analizuj wyniki i monitoruj kluczowe wskaźniki wydajności.
+                            Analizy i wskaźniki
                         </div>
                         <span class="module-badge soon">Wkrótce</span>
                     </div>
@@ -985,7 +1086,7 @@
                         maxlength="50"
                     >
                     <p class="form-hint">
-                        💡 To imię będzie wyświetlane zamiast emaila w nagłówku, na stronie głównej oraz w historii aktywności.
+                        💡 To imię będzie wyświetlane zamiast emaila.
                     </p>
                     <div class="form-current">
                         <strong>Obecnie:</strong> <span id="currentDisplay">ładowanie...</span>
@@ -1000,12 +1101,12 @@
                         style="opacity: 0.7; cursor: not-allowed;"
                     >
                     <p class="form-hint">
-                        Email jest przypisany do konta Google i nie można go zmienić.
+                        Email jest przypisany do konta Google.
                     </p>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="cancelProfileBtn">Anuluj</button>
-                    <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                    <button type="submit" class="btn btn-primary">Zapisz</button>
                 </div>
             </form>
         </div>
@@ -1027,15 +1128,15 @@
                     <label for="companyDomain">Domena <span class="optional">(opcjonalnie)</span></label>
                     <input type="text" id="companyDomain" placeholder="np. techcorp.pl">
                     <p class="form-hint">
-                        💡 Strona WWW zostanie utworzona automatycznie na podstawie domeny.
+                        💡 Strona WWW zostanie utworzona automatycznie.
                     </p>
                 </div>
                 <div class="form-group">
                     <label for="companyIndustry">Branża <span class="optional">(opcjonalnie)</span></label>
-                    <input type="text" id="companyIndustry" placeholder="np. IT, Marketing, Finanse">
+                    <input type="text" id="companyIndustry" placeholder="np. IT, Marketing">
                 </div>
                 <div class="form-group">
-                    <label for="companyPhone">Telefon firmowy <span class="optional">(opcjonalnie)</span></label>
+                    <label for="companyPhone">Telefon <span class="optional">(opcjonalnie)</span></label>
                     <input type="tel" id="companyPhone" placeholder="np. +48 123 456 789">
                 </div>
                 <div class="form-group">
@@ -1048,7 +1149,7 @@
                 </div>
                 <div class="form-group">
                     <label for="companyNotes">Notatki <span class="optional">(opcjonalnie)</span></label>
-                    <textarea id="companyNotes" placeholder="Dodatkowe informacje o firmie"></textarea>
+                    <textarea id="companyNotes" placeholder="Dodatkowe informacje"></textarea>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="cancelCompanyBtn">Anuluj</button>
@@ -1077,14 +1178,14 @@
                 <div class="form-group">
                     <label for="contactCompanyInput">Firma <span class="optional">(opcjonalnie)</span></label>
                     <div class="company-picker">
-                        <input type="text" id="contactCompanyInput" placeholder="Zacznij pisać nazwę firmy...">
+                        <input type="text" id="contactCompanyInput" placeholder="Zacznij pisać...">
                         <input type="hidden" id="contactCompanyId">
                         <div id="companySuggestions" class="company-suggestions"></div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="contactPosition">Stanowisko <span class="optional">(opcjonalnie)</span></label>
-                    <input type="text" id="contactPosition" placeholder="np. CEO, Marketing Manager">
+                    <input type="text" id="contactPosition" placeholder="np. CEO">
                 </div>
                 <div class="form-group">
                     <label for="contactPhone">Telefon <span class="optional">(opcjonalnie)</span></label>
@@ -1127,7 +1228,6 @@
         // ============= INIT =============
         async function init() {
             try {
-                // Set user email
                 const email = AuthService.getUserEmail();
                 if (email) {
                     await loadUserPreferences(email);
@@ -1190,95 +1290,175 @@
                     DataService.loadContacts()
                 ]);
 
-                renderTodaysTasks();
+                renderAllSections();
             } catch (error) {
                 console.error('Błąd ładowania danych:', error);
             }
         }
 
-        function renderTodaysTasks() {
-            const today = new Date().toISOString().split('T')[0];
-            const todaysTasks = allActivities.filter(a => {
-                if (a.status !== 'planned') return false;
-                const taskDate = a.date ? a.date.split('T')[0] : '';
-                return taskDate === today;
-            });
+        function renderAllSections() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const weekEnd = new Date(today);
+            weekEnd.setDate(weekEnd.getDate() + 7);
 
+            // Filter activities
+            const todayTasks = allActivities.filter(a => {
+                if (a.status !== 'planned') return false;
+                const taskDate = new Date(a.date);
+                taskDate.setHours(0, 0, 0, 0);
+                return taskDate.getTime() === today.getTime();
+            }).sort((a, b) => a.date.localeCompare(b.date));
+
+            const overdueTasks = allActivities.filter(a => {
+                if (a.status !== 'planned') return false;
+                const taskDate = new Date(a.date);
+                taskDate.setHours(0, 0, 0, 0);
+                return taskDate.getTime() < today.getTime();
+            }).sort((a, b) => a.date.localeCompare(b.date));
+
+            const tomorrowTasks = allActivities.filter(a => {
+                if (a.status !== 'planned') return false;
+                const taskDate = new Date(a.date);
+                taskDate.setHours(0, 0, 0, 0);
+                return taskDate.getTime() === tomorrow.getTime();
+            }).sort((a, b) => a.date.localeCompare(b.date));
+
+            const weekTasks = allActivities.filter(a => {
+                if (a.status !== 'planned') return false;
+                const taskDate = new Date(a.date);
+                taskDate.setHours(0, 0, 0, 0);
+                return taskDate.getTime() > tomorrow.getTime() && taskDate.getTime() < weekEnd.getTime();
+            }).sort((a, b) => a.date.localeCompare(b.date));
+
+            // Update stats
+            document.getElementById('overdueCount').textContent = overdueTasks.length;
+            document.getElementById('tomorrowCount').textContent = tomorrowTasks.length;
+            document.getElementById('weekCount').textContent = weekTasks.length;
+            document.getElementById('todayCount').textContent = todayTasks.length;
+
+            // Render sections
+            renderTodayTasks(todayTasks);
+            renderOverdueTasks(overdueTasks);
+            renderTomorrowTasks(tomorrowTasks);
+            renderWeekTasks(weekTasks);
+        }
+
+        function renderTodayTasks(tasks) {
             const tasksList = document.getElementById('tasksList');
             const tasksEmpty = document.getElementById('tasksEmpty');
-            const tasksCount = document.getElementById('tasksCount');
 
-            tasksCount.textContent = todaysTasks.length;
-
-            if (todaysTasks.length === 0) {
+            if (tasks.length === 0) {
                 tasksList.innerHTML = '';
                 tasksEmpty.style.display = 'block';
                 return;
             }
 
             tasksEmpty.style.display = 'none';
+            tasksList.innerHTML = tasks.map(task => renderTaskItem(task, false)).join('');
+        }
 
-            // Sort by time
-            todaysTasks.sort((a, b) => a.date.localeCompare(b.date));
+        function renderOverdueTasks(tasks) {
+            const overdueSection = document.getElementById('overdueSection');
+            const overdueList = document.getElementById('overdueList');
+            const overdueCardCount = document.getElementById('overdueCardCount');
 
-            tasksList.innerHTML = todaysTasks.map(task => {
-                const formatted = ActivitiesService.formatActivity(task);
-                const company = allCompanies.find(c => c.id === task.companyId);
-                const contact = allContacts.find(c => c.id === task.contactId);
+            if (tasks.length === 0) {
+                overdueSection.style.display = 'none';
+                return;
+            }
 
-                const time = new Date(task.date).toLocaleTimeString('pl-PL', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
+            overdueSection.style.display = 'block';
+            overdueCardCount.textContent = tasks.length;
+            overdueList.innerHTML = tasks.map(task => renderTaskItem(task, true)).join('');
+        }
 
-                return `
-                    <div class="task-item ${task.type.toLowerCase()}" onclick="openTask('${task.id}')">
-                        <div class="task-icon">${formatted.typeIcon}</div>
-                        <div class="task-content">
-                            <div class="task-header">
-                                <span class="task-type ${task.type.toLowerCase()}">${formatted.typeLabel}</span>
-                                <span class="task-title">${escapeHtml(task.title)}</span>
-                            </div>
-                            <div class="task-meta">
-                                <div class="task-meta-item">
-                                    <span>🕐</span>
-                                    <span class="task-time">${time}</span>
-                                </div>
-                                ${company ? `
-                                    <div class="task-meta-item">
-                                        <span>🏢</span>
-                                        <span>${escapeHtml(company.name)}</span>
-                                    </div>
-                                ` : ''}
-                                ${contact ? `
-                                    <div class="task-meta-item">
-                                        <span>👤</span>
-                                        <span>${escapeHtml(contact.name)}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                            ${task.notes ? `
-                                <div class="task-notes">${escapeHtml(task.notes)}</div>
-                            ` : ''}
-                            <div class="task-actions">
-                                <button class="task-action-btn primary" onclick="event.stopPropagation(); completeTask('${task.id}')">
-                                    ✓ Ukończ
-                                </button>
-                                <button class="task-action-btn" onclick="event.stopPropagation(); viewInRelationships('${task.companyId || task.contactId}', '${task.companyId ? 'company' : 'contact'}')">
-                                    👁️ Zobacz
-                                </button>
-                            </div>
-                        </div>
+        function renderTomorrowTasks(tasks) {
+            const tomorrowList = document.getElementById('tomorrowList');
+
+            if (tasks.length === 0) {
+                tomorrowList.innerHTML = '<div class="empty-state" style="padding: 1rem;"><p style="font-size: 0.75rem;">Brak zadań</p></div>';
+                return;
+            }
+
+            tomorrowList.innerHTML = tasks.slice(0, 5).map(task => renderUpcomingItem(task)).join('');
+        }
+
+        function renderWeekTasks(tasks) {
+            const weekList = document.getElementById('weekList');
+
+            if (tasks.length === 0) {
+                weekList.innerHTML = '<div class="empty-state" style="padding: 1rem;"><p style="font-size: 0.75rem;">Brak zadań</p></div>';
+                return;
+            }
+
+            weekList.innerHTML = tasks.slice(0, 5).map(task => renderUpcomingItem(task)).join('');
+        }
+
+        function renderTaskItem(task, isOverdue) {
+            const formatted = ActivitiesService.formatActivity(task);
+            const company = allCompanies.find(c => c.id === task.companyId);
+            const contact = allContacts.find(c => c.id === task.contactId);
+
+            const time = new Date(task.date).toLocaleTimeString('pl-PL', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const metaParts = [];
+            if (contact) metaParts.push(escapeHtml(contact.name));
+            if (company) metaParts.push(escapeHtml(company.name));
+            const meta = metaParts.join(' • ');
+
+            return `
+                <div class="task-item ${isOverdue ? 'overdue' : task.type.toLowerCase()}" onclick="openTask('${task.id}')">
+                    <div class="task-time">${time}</div>
+                    <div class="task-icon">${formatted.typeIcon}</div>
+                    <div class="task-content">
+                        <div class="task-title">${escapeHtml(task.title)}</div>
+                        ${meta ? `<div class="task-meta">${meta}</div>` : ''}
                     </div>
-                `;
-            }).join('');
+                    <div class="task-actions">
+                        <button class="task-action-btn primary" onclick="event.stopPropagation(); completeTask('${task.id}')">
+                            ✓
+                        </button>
+                        <button class="task-action-btn" onclick="event.stopPropagation(); viewInRelationships('${task.companyId || task.contactId}', '${task.companyId ? 'company' : 'contact'}')">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderUpcomingItem(task) {
+            const formatted = ActivitiesService.formatActivity(task);
+            const contact = allContacts.find(c => c.id === task.contactId);
+            const company = allCompanies.find(c => c.id === task.companyId);
+
+            const time = new Date(task.date).toLocaleTimeString('pl-PL', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const text = contact ? escapeHtml(contact.name) : (company ? escapeHtml(company.name) : escapeHtml(task.title));
+
+            return `
+                <div class="upcoming-item" onclick="openTask('${task.id}')">
+                    <span class="icon">${formatted.typeIcon}</span>
+                    <span class="text">${text}</span>
+                    <span class="time">${time}</span>
+                </div>
+            `;
         }
 
         function openTask(taskId) {
             const task = allActivities.find(a => a.id === taskId);
             if (!task) return;
 
-            // Redirect to relationships with task context
             if (task.companyId) {
                 window.location.href = `./modules/relationships.html?company=${task.companyId}`;
             } else if (task.contactId) {
@@ -1291,9 +1471,8 @@
                 await ActivitiesService.completeActivity(taskId);
                 showStatus('Zadanie ukończone!', 'success');
                 
-                // Reload activities
                 allActivities = await DataService.loadActivities();
-                renderTodaysTasks();
+                renderAllSections();
             } catch (error) {
                 console.error('Błąd:', error);
                 showStatus('Błąd: ' + error.message, 'error');
@@ -1308,7 +1487,7 @@
             }
         }
 
-        // ============= EXPORT TO WINDOW SCOPE =============
+        // Export to window
         window.openTask = openTask;
         window.completeTask = completeTask;
         window.viewInRelationships = viewInRelationships;
@@ -1405,12 +1584,12 @@
                 if (matchedCompany) {
                     selectedCompanyId = matchedCompany.id;
                     companyInputEl.value = matchedCompany.name;
-                    showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
+                    showStatus(`🎯 Auto-dopasowano: ${matchedCompany.name}`, 'success');
                 }
             }
 
             try {
-                // Create company on the fly if needed
+                // Create company on the fly
                 if (typedCompanyName && !selectedCompanyId) {
                     const existing = allCompanies.find(c => c.name && c.name.toLowerCase() === typedCompanyName.toLowerCase());
                     if (existing) {
@@ -1440,8 +1619,8 @@
                         await DataService.saveCompany(newCompany);
                         allCompanies.push(newCompany);
                         selectedCompanyId = newCompany.id;
-                        await DataService.logCompanyHistory(newCompany.id, 'event', 'Firma utworzona (z poziomu kontaktu)');
-                        showStatus(`Utworzono nową firmę "${newCompany.name}"`, 'success');
+                        await DataService.logCompanyHistory(newCompany.id, 'event', 'Firma utworzona (z kontaktu)');
+                        showStatus(`Utworzono: "${newCompany.name}"`, 'success');
                     }
                 }
 
@@ -1461,7 +1640,7 @@
                 } else {
                     allContacts.push(contact);
                     await DataService.logContactHistory(contact.id, 'event', 'Kontakt utworzony');
-                    if (contact.companyId) await DataService.logCompanyHistory(contact.companyId, 'event', `Kontakt "${contact.name}" powiązany z firmą`);
+                    if (contact.companyId) await DataService.logCompanyHistory(contact.companyId, 'event', `Kontakt "${contact.name}" powiązany`);
                     showStatus('Kontakt dodany', 'success');
                 }
 
@@ -1486,7 +1665,7 @@
 
             const exactExists = allCompanies.some(c => c.name && c.name.toLowerCase() === q && q.length > 0);
             if (q && !exactExists) {
-                html += `<div class="company-suggestion-item company-suggestion-new"><span>➕ Utwórz nową firmę "<strong>${escapeHtml(query.trim())}</strong>"</span></div>`;
+                html += `<div class="company-suggestion-item company-suggestion-new"><span>➕ Utwórz "<strong>${escapeHtml(query.trim())}</strong>"</span></div>`;
             }
 
             if (!html) {
@@ -1512,10 +1691,9 @@
                 const prefs = await DataService.loadUserPreferences(email);
                 if (prefs && prefs.displayName) {
                     AuthService.saveDisplayName(prefs.displayName);
-                    console.log('✓ Załadowano preferencje użytkownika:', prefs.displayName);
                 }
             } catch (error) {
-                console.warn('Nie udało się załadować preferencji użytkownika:', error);
+                console.warn('Nie udało się załadować preferencji:', error);
             }
         }
 
@@ -1544,7 +1722,7 @@
             const displayName = document.getElementById('displayName').value.trim();
             
             if (!email) {
-                alert('Błąd: brak emaila użytkownika');
+                alert('Błąd: brak emaila');
                 return;
             }
             
@@ -1565,7 +1743,7 @@
                 closeProfileModal();
             } catch (error) {
                 console.error('Błąd zapisu profilu:', error);
-                alert('Wystąpił błąd podczas zapisu profilu.');
+                alert('Wystąpił błąd podczas zapisu.');
             }
         }
 
@@ -1638,7 +1816,7 @@
                 });
             }
 
-            // Auto-match company by email domain
+            // Auto-match
             const contactEmailEl = document.getElementById('contactEmail');
             if (contactEmailEl && companyInputEl && companyIdEl) {
                 contactEmailEl.addEventListener('blur', () => {
@@ -1650,7 +1828,7 @@
                     if (matchedCompany) {
                         companyInputEl.value = matchedCompany.name;
                         companyIdEl.value = matchedCompany.id;
-                        showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
+                        showStatus(`🎯 Auto-dopasowano: ${matchedCompany.name}`, 'success');
                     }
                 });
             }
@@ -1662,19 +1840,12 @@
                 });
             });
 
-            // Hide company suggestions when clicking outside
+            // Hide suggestions when clicking outside
             document.addEventListener('click', (e) => {
                 if (companyInputEl && companyInputEl.closest('.company-picker') && companySuggestionsEl) {
                     if (!companyInputEl.closest('.company-picker').contains(e.target)) {
                         hideCompanySuggestions();
                     }
-                }
-            });
-
-            // Close profile modal on background click
-            document.getElementById('profileModal').addEventListener('click', (e) => {
-                if (e.target.id === 'profileModal') {
-                    closeProfileModal();
                 }
             });
         });
