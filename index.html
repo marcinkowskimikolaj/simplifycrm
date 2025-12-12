@@ -5,13 +5,13 @@
     <title>Dashboard - Simplify CRM</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- FONTS & STYLES --> 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap');
 
         :root {
             --bg-primary: #f5f1ed;
             --surface: #ffffff;
+            --surface-soft: rgba(255, 255, 255, 0.88);
             --text-primary: #111827;
             --text-secondary: #6b7280;
             --border-subtle: rgba(17, 24, 39, 0.12);
@@ -22,6 +22,8 @@
             --radius-chip: 999px;
             --accent: #2563eb;
             --success: #16a34a;
+            --error: #dc2626;
+            --warning: #f59e0b;
         }
 
         *, *::before, *::after {
@@ -37,7 +39,7 @@
             min-height: 100vh;
         }
 
-        /* HEADER */
+        /* ============= HEADER ============= */
         .app-header {
             background: var(--surface);
             border-bottom: 1px solid var(--border-subtle);
@@ -48,7 +50,7 @@
         }
 
         .app-header-inner {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -107,14 +109,6 @@
             transform: translateY(-1px);
         }
 
-        .icon-btn svg {
-            opacity: 0.7;
-        }
-
-        .icon-btn:hover svg {
-            opacity: 1;
-        }
-
         .logout-btn {
             display: inline-flex;
             align-items: center;
@@ -139,24 +133,24 @@
             transform: translateY(-1px);
         }
 
-        /* MAIN CONTAINER */
+        /* ============= MAIN CONTAINER ============= */
         .main-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 3rem 2rem;
+            padding: 2.5rem 2rem 3rem;
         }
 
-        /* WELCOME SECTION */
+        /* ============= WELCOME SECTION ============= */
         .welcome-section {
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
         }
 
         .welcome-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 3rem;
+            font-size: 2.8rem;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
 
         .welcome-date {
@@ -166,68 +160,272 @@
             letter-spacing: 0.08em;
         }
 
-        /* STATS GRID */
-        .stats-grid {
+        /* ============= QUICK ACTIONS ============= */
+        .quick-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.3rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
         }
 
-        .stat-card {
+        .quick-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            padding: 1.8rem 1.5rem;
             background: var(--surface);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-card);
-            padding: 1.8rem;
+            cursor: pointer;
             transition: all 0.2s ease;
+            text-align: center;
         }
 
-        .stat-card:hover {
+        .quick-action-btn:not(.disabled):hover {
             transform: translateY(-3px);
             box-shadow: var(--shadow-card);
             border-color: var(--border-strong);
         }
 
-        .stat-header {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            margin-bottom: 1rem;
+        .quick-action-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .stat-icon {
-            font-size: 1.5rem;
+        .quick-action-icon {
+            font-size: 2.5rem;
         }
 
-        .stat-title {
+        .quick-action-label {
             font-family: 'Outfit', sans-serif;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.12em;
-            font-weight: 600;
+        }
+
+        .quick-action-sublabel {
+            font-size: 0.7rem;
             color: var(--text-secondary);
+            margin-top: -0.4rem;
         }
 
-        .stat-value {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.5rem;
-            letter-spacing: 0.08em;
-            margin-bottom: 0.3rem;
+        /* ============= TODAY'S TASKS ============= */
+        .tasks-section {
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow-card);
         }
 
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        /* SECTION HEADER */
         .section-header {
-            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.8rem;
         }
 
         .section-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.1rem;
+            font-size: 1.8rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .section-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 0.6rem;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--accent);
+            border-radius: 999px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.2rem;
+            background: rgba(17, 24, 39, 0.02);
+            border-radius: 12px;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            border-left: 3px solid var(--border-subtle);
+        }
+
+        .task-item:hover {
+            background: rgba(17, 24, 39, 0.04);
+            border-color: var(--border-subtle);
+            transform: translateX(4px);
+        }
+
+        .task-item.email { border-left-color: #3b82f6; }
+        .task-item.phone { border-left-color: #10b981; }
+        .task-item.meeting { border-left-color: #8b5cf6; }
+        .task-item.task { border-left-color: #f59e0b; }
+
+        .task-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .task-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .task-type {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+        }
+
+        .task-type.email { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .task-type.phone { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .task-type.meeting { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .task-type.task { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .task-time {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .task-notes {
+            margin-top: 0.6rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .task-action-btn {
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .task-action-btn:hover {
+            background: rgba(15,23,42,0.04);
+            border-color: var(--border-strong);
+        }
+
+        .task-action-btn.primary {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .task-action-btn.primary:hover {
+            background: #15803d;
+            border-color: #15803d;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3.5rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.2rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.6rem;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* ============= MODULES GRID ============= */
+        .modules-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header-simple {
+            margin-bottom: 1.8rem;
+        }
+
+        .section-title-simple {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
             letter-spacing: 0.14em;
             text-transform: uppercase;
             margin-bottom: 0.35rem;
@@ -240,19 +438,10 @@
             margin-bottom: 0.8rem;
         }
 
-        .section-subtitle {
-            font-size: 0.82rem;
-            line-height: 1.6;
-            color: var(--text-secondary);
-            max-width: 44rem;
-        }
-
-        /* MODULES GRID */
         .modules-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.3rem;
-            margin-bottom: 3rem;
         }
 
         .module-card {
@@ -319,83 +508,7 @@
             color: var(--text-secondary);
         }
 
-        /* ACTIVITY SECTION */
-        .activity-section {
-            background: var(--surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-card);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .activity-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .activity-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem;
-            background: rgba(17, 24, 39, 0.02);
-            border-radius: 12px;
-            transition: background 0.15s ease;
-        }
-
-        .activity-item:hover {
-            background: rgba(17, 24, 39, 0.04);
-        }
-
-        .activity-icon {
-            font-size: 1.2rem;
-            margin-top: 0.2rem;
-        }
-
-        .activity-content {
-            flex: 1;
-        }
-
-        .activity-text {
-            font-size: 0.85rem;
-            line-height: 1.5;
-            margin-bottom: 0.3rem;
-        }
-
-        .activity-meta {
-            font-size: 0.72rem;
-            color: var(--text-secondary);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: var(--text-secondary);
-        }
-
-        .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
-        }
-
-        .empty-state h3 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            margin-bottom: 0.6rem;
-        }
-
-        .empty-state p {
-            font-size: 0.85rem;
-            line-height: 1.6;
-        }
-
-        /* LOADING */
+        /* ============= LOADING ============= */
         .loading {
             text-align: center;
             padding: 4rem 2rem;
@@ -423,7 +536,278 @@
             color: var(--text-secondary);
         }
 
-        /* RESPONSIVE */
+        /* ============= MODALS ============= */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 100%;
+            max-width: 520px;
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border-subtle);
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .modal-header h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            cursor: pointer;
+            font-size: 1.3rem;
+            line-height: 1;
+            transition: all 0.18s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(15,23,42,0.04);
+            border-color: var(--border-strong);
+        }
+
+        .form-group {
+            margin-bottom: 1.4rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-group label .optional {
+            font-weight: 400;
+            opacity: 0.6;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.85rem 1.1rem;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            background: var(--surface);
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(15,23,42,0.08);
+        }
+
+        .form-hint {
+            margin-top: 0.4rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.85rem 1.4rem;
+            border-radius: var(--radius-chip);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .btn-primary {
+            border: 1px solid var(--text-primary);
+            background: var(--text-primary);
+            color: #f5f1ed;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(15,23,42,0.24);
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--border-strong);
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(15,23,42,0.03);
+            border-color: var(--text-primary);
+        }
+
+        /* Company picker */
+        .company-picker {
+            position: relative;
+        }
+
+        .company-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 0.25rem;
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 18px 40px rgba(15,23,42,0.22);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 1500;
+            display: none;
+        }
+
+        .company-suggestions.visible {
+            display: block;
+        }
+
+        .company-suggestion-item {
+            padding: 0.55rem 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .company-suggestion-item:hover {
+            background: rgba(15,23,42,0.04);
+        }
+
+        .company-suggestion-item .suggestion-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-left: 0.75rem;
+        }
+
+        .company-suggestion-new {
+            font-weight: 600;
+        }
+
+        /* Profile modal */
+        .form-current {
+            display: block;
+            margin-top: 0.4rem;
+            padding: 0.7rem 1rem;
+            background: rgba(15,23,42,0.04);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .form-current strong {
+            color: var(--text-primary);
+        }
+
+        /* Status message */
+        .status-message {
+            position: fixed;
+            top: 1.4rem;
+            right: 1.4rem;
+            padding: 0.85rem 1.1rem;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid rgba(15,23,42,0.16);
+            box-shadow: 0 18px 40px rgba(15,23,42,0.22);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .status-message::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--text-primary);
+        }
+
+        .status-message.success::before {
+            background: var(--success);
+        }
+
+        .status-message.error::before {
+            background: var(--error);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ============= RESPONSIVE ============= */
         @media (max-width: 768px) {
             .app-header-inner {
                 flex-direction: column;
@@ -444,169 +828,19 @@
                 font-size: 2.2rem;
             }
 
-            .stats-grid,
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
             .modules-grid {
                 grid-template-columns: 1fr;
             }
-        }
 
-        /* PROFILE MODAL */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15,23,42,0.55);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            position: relative;
-            width: 100%;
-            max-width: 480px;
-            background: var(--surface);
-            border-radius: 24px;
-            border: 1px solid var(--border-subtle);
-            padding: 2rem 2.2rem;
-            box-shadow: var(--shadow-soft);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.8rem;
-        }
-
-        .modal-header h2 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.9rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-        }
-
-        .close-btn {
-            width: 34px;
-            height: 34px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            border: 1px solid var(--border-subtle);
-            background: transparent;
-            cursor: pointer;
-            font-size: 1.4rem;
-            line-height: 1;
-            transition: all 0.18s ease;
-        }
-
-        .close-btn:hover {
-            background: rgba(15,23,42,0.04);
-            border-color: var(--border-strong);
-        }
-
-        .form-group {
-            margin-bottom: 1.4rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.9rem 1.2rem;
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            background: var(--surface);
-            font-family: 'Manrope', sans-serif;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            transition: border-color 0.18s ease, box-shadow 0.18s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--text-primary);
-            box-shadow: 0 0 0 3px rgba(15,23,42,0.08);
-        }
-
-        .form-hint {
-            margin-top: 0.5rem;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .form-current {
-            display: block;
-            margin-top: 0.4rem;
-            padding: 0.7rem 1rem;
-            background: rgba(15,23,42,0.04);
-            border-radius: 10px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .form-current strong {
-            color: var(--text-primary);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 0.8rem;
-            margin-top: 2rem;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 0.9rem 1.6rem;
-            border-radius: var(--radius-chip);
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            cursor: pointer;
-            transition: all 0.18s ease;
-            border: none;
-        }
-
-        .btn-primary {
-            background: var(--text-primary);
-            color: #f5f1ed;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 24px rgba(15,23,42,0.24);
-        }
-
-        .btn-secondary {
-            border: 1px solid var(--border-strong);
-            background: transparent;
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(15,23,42,0.03);
-            border-color: var(--text-primary);
+            .task-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.4rem;
+            }
         }
     </style>
 </head>
@@ -638,118 +872,103 @@
             <p class="welcome-date" id="welcomeDate"></p>
         </section>
 
-        <!-- STATS SECTION -->
-        <section id="statsSection" class="stats-grid" style="display: none;">
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-icon">🏢</span>
-                    <span class="stat-title">Firmy</span>
-                </div>
-                <div class="stat-value" id="companiesCount">-</div>
-                <div class="stat-label">firm w bazie</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-icon">👥</span>
-                    <span class="stat-title">Kontakty</span>
-                </div>
-                <div class="stat-value" id="contactsCount">-</div>
-                <div class="stat-label">osób kontaktowych</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-icon">📝</span>
-                    <span class="stat-title">Notatki</span>
-                </div>
-                <div class="stat-value" id="notesCount">-</div>
-                <div class="stat-label">notatek dodanych</div>
-            </div>
-        </section>
-
         <!-- LOADING STATE -->
         <div id="loadingState" class="loading">
             <div class="spinner"></div>
             <p>Ładowanie danych CRM...</p>
         </div>
 
-        <!-- MODULES SECTION -->
-        <section id="modulesSection" style="display: none;">
-            <div class="section-header">
-                <h2 class="section-title">Moduły CRM</h2>
-                <div class="section-underline"></div>
-                <p class="section-subtitle">
-                    Wybierz moduł, aby rozpocząć pracę. Aktualnie dostępny jest moduł Relacje (zarządzanie firmami i kontaktami).
-                </p>
-            </div>
+        <!-- MAIN DASHBOARD (hidden until loaded) -->
+        <div id="dashboardContent" style="display: none;">
+            
+            <!-- QUICK ACTIONS -->
+            <section class="quick-actions">
+                <button class="quick-action-btn" onclick="openAddContactModal()">
+                    <div class="quick-action-icon">👤</div>
+                    <div class="quick-action-label">Dodaj kontakt</div>
+                </button>
 
-            <div class="modules-grid">
-                <!-- RELATIONSHIPS MODULE -->
-                <div class="module-card" onclick="window.location.href='./modules/relationships.html'">
-                    <div class="module-icon">👥</div>
-                    <div class="module-title">Relacje</div>
-                    <div class="module-description">
-                        Zarządzaj firmami i osobami kontaktowymi. Dodawaj kontakty, śledź historię współpracy i buduj długoterminowe relacje biznesowe.
-                    </div>
-                    <span class="module-badge active">✓ Dostępny</span>
+                <button class="quick-action-btn" onclick="openAddCompanyModal()">
+                    <div class="quick-action-icon">🏢</div>
+                    <div class="quick-action-label">Dodaj firmę</div>
+                </button>
+
+                <button class="quick-action-btn disabled">
+                    <div class="quick-action-icon">💼</div>
+                    <div class="quick-action-label">Dodaj deal</div>
+                    <div class="quick-action-sublabel">Dostępne wkrótce</div>
+                </button>
+            </section>
+
+            <!-- TODAY'S TASKS -->
+            <section class="tasks-section">
+                <div class="section-header">
+                    <h2 class="section-title">Dzisiejsze zadania</h2>
+                    <span class="section-count" id="tasksCount">0</span>
                 </div>
 
-                <!-- PIPELINE MODULE (Coming Soon) -->
-                <div class="module-card disabled">
-                    <div class="module-icon">📈</div>
-                    <div class="module-title">Pipeline</div>
-                    <div class="module-description">
-                        Śledź opportunities i zarządzaj lejkiem sprzedażowym. Prognozuj przychody i monitoruj postępy w realizacji celów.
-                    </div>
-                    <span class="module-badge soon">Wkrótce</span>
-                </div>
-
-                <!-- TASKS MODULE (Coming Soon) -->
-                <div class="module-card disabled">
-                    <div class="module-icon">✅</div>
-                    <div class="module-title">Zadania</div>
-                    <div class="module-description">
-                        Organizuj swoją pracę z kalendarzem spotkań, listą zadań i automatycznymi przypomnieniami o follow-upach.
-                    </div>
-                    <span class="module-badge soon">Wkrótce</span>
-                </div>
-
-                <!-- ANALYTICS MODULE (Coming Soon) -->
-                <div class="module-card disabled">
-                    <div class="module-icon">📊</div>
-                    <div class="module-title">Raporty</div>
-                    <div class="module-description">
-                        Analizuj wyniki sprzedażowe, generuj raporty i monitoruj kluczowe wskaźniki wydajności Twojego biznesu.
-                    </div>
-                    <span class="module-badge soon">Wkrótce</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- ACTIVITY SECTION -->
-        <section id="activitySection" style="display: none;">
-            <div class="section-header">
-                <h2 class="section-title">Ostatnia aktywność</h2>
-                <div class="section-underline"></div>
-                <p class="section-subtitle">
-                    Najnowsze zmiany i notatki w Twoim CRM.
-                </p>
-            </div>
-
-            <div class="activity-section">
-                <div id="activityList" class="activity-list"></div>
+                <div id="tasksList" class="tasks-list"></div>
                 
-                <div id="activityEmpty" class="empty-state" style="display: none;">
-                    <div class="empty-state-icon">📭</div>
-                    <h3>Brak aktywności</h3>
-                    <p>Nie ma jeszcze żadnych wpisów w historii. Zacznij pracę w module Relacje, aby zobaczyć tutaj aktywność.</p>
+                <div id="tasksEmpty" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">✨</div>
+                    <h3>Brak zadań</h3>
+                    <p>Nie masz zaplanowanych zadań na dziś. Świetna robota!</p>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            <!-- MODULES SECTION -->
+            <section class="modules-section">
+                <div class="section-header-simple">
+                    <h2 class="section-title-simple">Moduły CRM</h2>
+                    <div class="section-underline"></div>
+                </div>
+
+                <div class="modules-grid">
+                    <!-- RELATIONSHIPS MODULE -->
+                    <div class="module-card" onclick="window.location.href='./modules/relationships.html'">
+                        <div class="module-icon">👥</div>
+                        <div class="module-title">Relacje</div>
+                        <div class="module-description">
+                            Zarządzaj firmami i osobami kontaktowymi. Dodawaj kontakty i śledź historię współpracy.
+                        </div>
+                        <span class="module-badge active">✓ Dostępny</span>
+                    </div>
+
+                    <!-- PIPELINE MODULE (Coming Soon) -->
+                    <div class="module-card disabled">
+                        <div class="module-icon">📈</div>
+                        <div class="module-title">Pipeline</div>
+                        <div class="module-description">
+                            Śledź opportunities i zarządzaj lejkiem sprzedażowym.
+                        </div>
+                        <span class="module-badge soon">Wkrótce</span>
+                    </div>
+
+                    <!-- TASKS MODULE (Coming Soon) -->
+                    <div class="module-card disabled">
+                        <div class="module-icon">✅</div>
+                        <div class="module-title">Zadania</div>
+                        <div class="module-description">
+                            Organizuj pracę z kalendarzem i automatycznymi przypomnieniami.
+                        </div>
+                        <span class="module-badge soon">Wkrótce</span>
+                    </div>
+
+                    <!-- ANALYTICS MODULE (Coming Soon) -->
+                    <div class="module-card disabled">
+                        <div class="module-icon">📊</div>
+                        <div class="module-title">Raporty</div>
+                        <div class="module-description">
+                            Analizuj wyniki i monitoruj kluczowe wskaźniki wydajności.
+                        </div>
+                        <span class="module-badge soon">Wkrótce</span>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
 
-    <!-- PROFILE MODAL -->
+    <!-- MODAL: PROFILE -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -792,38 +1011,129 @@
         </div>
     </div>
 
+    <!-- MODAL: ADD COMPANY -->
+    <div id="companyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="companyModalTitle">Dodaj firmę</h2>
+                <button class="close-btn" id="closeCompanyModalBtn">&times;</button>
+            </div>
+            <form id="companyForm">
+                <div class="form-group">
+                    <label for="companyName">Nazwa firmy *</label>
+                    <input type="text" id="companyName" required>
+                </div>
+                <div class="form-group">
+                    <label for="companyDomain">Domena <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyDomain" placeholder="np. techcorp.pl">
+                    <p class="form-hint">
+                        💡 Strona WWW zostanie utworzona automatycznie na podstawie domeny.
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label for="companyIndustry">Branża <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyIndustry" placeholder="np. IT, Marketing, Finanse">
+                </div>
+                <div class="form-group">
+                    <label for="companyPhone">Telefon firmowy <span class="optional">(opcjonalnie)</span></label>
+                    <input type="tel" id="companyPhone" placeholder="np. +48 123 456 789">
+                </div>
+                <div class="form-group">
+                    <label for="companyCity">Miasto <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyCity" placeholder="np. Warszawa">
+                </div>
+                <div class="form-group">
+                    <label for="companyCountry">Kraj <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="companyCountry" placeholder="np. Polska">
+                </div>
+                <div class="form-group">
+                    <label for="companyNotes">Notatki <span class="optional">(opcjonalnie)</span></label>
+                    <textarea id="companyNotes" placeholder="Dodatkowe informacje o firmie"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelCompanyBtn">Anuluj</button>
+                    <button type="submit" class="btn btn-primary">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD CONTACT -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="contactModalTitle">Dodaj kontakt</h2>
+                <button class="close-btn" id="closeContactModalBtn">&times;</button>
+            </div>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="contactName">Imię i nazwisko *</label>
+                    <input type="text" id="contactName" required>
+                </div>
+                <div class="form-group">
+                    <label for="contactEmail">Email <span class="optional">(opcjonalnie)</span></label>
+                    <input type="email" id="contactEmail" placeholder="np. jan@techcorp.pl">
+                </div>
+                <div class="form-group">
+                    <label for="contactCompanyInput">Firma <span class="optional">(opcjonalnie)</span></label>
+                    <div class="company-picker">
+                        <input type="text" id="contactCompanyInput" placeholder="Zacznij pisać nazwę firmy...">
+                        <input type="hidden" id="contactCompanyId">
+                        <div id="companySuggestions" class="company-suggestions"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="contactPosition">Stanowisko <span class="optional">(opcjonalnie)</span></label>
+                    <input type="text" id="contactPosition" placeholder="np. CEO, Marketing Manager">
+                </div>
+                <div class="form-group">
+                    <label for="contactPhone">Telefon <span class="optional">(opcjonalnie)</span></label>
+                    <input type="tel" id="contactPhone">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelContactBtn">Anuluj</button>
+                    <button type="submit" class="btn btn-primary">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Google APIs -->
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <!-- Dashboard Logic -->
     <script type="module">
         import { CONFIG } from './shared/config.js';
         import { AuthService } from './shared/auth.js';
         import { DataService } from './shared/data-service.js';
+        import { ActivitiesService } from './shared/activities-service.js';
 
         // ============= AUTH GUARD =============
         if (!AuthService.requireAuth()) {
-            throw new Error('Unauthorized - redirecting to login');
+            throw new Error('Unauthorized');
         }
 
         // ============= VARIABLES =============
-        let allData = null;
+        let allActivities = [];
+        let allCompanies = [];
+        let allContacts = [];
+        let editingCompanyIndex = null;
+        let editingContactIndex = null;
+
+        let companyInputEl = null;
+        let companyIdEl = null;
+        let companySuggestionsEl = null;
 
         // ============= INIT =============
         async function init() {
             try {
-                // Set user email in header
+                // Set user email
                 const email = AuthService.getUserEmail();
                 if (email) {
-                    // Load user preferences
                     await loadUserPreferences(email);
-                    
-                    // Display name or email
                     const displayText = AuthService.getUserDisplayText();
                     document.getElementById('userEmail').textContent = displayText;
                     
-                    // Welcome message
                     const displayName = AuthService.getDisplayName();
                     if (displayName) {
                         document.getElementById('welcomeTitle').textContent = `Witaj, ${displayName}! 👋`;
@@ -832,25 +1142,17 @@
                     }
                 }
 
-                // Set current date
                 setWelcomeDate();
-
-                // Initialize GAPI
                 await initializeGAPI();
-
-                // Load data
                 await loadDashboardData();
-
-                // Show sections
-                showSections();
+                showDashboard();
 
             } catch (error) {
-                console.error('Błąd inicjalizacji dashboard:', error);
-                alert('Wystąpił błąd podczas ładowania danych. Sprawdź konsolę.');
+                console.error('Błąd inicjalizacji:', error);
+                alert('Wystąpił błąd podczas ładowania danych.');
             }
         }
 
-        // ============= GAPI INIT =============
         async function initializeGAPI() {
             return new Promise((resolve, reject) => {
                 if (typeof gapi === 'undefined') {
@@ -864,10 +1166,7 @@
                             apiKey: '',
                             discoveryDocs: CONFIG.API.DISCOVERY_DOCS,
                         });
-
-                        // Set token from session
                         AuthService.setGAPIToken();
-                        console.log('✓ GAPI initialized');
                         resolve();
                     } catch (error) {
                         reject(error);
@@ -876,89 +1175,98 @@
             });
         }
 
-        // ============= DATE =============
         function setWelcomeDate() {
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const dateStr = new Date().toLocaleDateString('pl-PL', options);
             const capitalized = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
             document.getElementById('welcomeDate').textContent = capitalized;
         }
 
-        // ============= LOAD DATA =============
         async function loadDashboardData() {
             try {
-                console.log('📊 Ładowanie danych dashboard...');
-                allData = await DataService.loadAllData();
-                
-                renderStats();
-                renderActivity();
-                
+                [allActivities, allCompanies, allContacts] = await Promise.all([
+                    DataService.loadActivities(),
+                    DataService.loadCompanies(),
+                    DataService.loadContacts()
+                ]);
+
+                renderTodaysTasks();
             } catch (error) {
                 console.error('Błąd ładowania danych:', error);
-                throw error;
             }
         }
 
-        // ============= RENDER STATS =============
-        function renderStats() {
-            const { companies, contacts, companyHistory, contactHistory } = allData;
+        function renderTodaysTasks() {
+            const today = new Date().toISOString().split('T')[0];
+            const todaysTasks = allActivities.filter(a => {
+                if (a.status !== 'planned') return false;
+                const taskDate = a.date ? a.date.split('T')[0] : '';
+                return taskDate === today;
+            });
 
-            // Count notes (type === 'note')
-            const notesCount = 
-                [...companyHistory, ...contactHistory].filter(h => h.type === 'note').length;
+            const tasksList = document.getElementById('tasksList');
+            const tasksEmpty = document.getElementById('tasksEmpty');
+            const tasksCount = document.getElementById('tasksCount');
 
-            document.getElementById('companiesCount').textContent = companies.length;
-            document.getElementById('contactsCount').textContent = contacts.length;
-            document.getElementById('notesCount').textContent = notesCount;
-        }
+            tasksCount.textContent = todaysTasks.length;
 
-        // ============= RENDER ACTIVITY =============
-        function renderActivity() {
-            const { companies, contacts, companyHistory, contactHistory } = allData;
-            const activityList = document.getElementById('activityList');
-            const activityEmpty = document.getElementById('activityEmpty');
-
-            // Combine all history entries
-            const allHistory = [
-                ...companyHistory.map(h => ({ ...h, entity: 'company' })),
-                ...contactHistory.map(h => ({ ...h, entity: 'contact' }))
-            ];
-
-            // Sort by timestamp (newest first)
-            allHistory.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-
-            // Take last 10
-            const recentActivity = allHistory.slice(0, 10);
-
-            if (recentActivity.length === 0) {
-                activityList.innerHTML = '';
-                activityEmpty.style.display = 'block';
+            if (todaysTasks.length === 0) {
+                tasksList.innerHTML = '';
+                tasksEmpty.style.display = 'block';
                 return;
             }
 
-            activityEmpty.style.display = 'none';
-            activityList.innerHTML = recentActivity.map(entry => {
-                const icon = entry.type === 'note' ? '📝' : '⚡';
-                const entityName = getEntityName(entry);
-                const text = entry.content || '';
-                const timeAgo = getTimeAgo(entry.timestamp);
+            tasksEmpty.style.display = 'none';
+
+            // Sort by time
+            todaysTasks.sort((a, b) => a.date.localeCompare(b.date));
+
+            tasksList.innerHTML = todaysTasks.map(task => {
+                const formatted = ActivitiesService.formatActivity(task);
+                const company = allCompanies.find(c => c.id === task.companyId);
+                const contact = allContacts.find(c => c.id === task.contactId);
+
+                const time = new Date(task.date).toLocaleTimeString('pl-PL', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
 
                 return `
-                    <div class="activity-item">
-                        <div class="activity-icon">${icon}</div>
-                        <div class="activity-content">
-                            <div class="activity-text">
-                                ${entry.type === 'note' ? 'Notatka' : 'Zdarzenie'} 
-                                ${entityName ? `dla <strong>${escapeHtml(entityName)}</strong>` : ''}: 
-                                ${escapeHtml(text.substring(0, 100))}${text.length > 100 ? '...' : ''}
+                    <div class="task-item ${task.type.toLowerCase()}" onclick="openTask('${task.id}')">
+                        <div class="task-icon">${formatted.typeIcon}</div>
+                        <div class="task-content">
+                            <div class="task-header">
+                                <span class="task-type ${task.type.toLowerCase()}">${formatted.typeLabel}</span>
+                                <span class="task-title">${escapeHtml(task.title)}</span>
                             </div>
-                            <div class="activity-meta">
-                                ${timeAgo}${entry.user ? ' • ' + escapeHtml(formatUserName(entry.user)) : ''}
+                            <div class="task-meta">
+                                <div class="task-meta-item">
+                                    <span>🕐</span>
+                                    <span class="task-time">${time}</span>
+                                </div>
+                                ${company ? `
+                                    <div class="task-meta-item">
+                                        <span>🏢</span>
+                                        <span>${escapeHtml(company.name)}</span>
+                                    </div>
+                                ` : ''}
+                                ${contact ? `
+                                    <div class="task-meta-item">
+                                        <span>👤</span>
+                                        <span>${escapeHtml(contact.name)}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            ${task.notes ? `
+                                <div class="task-notes">${escapeHtml(task.notes)}</div>
+                            ` : ''}
+                            <div class="task-actions">
+                                <button class="task-action-btn primary" onclick="event.stopPropagation(); completeTask('${task.id}')">
+                                    ✓ Ukończ
+                                </button>
+                                <button class="task-action-btn" onclick="event.stopPropagation(); viewInRelationships('${task.companyId || task.contactId}', '${task.companyId ? 'company' : 'contact'}')">
+                                    👁️ Zobacz
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -966,74 +1274,231 @@
             }).join('');
         }
 
-        // ============= HELPERS =============
-        function getEntityName(entry) {
-            if (entry.entity === 'company') {
-                const company = allData.companies.find(c => c.id === entry.companyId);
-                return company ? company.name : null;
-            } else if (entry.entity === 'contact') {
-                const contact = allData.contacts.find(c => c.id === entry.contactId);
-                return contact ? contact.name : null;
+        function openTask(taskId) {
+            const task = allActivities.find(a => a.id === taskId);
+            if (!task) return;
+
+            // Redirect to relationships with task context
+            if (task.companyId) {
+                window.location.href = `./modules/relationships.html?company=${task.companyId}`;
+            } else if (task.contactId) {
+                window.location.href = `./modules/relationships.html?contact=${task.contactId}`;
             }
-            return null;
         }
 
-        /**
-         * Konwertuje email na display name jeśli to jest aktualny użytkownik
-         */
-        function formatUserName(userName) {
-            if (!userName) return '';
-            
-            const currentEmail = AuthService.getUserEmail();
-            const displayName = AuthService.getDisplayName();
-            
-            // Jeśli userName to email aktualnego użytkownika i mamy display name
-            if (userName === currentEmail && displayName) {
-                return displayName;
+        async function completeTask(taskId) {
+            try {
+                await ActivitiesService.completeActivity(taskId);
+                showStatus('Zadanie ukończone!', 'success');
+                
+                // Reload activities
+                allActivities = await DataService.loadActivities();
+                renderTodaysTasks();
+            } catch (error) {
+                console.error('Błąd:', error);
+                showStatus('Błąd: ' + error.message, 'error');
             }
-            
-            // Jeśli userName to email aktualnego użytkownika ale nie ma display name
-            if (userName === currentEmail) {
-                return currentEmail.split('@')[0];
+        }
+
+        function viewInRelationships(id, type) {
+            if (type === 'company') {
+                window.location.href = `./modules/relationships.html?company=${id}`;
+            } else {
+                window.location.href = `./modules/relationships.html?contact=${id}`;
             }
-            
-            // Dla innych użytkowników - zwróć jak jest (może być email lub już display name)
-            return userName;
         }
 
-        function getTimeAgo(isoString) {
-            if (!isoString) return '';
-            const date = new Date(isoString);
-            if (isNaN(date.getTime())) return isoString;
-
-            const now = Date.now();
-            const diff = now - date.getTime();
-            const minutes = Math.floor(diff / 60000);
-            const hours = Math.floor(diff / 3600000);
-            const days = Math.floor(diff / 86400000);
-
-            if (minutes < 1) return 'Przed chwilą';
-            if (minutes < 60) return `${minutes} min temu`;
-            if (hours < 24) return `${hours}h temu`;
-            if (days < 7) return `${days} dni temu`;
-            
-            return date.toLocaleDateString('pl-PL', { 
-                day: 'numeric', 
-                month: 'short' 
-            });
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text == null ? '' : text;
-            return div.innerHTML;
-        }
-
-        function showSections() {
+        function showDashboard() {
             document.getElementById('loadingState').style.display = 'none';
-            document.getElementById('statsSection').style.display = 'grid';
-            document.getElementById('modulesSection').style.display = 'block';
-            document.getElementById('activitySection').style.display = 'block';
+            document.getElementById('dashboardContent').style.display = 'block';
+        }
+
+        // ============= COMPANY MODAL =============
+        window.openAddCompanyModal = function() {
+            editingCompanyIndex = null;
+            document.getElementById('companyModalTitle').textContent = 'Dodaj firmę';
+            document.getElementById('companyForm').reset();
+            document.getElementById('companyModal').classList.add('active');
+        };
+
+        function closeCompanyModal() {
+            document.getElementById('companyModal').classList.remove('active');
+            document.getElementById('companyForm').reset();
+            editingCompanyIndex = null;
+        }
+
+        async function saveCompany(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('companyName').value.trim();
+            const domain = document.getElementById('companyDomain').value.trim();
+            const phone = document.getElementById('companyPhone').value.trim();
+            const industry = document.getElementById('companyIndustry').value.trim();
+            const city = document.getElementById('companyCity').value.trim();
+            const country = document.getElementById('companyCountry').value.trim();
+            const notes = document.getElementById('companyNotes').value.trim();
+            
+            let website = domain ? (domain.startsWith('http') ? domain : `https://${domain}`) : '';
+
+            const company = {
+                id: editingCompanyIndex !== null ? allCompanies[editingCompanyIndex].id : DataService.generateId(),
+                name, industry, website, phone, city, country, domain, notes,
+                tags: ''
+            };
+
+            try {
+                await DataService.saveCompany(company, editingCompanyIndex);
+                
+                if (editingCompanyIndex !== null) {
+                    allCompanies[editingCompanyIndex] = company;
+                    await DataService.logCompanyHistory(company.id, 'event', 'Firma zaktualizowana');
+                    showStatus('Firma zaktualizowana', 'success');
+                } else {
+                    allCompanies.push(company);
+                    await DataService.logCompanyHistory(company.id, 'event', 'Firma utworzona');
+                    showStatus('Firma dodana', 'success');
+                }
+
+                closeCompanyModal();
+            } catch (err) {
+                console.error('Błąd zapisu firmy:', err);
+                showStatus('Błąd zapisu firmy', 'error');
+            }
+        }
+
+        // ============= CONTACT MODAL =============
+        window.openAddContactModal = function() {
+            editingContactIndex = null;
+            document.getElementById('contactModalTitle').textContent = 'Dodaj kontakt';
+            document.getElementById('contactForm').reset();
+            hideCompanySuggestions();
+            document.getElementById('contactModal').classList.add('active');
+        };
+
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.remove('active');
+            document.getElementById('contactForm').reset();
+            hideCompanySuggestions();
+            editingContactIndex = null;
+        }
+
+        async function saveContact(e) {
+            e.preventDefault();
+            
+            const typedCompanyName = (companyInputEl?.value || '').trim();
+            let selectedCompanyId = companyIdEl?.value || '';
+            
+            const name = document.getElementById('contactName').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const phone = document.getElementById('contactPhone').value.trim();
+            const position = document.getElementById('contactPosition').value.trim();
+
+            // Auto-match by domain
+            if (!typedCompanyName && !selectedCompanyId && email) {
+                const domain = DataService.extractDomain(email);
+                const matchedCompany = DataService.findCompanyByDomain(allCompanies, domain);
+                if (matchedCompany) {
+                    selectedCompanyId = matchedCompany.id;
+                    companyInputEl.value = matchedCompany.name;
+                    showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
+                }
+            }
+
+            try {
+                // Create company on the fly if needed
+                if (typedCompanyName && !selectedCompanyId) {
+                    const existing = allCompanies.find(c => c.name && c.name.toLowerCase() === typedCompanyName.toLowerCase());
+                    if (existing) {
+                        selectedCompanyId = existing.id;
+                    } else {
+                        let newDomain = '';
+                        let newWebsite = '';
+                        
+                        if (email && email.includes('@')) {
+                            const extracted = DataService.extractDomain(email);
+                            const publicDomains = ['gmail.com', 'wp.pl', 'onet.pl', 'interia.pl', 'outlook.com', 'yahoo.com'];
+                            if (!publicDomains.includes(extracted)) {
+                                newDomain = extracted;
+                                newWebsite = `https://${extracted}`;
+                            }
+                        }
+
+                        const newCompany = {
+                            id: DataService.generateId(),
+                            name: typedCompanyName,
+                            industry: '', notes: '', phone: '', city: '', country: '', 
+                            domain: newDomain, 
+                            website: newWebsite,
+                            tags: ''
+                        };
+                        
+                        await DataService.saveCompany(newCompany);
+                        allCompanies.push(newCompany);
+                        selectedCompanyId = newCompany.id;
+                        await DataService.logCompanyHistory(newCompany.id, 'event', 'Firma utworzona (z poziomu kontaktu)');
+                        showStatus(`Utworzono nową firmę "${newCompany.name}"`, 'success');
+                    }
+                }
+
+                const contact = {
+                    id: editingContactIndex !== null ? allContacts[editingContactIndex].id : DataService.generateId(),
+                    companyId: selectedCompanyId || '',
+                    name, position, email, phone,
+                    tags: ''
+                };
+
+                await DataService.saveContact(contact, editingContactIndex);
+
+                if (editingContactIndex !== null) {
+                    allContacts[editingContactIndex] = contact;
+                    await DataService.logContactHistory(contact.id, 'event', 'Kontakt zaktualizowany');
+                    showStatus('Kontakt zaktualizowany', 'success');
+                } else {
+                    allContacts.push(contact);
+                    await DataService.logContactHistory(contact.id, 'event', 'Kontakt utworzony');
+                    if (contact.companyId) await DataService.logCompanyHistory(contact.companyId, 'event', `Kontakt "${contact.name}" powiązany z firmą`);
+                    showStatus('Kontakt dodany', 'success');
+                }
+
+                closeContactModal();
+            } catch (err) {
+                console.error('Błąd zapisu kontaktu:', err);
+                showStatus('Błąd zapisu kontaktu', 'error');
+            }
+        }
+
+        // ============= COMPANY PICKER =============
+        function showCompanySuggestions(query) {
+            if (!companySuggestionsEl || !companyInputEl) return;
+            const q = (query || '').trim().toLowerCase();
+            let filtered = q ? allCompanies.filter(c => (c.name || '').toLowerCase().includes(q)) : allCompanies;
+
+            let html = '';
+            filtered.slice(0, 8).forEach(c => {
+                const meta = [c.industry, c.city].filter(Boolean).join(' • ');
+                html += `<div class="company-suggestion-item" data-id="${c.id}"><span>${escapeHtml(c.name)}</span>${meta ? `<span class="suggestion-meta">${escapeHtml(meta)}</span>` : ''}</div>`;
+            });
+
+            const exactExists = allCompanies.some(c => c.name && c.name.toLowerCase() === q && q.length > 0);
+            if (q && !exactExists) {
+                html += `<div class="company-suggestion-item company-suggestion-new"><span>➕ Utwórz nową firmę "<strong>${escapeHtml(query.trim())}</strong>"</span></div>`;
+            }
+
+            if (!html) {
+                companySuggestionsEl.innerHTML = '';
+                companySuggestionsEl.classList.remove('visible');
+                return;
+            }
+
+            companySuggestionsEl.innerHTML = html;
+            companySuggestionsEl.classList.add('visible');
+        }
+
+        function hideCompanySuggestions() {
+            if (companySuggestionsEl) {
+                companySuggestionsEl.classList.remove('visible');
+                companySuggestionsEl.innerHTML = '';
+            }
         }
 
         // ============= USER PREFERENCES =============
@@ -1046,7 +1511,6 @@
                 }
             } catch (error) {
                 console.warn('Nie udało się załadować preferencji użytkownika:', error);
-                // Nie blokuj działania aplikacji
             }
         }
 
@@ -1080,13 +1544,9 @@
             }
             
             try {
-                // Save to Google Sheets
                 await DataService.saveUserPreferences(email, displayName);
-                
-                // Save to localStorage
                 AuthService.saveDisplayName(displayName);
                 
-                // Update UI
                 const displayText = AuthService.getUserDisplayText();
                 document.getElementById('userEmail').textContent = displayText;
                 
@@ -1096,65 +1556,125 @@
                     document.getElementById('welcomeTitle').textContent = `Witaj, ${email.split('@')[0]}! 👋`;
                 }
                 
-                // Show success message
-                showStatus('✓ Profil zaktualizowany!');
-                
+                showStatus('✓ Profil zaktualizowany!', 'success');
                 closeProfileModal();
             } catch (error) {
                 console.error('Błąd zapisu profilu:', error);
-                alert('Wystąpił błąd podczas zapisu profilu. Sprawdź konsolę.');
+                alert('Wystąpił błąd podczas zapisu profilu.');
             }
         }
 
-        function showStatus(message) {
-            const statusDiv = document.createElement('div');
-            statusDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #111827;
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                z-index: 10000;
-                font-family: 'Outfit', sans-serif;
-                font-size: 0.85rem;
-                font-weight: 600;
-                letter-spacing: 0.05em;
-            `;
-            statusDiv.textContent = message;
-            document.body.appendChild(statusDiv);
-            
-            setTimeout(() => {
-                statusDiv.style.opacity = '0';
-                statusDiv.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => statusDiv.remove(), 300);
-            }, 2500);
+        // ============= HELPERS =============
+        function showStatus(message, type) {
+            const msg = document.createElement('div');
+            msg.className = 'status-message' + (type ? ' ' + type : '');
+            msg.textContent = message;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 3200);
         }
 
-        // ============= LOGOUT =============
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if (confirm('Czy na pewno chcesz się wylogować?')) {
-                AuthService.logout();
-            }
-        });
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text == null ? '' : text;
+            return div.innerHTML;
+        }
 
-        // ============= PROFILE =============
-        document.getElementById('profileBtn').addEventListener('click', openProfileModal);
-        document.getElementById('closeProfileBtn').addEventListener('click', closeProfileModal);
-        document.getElementById('cancelProfileBtn').addEventListener('click', closeProfileModal);
-        document.getElementById('profileForm').addEventListener('submit', saveProfile);
+        // ============= EVENT LISTENERS =============
+        document.addEventListener('DOMContentLoaded', () => {
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                if (confirm('Czy na pewno chcesz się wylogować?')) {
+                    AuthService.logout();
+                }
+            });
 
-        // Close modal on background click
-        document.getElementById('profileModal').addEventListener('click', (e) => {
-            if (e.target.id === 'profileModal') {
-                closeProfileModal();
+            // Profile
+            document.getElementById('profileBtn').addEventListener('click', openProfileModal);
+            document.getElementById('closeProfileBtn').addEventListener('click', closeProfileModal);
+            document.getElementById('cancelProfileBtn').addEventListener('click', closeProfileModal);
+            document.getElementById('profileForm').addEventListener('submit', saveProfile);
+
+            // Company modal
+            document.getElementById('closeCompanyModalBtn').addEventListener('click', closeCompanyModal);
+            document.getElementById('cancelCompanyBtn').addEventListener('click', closeCompanyModal);
+            document.getElementById('companyForm').addEventListener('submit', saveCompany);
+
+            // Contact modal
+            document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
+            document.getElementById('cancelContactBtn').addEventListener('click', closeContactModal);
+            document.getElementById('contactForm').addEventListener('submit', saveContact);
+
+            // Company picker
+            companyInputEl = document.getElementById('contactCompanyInput');
+            companyIdEl = document.getElementById('contactCompanyId');
+            companySuggestionsEl = document.getElementById('companySuggestions');
+
+            if (companyInputEl) {
+                const onInput = () => {
+                    companyIdEl.value = '';
+                    showCompanySuggestions(companyInputEl.value);
+                };
+                companyInputEl.addEventListener('input', onInput);
+                companyInputEl.addEventListener('focus', onInput);
             }
+
+            if (companySuggestionsEl) {
+                companySuggestionsEl.addEventListener('click', (e) => {
+                    const item = e.target.closest('.company-suggestion-item');
+                    if (!item) return;
+                    if (item.dataset.id) {
+                        const company = allCompanies.find(c => c.id === item.dataset.id);
+                        if (company) {
+                            companyInputEl.value = company.name;
+                            companyIdEl.value = company.id;
+                        }
+                    }
+                    hideCompanySuggestions();
+                });
+            }
+
+            // Auto-match company by email domain
+            const contactEmailEl = document.getElementById('contactEmail');
+            if (contactEmailEl && companyInputEl && companyIdEl) {
+                contactEmailEl.addEventListener('blur', () => {
+                    const email = contactEmailEl.value.trim();
+                    if (!email || !email.includes('@')) return;
+                    if (companyInputEl.value.trim() || companyIdEl.value) return;
+                    const domain = DataService.extractDomain(email);
+                    const matchedCompany = DataService.findCompanyByDomain(allCompanies, domain);
+                    if (matchedCompany) {
+                        companyInputEl.value = matchedCompany.name;
+                        companyIdEl.value = matchedCompany.id;
+                        showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
+                    }
+                });
+            }
+
+            // Close modals on background click
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.classList.remove('active');
+                });
+            });
+
+            // Hide company suggestions when clicking outside
+            document.addEventListener('click', (e) => {
+                if (companyInputEl && companyInputEl.closest('.company-picker') && companySuggestionsEl) {
+                    if (!companyInputEl.closest('.company-picker').contains(e.target)) {
+                        hideCompanySuggestions();
+                    }
+                }
+            });
+
+            // Close profile modal on background click
+            document.getElementById('profileModal').addEventListener('click', (e) => {
+                if (e.target.id === 'profileModal') {
+                    closeProfileModal();
+                }
+            });
         });
 
         // ============= START =============
-        // Wait for GAPI to load
         if (typeof gapi !== 'undefined') {
             init();
         } else {
