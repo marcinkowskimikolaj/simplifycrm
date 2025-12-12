@@ -2892,14 +2892,19 @@ function editCompany(index) {
             document.getElementById('companyModalTitle').textContent = 'Edytuj firmę';
             document.getElementById('companyName').value = company.name;
             document.getElementById('companyIndustry').value = company.industry || '';
-            // USUNIĘTO: companyWebsite - pole nie istnieje w formularzu
+            
+            // Obsługa pola Website (jeśli istnieje w HTML)
+            if(document.getElementById('companyWebsite')) {
+                document.getElementById('companyWebsite').value = company.website || '';
+            }
+            
             document.getElementById('companyPhone').value = company.phone || '';
             document.getElementById('companyCity').value = company.city || '';
             document.getElementById('companyCountry').value = company.country || '';
             document.getElementById('companyDomain').value = company.domain || '';
             document.getElementById('companyNotes').value = company.notes || '';
             
-            // Render tags selector if function exists
+            // Tagi - ważne dla zachowania danych
             if (typeof renderTagSelector === 'function') {
                 renderTagSelector('companyTagsSelector', 'company', company.tags || '');
             }
@@ -2924,13 +2929,10 @@ async function saveCompany(e) {
             const country = document.getElementById('companyCountry').value.trim();
             const notes = document.getElementById('companyNotes').value.trim();
             
-            // 2. Automatyczne generowanie WWW z domeny
-            let website = '';
-            if (domain) {
+            // 2. Obsługa WWW (Pobierz z inputa lub wygeneruj z domeny)
+            let website = document.getElementById('companyWebsite') ? document.getElementById('companyWebsite').value.trim() : '';
+            if (!website && domain) {
                 website = domain.startsWith('http') ? domain : `https://${domain}`;
-            } else if (editingCompanyIndex !== null) {
-                // Przy edycji: jeśli nie wpisano nowej domeny, zachowaj stare WWW (zabezpieczenie)
-                website = companies[editingCompanyIndex].website || '';
             }
 
             // === DEDUPLIKACJA START ===
@@ -2948,11 +2950,11 @@ async function saveCompany(e) {
                 const duplicate = companies.find(c => {
                     if (c.id === currentId) return false;
                     
-                    // A. Nazwa
+                    // A. Nazwa (inteligentne dopasowanie)
                     const storedCleanName = cleanName(c.name);
                     const matchName = inputCleanName && storedCleanName && inputCleanName === storedCleanName;
 
-                    // B. WWW / Domena
+                    // B. WWW / Domena (krzyżowe sprawdzanie)
                     const storedWeb = cleanUrl(c.website);
                     const storedDomain = cleanUrl(c.domain);
                     const matchWeb = (inputCleanWeb && (inputCleanWeb === storedWeb || inputCleanWeb === storedDomain)) ||
@@ -2990,13 +2992,13 @@ async function saveCompany(e) {
                         modal.classList.remove('active'); 
                         window.skipDuplicateCheck = false; 
                     };
-                    return; 
+                    return; // STOP
                 }
             }
             window.skipDuplicateCheck = false;
             // === DEDUPLIKACJA KONIEC ===
 
-            // Pobierz tagi (jeśli funkcja dostępna)
+            // Pobierz tagi (Logic from your latest file)
             let tagsIds = '';
             if (typeof getSelectedTagsFromSelector === 'function') {
                 tagsIds = getSelectedTagsFromSelector('companyTagsSelector');
@@ -3114,7 +3116,56 @@ async function saveCompany(e) {
             e.preventDefault();
             const typedCompanyName = (companyInputEl?.value || '').trim();
             let selectedCompanyId = companyIdEl?.value || '';
-            const email = document.getElementById('contactEmail').value;
+            
+            const name = document.getElementById('contactName').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const phone = document.getElementById('contactPhone').value.trim();
+            const position = document.getElementById('contactPosition').value.trim();
+
+            // === DEDUPLIKACJA START ===
+            if (!window.skipDuplicateCheck) {
+                const currentId = editingContactIndex !== null ? contacts[editingContactIndex].id : null;
+                const duplicate = contacts.find(c => {
+                    if (c.id === currentId) return false;
+                    
+                    const matchName = name && c.name && c.name.toLowerCase() === name.toLowerCase();
+                    const matchEmail = email && c.email && c.email.toLowerCase() === email.toLowerCase();
+                    const clean = (p) => (p || '').replace(/[\s-]/g, '');
+                    const matchPhone = phone && c.phone && clean(phone) === clean(c.phone);
+                    
+                    return matchName || matchEmail || matchPhone;
+                });
+
+                if (duplicate) {
+                    const modal = document.getElementById('duplicateModal');
+                    const content = document.getElementById('duplicateContent');
+                    const saveAnywayBtn = document.getElementById('saveAnywayBtn');
+                    const backBtn = document.getElementById('backToEditBtn');
+
+                    content.innerHTML = `
+                        <div>Znaleziono kontakt o podobnych danych:</div>
+                        <div style="background:rgba(15,23,42,0.05); padding:12px; border-radius:8px; margin-top:10px; border:1px solid var(--border-subtle);">
+                            <div style="font-size:1.1em; font-weight:600;">${escapeHtml(duplicate.name)}</div>
+                            ${duplicate.email ? `<div>📧 ${escapeHtml(duplicate.email)}</div>` : ''}
+                            ${duplicate.phone ? `<div>📱 ${escapeHtml(duplicate.phone)}</div>` : ''}
+                        </div>
+                        <div style="margin-top:15px; font-size:0.9rem;">Czy na pewno chcesz utworzyć ten kontakt?</div>
+                    `;
+                    modal.classList.add('active');
+                    saveAnywayBtn.onclick = () => {
+                        window.skipDuplicateCheck = true;
+                        modal.classList.remove('active');
+                        document.getElementById('contactForm').requestSubmit(); 
+                    };
+                    backBtn.onclick = () => {
+                        modal.classList.remove('active');
+                        window.skipDuplicateCheck = false;
+                    };
+                    return; // STOP
+                }
+            }
+            window.skipDuplicateCheck = false;
+            // === DEDUPLIKACJA KONIEC ===
 
             // Auto-match by domain
             if (!typedCompanyName && !selectedCompanyId && email) {
@@ -3122,37 +3173,62 @@ async function saveCompany(e) {
                 const matchedCompany = DataService.findCompanyByDomain(companies, domain);
                 if (matchedCompany) {
                     selectedCompanyId = matchedCompany.id;
+                    companyInputEl.value = matchedCompany.name;
                     showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
                 }
             }
 
             try {
+                // LOGIKA TWORZENIA FIRMY "W LOCIE"
                 if (typedCompanyName && !selectedCompanyId) {
                     const existing = companies.find(c => c.name && c.name.toLowerCase() === typedCompanyName.toLowerCase());
                     if (existing) {
                         selectedCompanyId = existing.id;
                     } else {
+                        let newDomain = '';
+                        let newWebsite = '';
+                        
+                        if (email && email.includes('@')) {
+                            const extracted = DataService.extractDomain(email);
+                            const publicDomains = ['gmail.com', 'wp.pl', 'onet.pl', 'interia.pl', 'outlook.com', 'yahoo.com'];
+                            if (!publicDomains.includes(extracted)) {
+                                newDomain = extracted;
+                                newWebsite = `https://${extracted}`;
+                            }
+                        }
+
                         const newCompany = {
                             id: DataService.generateId(),
                             name: typedCompanyName,
-                            industry: '', notes: '', website: '', phone: '', city: '', country: '', domain: ''
+                            industry: '', notes: '', phone: '', city: '', country: '', 
+                            domain: newDomain, 
+                            website: newWebsite,
+                            tags: ''
                         };
+                        
                         await DataService.saveCompany(newCompany);
                         companies.push(newCompany);
                         selectedCompanyId = newCompany.id;
                         await DataService.logCompanyHistory(newCompany.id, 'event', 'Firma utworzona (z poziomu kontaktu)');
+                        await loadCompanyHistory(); // Odśwież dane
                         showStatus(`Utworzono nową firmę "${newCompany.name}"`, 'success');
                         renderCompanies();
                     }
                 }
 
+                // Pobierz tagi (Logic from your latest file)
+                let tagsIds = '';
+                if (typeof getSelectedTagsFromSelector === 'function') {
+                    tagsIds = getSelectedTagsFromSelector('contactTagsSelector');
+                } else if (editingContactIndex !== null) {
+                    tagsIds = contacts[editingContactIndex].tags || '';
+                }
+
                 const contact = {
                     id: editingContactIndex !== null ? contacts[editingContactIndex].id : DataService.generateId(),
                     companyId: selectedCompanyId || '',
-                    name: document.getElementById('contactName').value,
-                    position: document.getElementById('contactPosition').value,
-                    email: document.getElementById('contactEmail').value,
-                    phone: document.getElementById('contactPhone').value
+                    name, position, email, phone,
+                    tags: tagsIds
                 };
 
                 await DataService.saveContact(contact, editingContactIndex);
