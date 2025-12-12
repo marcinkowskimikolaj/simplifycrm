@@ -1668,7 +1668,159 @@
             padding-top: 0.8rem;
             border-top: 1px solid var(--border-subtle);
         }
+/* ============= ACTIVITIES STYLES ============= */
+        
+        /* ACTIVITY TYPE SELECTOR */
+        .activity-type-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+        }
 
+        .activity-type-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.8rem;
+            border: 2px solid var(--border-subtle);
+            border-radius: 12px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .activity-type-btn:hover {
+            border-color: var(--border-strong);
+            background: rgba(15,23,42,0.02);
+        }
+
+        .activity-type-btn.active {
+            border-color: var(--text-primary);
+            background: rgba(15,23,42,0.04);
+        }
+
+        .activity-type-btn .type-icon {
+            font-size: 1.5rem;
+        }
+
+        .activity-type-btn .type-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* ACTIVITY ITEM */
+        .activity-item {
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            border-left-width: 3px;
+            padding: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .activity-item:hover {
+            box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+            transform: translateY(-1px);
+        }
+
+        .activity-item-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .activity-item-icon {
+            font-size: 1.2rem;
+        }
+
+        .activity-item-type {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--text-secondary);
+        }
+
+        .activity-item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .activity-item-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .activity-item-notes {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            margin-bottom: 0.8rem;
+        }
+
+        .activity-item-actions {
+            display: flex;
+            gap: 0.4rem;
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .activity-item-actions button {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .activity-item-actions button:hover {
+            background: rgba(15,23,42,0.04);
+            border-color: var(--border-strong);
+        }
+
+        .activity-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-left: auto;
+        }
+
+        .activity-status.planned {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .activity-status.completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .activity-status.cancelled {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
 </style>
 </head>
 <body>
@@ -1817,8 +1969,13 @@
                             <div class="history-controls">
                                 <div class="history-tabs">
                                     <button class="history-tab-btn active" data-entity="contact" data-scope="notes">Notatki</button>
+                                    <button class="history-tab-btn" data-entity="contact" data-scope="activities">Aktywności</button>
                                     <button class="history-tab-btn" data-entity="contact" data-scope="full">Full stream</button>
                                 </div>
+                                <button id="addContactActivityBtn" class="add-btn history-add-btn">
+                                    <span class="plus">+</span>
+                                    <span>Dodaj aktywność</span>
+                                </button>
                                 <button id="addContactNoteBtn" class="add-btn history-add-btn">
                                     <span class="plus">+</span>
                                     <span>Dodaj notatkę</span>
@@ -1949,8 +2106,13 @@
                             <div class="history-controls">
                                 <div class="history-tabs">
                                     <button class="history-tab-btn active" data-entity="company" data-scope="notes">Notatki</button>
+                                    <button class="history-tab-btn" data-entity="company" data-scope="activities">Aktywności</button>
                                     <button class="history-tab-btn" data-entity="company" data-scope="full">Full stream</button>
                                 </div>
+                                <button id="addCompanyActivityBtn" class="add-btn history-add-btn">
+                                    <span class="plus">+</span>
+                                    <span>Dodaj aktywność</span>
+                                </button>
                                 <button id="addCompanyNoteBtn" class="add-btn history-add-btn">
                                     <span class="plus">+</span>
                                     <span>Dodaj notatkę</span>
@@ -2106,6 +2268,7 @@
         import { CONFIG } from '../shared/config.js';
         import { AuthService } from '../shared/auth.js';
         import { DataService } from '../shared/data-service.js';
+        import { ActivitiesService } from '../shared/activities-service.js';
 
         // ============= AUTH GUARD =============
         if (!AuthService.requireAuth()) {
@@ -2120,6 +2283,9 @@
         let contactTagRelations = [];
         let currentTagFilter = null;
         let currentTagType = 'companies';
+        let companyActivities = [];
+        let contactActivities = [];
+        let currentActivityType = 'EMAIL';
 
         let companies = [];
         let contacts = [];
@@ -2217,7 +2383,11 @@
 
                 // STEP 2: Load tags and history
                 await loadTagsData();
-                await Promise.all([loadCompanyHistory(), loadContactHistory()]);
+                await Promise.all([
+                    loadCompanyHistory(), 
+                    loadContactHistory(),
+                    loadActivitiesData()
+                ]);
 
                 // STEP 3: NOW render everything (all data is available)
                 renderCompanies();
@@ -3178,6 +3348,244 @@
             return userName;
         }
 
+// ============= ACTIVITIES =============
+
+        async function loadActivitiesData() {
+            try {
+                companyActivities = await DataService.loadActivities();
+                contactActivities = companyActivities;
+                console.log('✓ Aktywności załadowane:', companyActivities.length);
+            } catch (error) {
+                console.warn('Nie udało się załadować aktywności:', error);
+                companyActivities = [];
+                contactActivities = [];
+            }
+        }
+
+        function openActivityModal(entityType, entityId) {
+            if (!entityId) {
+                showStatus('Najpierw wybierz rekord', 'error');
+                return;
+            }
+            
+            document.getElementById('activityEntityType').value = entityType;
+            document.getElementById('activityEntityId').value = entityId;
+            document.getElementById('activityType').value = 'EMAIL';
+            currentActivityType = 'EMAIL';
+            
+            // Reset form
+            document.getElementById('activityForm').reset();
+            document.getElementById('activityTitle').value = '';
+            document.getElementById('activityNotes').value = '';
+            
+            // Set default date (now)
+            const now = new Date();
+            const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
+            document.getElementById('activityDate').value = localDateTime;
+            
+            // Show/hide contact selector
+            const contactSelectorGroup = document.getElementById('activityContactSelectorGroup');
+            if (entityType === 'company') {
+                const companyContacts = contacts.filter(c => c.companyId === entityId);
+                const select = document.getElementById('activityContactSelect');
+                select.innerHTML = '<option value="">Tylko firma</option>' +
+                    companyContacts.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                contactSelectorGroup.style.display = 'block';
+            } else {
+                contactSelectorGroup.style.display = 'none';
+            }
+            
+            document.getElementById('activityModal').classList.add('active');
+            document.getElementById('activityTitle').focus();
+        }
+
+        function closeActivityModal() {
+            document.getElementById('activityModal').classList.remove('active');
+            document.getElementById('activityForm').reset();
+        }
+
+        async function saveActivity(e) {
+            e.preventDefault();
+            
+            const entityType = document.getElementById('activityEntityType').value;
+            const entityId = document.getElementById('activityEntityId').value;
+            const type = currentActivityType;
+            const title = document.getElementById('activityTitle').value;
+            const date = document.getElementById('activityDate').value;
+            const notes = document.getElementById('activityNotes').value;
+            
+            let companyId = '';
+            let contactId = '';
+            
+            if (entityType === 'company') {
+                companyId = entityId;
+                const selectedContactId = document.getElementById('activityContactSelect').value;
+                if (selectedContactId) {
+                    contactId = selectedContactId;
+                }
+            } else if (entityType === 'contact') {
+                contactId = entityId;
+                const contact = contacts.find(c => c.id === contactId);
+                if (contact && contact.companyId) {
+                    companyId = contact.companyId;
+                }
+            }
+            
+            try {
+                await ActivitiesService.createActivity({
+                    type,
+                    title,
+                    date: new Date(date).toISOString(),
+                    notes,
+                    companyId,
+                    contactId,
+                    status: 'planned'
+                });
+                
+                showStatus('Aktywność dodana', 'success');
+                
+                await loadActivitiesData();
+                
+                if (currentCompanyId) {
+                    renderCompanyActivities(currentCompanyId);
+                    await loadCompanyHistory();
+                    renderCompanyHistory(currentCompanyId);
+                }
+                
+                if (currentContactId) {
+                    renderContactActivities(currentContactId);
+                    await loadContactHistory();
+                    renderContactHistory(currentContactId);
+                }
+                
+                closeActivityModal();
+            } catch (error) {
+                console.error('Błąd zapisu aktywności:', error);
+                showStatus('Błąd zapisu: ' + error.message, 'error');
+            }
+        }
+
+        function renderCompanyActivities(companyId) {
+            const list = document.getElementById('companyHistoryList');
+            const empty = document.getElementById('companyHistoryEmpty');
+            if (!list || !empty) return;
+            
+            const activities = companyActivities.filter(a => a.companyId === companyId);
+            
+            if (activities.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak aktywności';
+                empty.querySelector('p').textContent = 'Nie dodano jeszcze żadnych aktywności dla tej firmy.';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            list.innerHTML = activities
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .map(activity => {
+                    const formatted = ActivitiesService.formatActivity(activity);
+                    return `
+                        <div class="activity-item" style="border-left-color: ${formatted.typeColor}">
+                            <div class="activity-item-header">
+                                <span class="activity-item-icon">${formatted.typeIcon}</span>
+                                <span class="activity-item-type">${formatted.typeLabel}</span>
+                                <span class="activity-status ${activity.status}">${formatted.statusLabel}</span>
+                            </div>
+                            <div class="activity-item-title">${escapeHtml(formatted.title)}</div>
+                            <div class="activity-item-date">${formatted.formattedDate}</div>
+                            ${formatted.notes ? `<div class="activity-item-notes">${escapeHtml(formatted.notes)}</div>` : ''}
+                            <div class="activity-item-actions">
+                                ${activity.status === 'planned' ? `<button onclick="completeActivity('${activity.id}')">✓ Ukończ</button>` : ''}
+                                <button onclick="deleteActivity('${activity.id}')">🗑️ Usuń</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        function renderContactActivities(contactId) {
+            const list = document.getElementById('contactHistoryList');
+            const empty = document.getElementById('contactHistoryEmpty');
+            if (!list || !empty) return;
+            
+            const activities = contactActivities.filter(a => a.contactId === contactId);
+            
+            if (activities.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak aktywności';
+                empty.querySelector('p').textContent = 'Nie dodano jeszcze żadnych aktywności dla tego kontaktu.';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            list.innerHTML = activities
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .map(activity => {
+                    const formatted = ActivitiesService.formatActivity(activity);
+                    return `
+                        <div class="activity-item" style="border-left-color: ${formatted.typeColor}">
+                            <div class="activity-item-header">
+                                <span class="activity-item-icon">${formatted.typeIcon}</span>
+                                <span class="activity-item-type">${formatted.typeLabel}</span>
+                                <span class="activity-status ${activity.status}">${formatted.statusLabel}</span>
+                            </div>
+                            <div class="activity-item-title">${escapeHtml(formatted.title)}</div>
+                            <div class="activity-item-date">${formatted.formattedDate}</div>
+                            ${formatted.notes ? `<div class="activity-item-notes">${escapeHtml(formatted.notes)}</div>` : ''}
+                            <div class="activity-item-actions">
+                                ${activity.status === 'planned' ? `<button onclick="completeActivity('${activity.id}')">✓ Ukończ</button>` : ''}
+                                <button onclick="deleteActivity('${activity.id}')">🗑️ Usuń</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        async function completeActivity(activityId) {
+            try {
+                await ActivitiesService.completeActivity(activityId);
+                showStatus('Aktywność ukończona', 'success');
+                
+                await loadActivitiesData();
+                
+                if (currentCompanyId) renderCompanyActivities(currentCompanyId);
+                if (currentContactId) renderContactActivities(currentContactId);
+            } catch (error) {
+                console.error('Błąd:', error);
+                showStatus('Błąd: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteActivity(activityId) {
+            if (!confirm('Czy na pewno chcesz usunąć tę aktywność?')) return;
+            
+            try {
+                await ActivitiesService.deleteActivity(activityId);
+                showStatus('Aktywność usunięta', 'success');
+                
+                await loadActivitiesData();
+                
+                if (currentCompanyId) {
+                    renderCompanyActivities(currentCompanyId);
+                    await loadCompanyHistory();
+                    renderCompanyHistory(currentCompanyId);
+                }
+                
+                if (currentContactId) {
+                    renderContactActivities(currentContactId);
+                    await loadContactHistory();
+                    renderContactHistory(currentContactId);
+                }
+            } catch (error) {
+                console.error('Błąd:', error);
+                showStatus('Błąd: ' + error.message, 'error');
+            }
+        }
+        
         // ============= TAGS JAVASCRIPT =============
 // Ten kod należy dodać do relationships.html w sekcji 
 // ========== TAGS MANAGER MODAL ==========
@@ -3814,7 +4222,9 @@ async function loadTagsData() {
         window.quickAssignTag = quickAssignTag;
         window.toggleTagDropdown = toggleTagDropdown;
         window.removeTagFromDetail = removeTagFromDetail;
-        window.clearTagFilter = clearTagFilter;
+        window.openActivityModal = openActivityModal;
+        window.completeActivity = completeActivity;
+        window.deleteActivity = deleteActivity;
 
 
         // ============= EVENT LISTENERS =============
@@ -3932,21 +4342,33 @@ async function loadTagsData() {
             document.getElementById('addContactNoteBtn').addEventListener('click', () => openNoteModal('contact', currentContactId));
 
             // History tabs
-            document.querySelectorAll('.history-tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const entity = btn.dataset.entity;
-                    const scope = btn.dataset.scope;
-                    document.querySelectorAll(`.history-tab-btn[data-entity="${entity}"]`).forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    if (entity === 'company') {
-                        currentCompanyHistoryScope = scope;
-                        if (currentCompanyId) renderCompanyHistory(currentCompanyId);
-                    } else if (entity === 'contact') {
-                        currentContactHistoryScope = scope;
-                        if (currentContactId) renderContactHistory(currentContactId);
-                    }
-                });
-            });
+document.querySelectorAll('.history-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const entity = btn.dataset.entity;
+        const scope = btn.dataset.scope;
+        document.querySelectorAll(`.history-tab-btn[data-entity="${entity}"]`).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (entity === 'company') {
+            currentCompanyHistoryScope = scope;
+            if (currentCompanyId) {
+                if (scope === 'activities') {
+                    renderCompanyActivities(currentCompanyId);
+                } else {
+                    renderCompanyHistory(currentCompanyId);
+                }
+            }
+        } else if (entity === 'contact') {
+            currentContactHistoryScope = scope;
+            if (currentContactId) {
+                if (scope === 'activities') {
+                    renderContactActivities(currentContactId);
+                } else {
+                    renderContactHistory(currentContactId);
+                }
+            }
+        }
+    });
+});
 
             // Close modals on background click
             document.querySelectorAll('.modal').forEach(modal => {
@@ -3964,7 +4386,27 @@ async function loadTagsData() {
                 }
             });
         });
+// Activity modal
+            document.getElementById('closeActivityModalBtn').addEventListener('click', closeActivityModal);
+            document.getElementById('cancelActivityBtn').addEventListener('click', closeActivityModal);
+            document.getElementById('activityForm').addEventListener('submit', saveActivity);
+            document.getElementById('addCompanyActivityBtn').addEventListener('click', () => openActivityModal('company', currentCompanyId));
+            document.getElementById('addContactActivityBtn').addEventListener('click', () => openActivityModal('contact', currentContactId));
 
+            // Activity type selector
+            document.querySelectorAll('.activity-type-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.activity-type-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentActivityType = btn.dataset.type;
+                    document.getElementById('activityType').value = btn.dataset.type;
+                });
+            });
+
+            // Close activity modal on background click
+            document.getElementById('activityModal').addEventListener('click', (e) => {
+                if (e.target.id === 'activityModal') closeActivityModal();
+            });
         // ============= START =============
         if (typeof gapi !== 'undefined') {
             init();
@@ -4054,6 +4496,73 @@ async function loadTagsData() {
             </div>
         </div>
     </div>
-
+<!-- MODAL: ADD ACTIVITY -->
+    <div id="activityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="activityModalTitle">Dodaj aktywność</h2>
+                <button class="close-btn" id="closeActivityModalBtn">&times;</button>
+            </div>
+            <form id="activityForm">
+                <input type="hidden" id="activityEntityType">
+                <input type="hidden" id="activityEntityId">
+                <input type="hidden" id="activityType" value="EMAIL">
+                
+                <!-- Type selector -->
+                <div class="form-group">
+                    <label>Typ aktywności *</label>
+                    <div class="activity-type-selector" id="activityTypeSelector">
+                        <button type="button" class="activity-type-btn active" data-type="EMAIL">
+                            <span class="type-icon">📧</span>
+                            <span class="type-label">Email</span>
+                        </button>
+                        <button type="button" class="activity-type-btn" data-type="PHONE">
+                            <span class="type-icon">📞</span>
+                            <span class="type-label">Telefon</span>
+                        </button>
+                        <button type="button" class="activity-type-btn" data-type="MEETING">
+                            <span class="type-icon">🤝</span>
+                            <span class="type-label">Spotkanie</span>
+                        </button>
+                        <button type="button" class="activity-type-btn" data-type="TASK">
+                            <span class="type-icon">✅</span>
+                            <span class="type-label">Zadanie</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="activityTitle">Tytuł *</label>
+                    <input type="text" id="activityTitle" required placeholder="np. Rozmowa ws. oferty">
+                </div>
+                
+                <!-- Date -->
+                <div class="form-group">
+                    <label for="activityDate">Data i czas *</label>
+                    <input type="datetime-local" id="activityDate" required>
+                </div>
+                
+                <!-- Notes -->
+                <div class="form-group">
+                    <label for="activityNotes">Notatki <span class="optional">(opcjonalnie)</span></label>
+                    <textarea id="activityNotes" placeholder="Szczegółowe informacje..."></textarea>
+                </div>
+                
+                <!-- Contact selector (when from company) -->
+                <div class="form-group" id="activityContactSelectorGroup" style="display: none;">
+                    <label for="activityContactSelect">Przypisz do osoby <span class="optional">(opcjonalnie)</span></label>
+                    <select id="activityContactSelect">
+                        <option value="">Tylko firma</option>
+                    </select>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelActivityBtn">Anuluj</button>
+                    <button type="submit" class="btn btn-primary">Zapisz aktywność</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
