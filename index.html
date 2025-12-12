@@ -1308,6 +1308,11 @@
             }
         }
 
+        // ============= EXPORT TO WINDOW SCOPE =============
+        window.openTask = openTask;
+        window.completeTask = completeTask;
+        window.viewInRelationships = viewInRelationships;
+
         function showDashboard() {
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('dashboardContent').style.display = 'block';
