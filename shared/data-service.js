@@ -364,7 +364,7 @@ export class DataService {
             companyId,
             type, // 'note' lub 'event'
             timestamp: new Date().toISOString(),
-            user: AuthService.getUserEmail() || '',
+            user: AuthService.getUserDisplayText() || AuthService.getUserEmail() || '',
             content,
             meta
         };
@@ -408,7 +408,7 @@ export class DataService {
             contactId,
             type, // 'note' lub 'event'
             timestamp: new Date().toISOString(),
-            user: AuthService.getUserEmail() || '',
+            user: AuthService.getUserDisplayText() || AuthService.getUserEmail() || '',
             content,
             meta
         };
