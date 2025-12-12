@@ -522,7 +522,7 @@
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-card);
             padding: 2rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .detail-title {
@@ -1938,13 +1938,12 @@
                     <span>Powrót do listy kontaktów</span>
                 </button>
 
-                <div class="detail-card">
-                    <div id="contactDetailContent"></div>
-                </div>
-
                 <div class="detail-layout">
-                    <!-- LEFT: COMPANY OF CONTACT -->
+                    <!-- LEFT: INFO CARD + COMPANY OF CONTACT -->
                     <div class="detail-column-left">
+                        <div class="detail-card">
+                            <div id="contactDetailContent"></div>
+                        </div>
                         <div class="section-header small">
                             <div class="section-title-block">
                                 <h1 class="section-title">Firma kontaktu</h1>
@@ -1968,6 +1967,7 @@
                             </div>
                             <div class="history-controls">
                                 <div class="history-tabs">
+                                    <button class="history-tab-btn active" data-entity="contact" data-scope="all">Wszystko</button>
                                     <button class="history-tab-btn active" data-entity="contact" data-scope="notes">Notatki</button>
                                     <button class="history-tab-btn" data-entity="contact" data-scope="activities">Aktywności</button>
                                     <button class="history-tab-btn" data-entity="contact" data-scope="full">Full stream</button>
@@ -2065,13 +2065,12 @@
                     <span>Powrót do listy firm</span>
                 </button>
 
-                <div class="detail-card">
-                    <div id="companyDetailContent"></div>
-                </div>
-
                 <div class="detail-layout">
-                    <!-- LEFT: CONTACTS IN COMPANY -->
+                    <!-- LEFT: INFO CARD + CONTACTS IN COMPANY -->
                     <div class="detail-column-left">
+                        <div class="detail-card">
+                            <div id="companyDetailContent"></div>
+                        </div>
                         <div class="section-header small">
                             <div class="section-title-block">
                                 <h1 class="section-title">Kontakty w firmie</h1>
@@ -2105,6 +2104,7 @@
                             </div>
                             <div class="history-controls">
                                 <div class="history-tabs">
+                                    <button class="history-tab-btn active" data-entity="company" data-scope="all">Wszystko</button>
                                     <button class="history-tab-btn active" data-entity="company" data-scope="notes">Notatki</button>
                                     <button class="history-tab-btn" data-entity="company" data-scope="activities">Aktywności</button>
                                     <button class="history-tab-btn" data-entity="company" data-scope="full">Full stream</button>
@@ -2300,8 +2300,8 @@
         let currentContactId = null;
         let currentSearchTerm = '';
 
-        let currentCompanyHistoryScope = 'notes';
-        let currentContactHistoryScope = 'notes';
+        let currentCompanyHistoryScope = 'all';
+        let currentContactHistoryScope = 'all';
 
         let companyInputEl = null;
         let companyIdEl = null;
@@ -3330,8 +3330,22 @@ async function saveCompany(e) {
             const empty = document.getElementById('companyHistoryEmpty');
             if (!list || !empty) return;
 
-            const all = companyHistory.filter(h => h.companyId === companyId).sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
             const scope = currentCompanyHistoryScope;
+            
+            // Dla scope 'all' - pobierz aktywności + notatki (bez events)
+            if (scope === 'all') {
+                renderCompanyAll(companyId);
+                return;
+            }
+            
+            // Dla scope 'activities' - renderuj aktywności
+            if (scope === 'activities') {
+                renderCompanyActivities(companyId);
+                return;
+            }
+            
+            // Dla scope 'notes' lub 'full'
+            const all = companyHistory.filter(h => h.companyId === companyId).sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
             const shown = scope === 'notes' ? all.filter(h => h.type === 'note') : all;
 
             if (shown.length === 0) {
@@ -3357,8 +3371,22 @@ async function saveCompany(e) {
             const empty = document.getElementById('contactHistoryEmpty');
             if (!list || !empty) return;
 
-            const all = contactHistory.filter(h => h.contactId === contactId).sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
             const scope = currentContactHistoryScope;
+            
+            // Dla scope 'all' - pobierz aktywności + notatki (bez events)
+            if (scope === 'all') {
+                renderContactAll(contactId);
+                return;
+            }
+            
+            // Dla scope 'activities' - renderuj aktywności
+            if (scope === 'activities') {
+                renderContactActivities(contactId);
+                return;
+            }
+            
+            // Dla scope 'notes' lub 'full'
+            const all = contactHistory.filter(h => h.contactId === contactId).sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
             const shown = scope === 'notes' ? all.filter(h => h.type === 'note') : all;
 
             if (shown.length === 0) {
@@ -3378,7 +3406,139 @@ async function saveCompany(e) {
                 </div>
             `).join('');
         }
+/**
+         * Renderuj "Wszystko" dla firmy - aktywności + notatki (bez events)
+         */
+        function renderCompanyAll(companyId) {
+            const list = document.getElementById('companyHistoryList');
+            const empty = document.getElementById('companyHistoryEmpty');
+            
+            // Pobierz aktywności
+            const activities = companyActivities.filter(a => a.companyId === companyId);
+            
+            // Pobierz notatki (tylko type==='note', bez events)
+            const notes = companyHistory.filter(h => h.companyId === companyId && h.type === 'note');
+            
+            // Połącz i sortuj chronologicznie
+            const combined = [
+                ...activities.map(a => ({ ...a, itemType: 'activity' })),
+                ...notes.map(n => ({ ...n, itemType: 'note' }))
+            ].sort((a, b) => {
+                const dateA = a.itemType === 'activity' ? a.date : a.timestamp;
+                const dateB = b.itemType === 'activity' ? b.date : b.timestamp;
+                return (dateB || '').localeCompare(dateA || '');
+            });
+            
+            if (combined.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak aktywności';
+                empty.querySelector('p').textContent = 'Nie dodano jeszcze żadnych aktywności ani notatek.';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            list.innerHTML = combined.map(item => {
+                if (item.itemType === 'activity') {
+                    // Render aktywności
+                    const formatted = ActivitiesService.formatActivity(item);
+                    return `
+                        <div class="activity-item" style="border-left-color: ${formatted.typeColor}">
+                            <div class="activity-item-header">
+                                <span class="activity-item-icon">${formatted.typeIcon}</span>
+                                <span class="activity-item-type">${formatted.typeLabel}</span>
+                                <span class="activity-status ${item.status}">${formatted.statusLabel}</span>
+                            </div>
+                            <div class="activity-item-title">${escapeHtml(formatted.title)}</div>
+                            <div class="activity-item-date">${formatted.formattedDate}</div>
+                            ${formatted.notes ? `<div class="activity-item-notes">${escapeHtml(formatted.notes)}</div>` : ''}
+                            <div class="activity-item-actions">
+                                ${item.status === 'planned' ? `<button onclick="completeActivity('${item.id}')">✓ Ukończ</button>` : ''}
+                                <button onclick="deleteActivity('${item.id}')">🗑️ Usuń</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Render notatki
+                    return `
+                        <div class="history-item note">
+                            <div class="history-item-header">
+                                <span class="history-item-type">NOTATKA</span>
+                                <span class="history-item-meta">${DataService.formatDateTime(item.timestamp)}${item.user ? ' • ' + escapeHtml(formatUserName(item.user)) : ''}</span>
+                            </div>
+                            <div class="history-item-body">${escapeHtml(item.content || '')}</div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
 
+        /**
+         * Renderuj "Wszystko" dla kontaktu - aktywności + notatki (bez events)
+         */
+        function renderContactAll(contactId) {
+            const list = document.getElementById('contactHistoryList');
+            const empty = document.getElementById('contactHistoryEmpty');
+            
+            // Pobierz aktywności
+            const activities = contactActivities.filter(a => a.contactId === contactId);
+            
+            // Pobierz notatki (tylko type==='note', bez events)
+            const notes = contactHistory.filter(h => h.contactId === contactId && h.type === 'note');
+            
+            // Połącz i sortuj chronologicznie
+            const combined = [
+                ...activities.map(a => ({ ...a, itemType: 'activity' })),
+                ...notes.map(n => ({ ...n, itemType: 'note' }))
+            ].sort((a, b) => {
+                const dateA = a.itemType === 'activity' ? a.date : a.timestamp;
+                const dateB = b.itemType === 'activity' ? b.date : b.timestamp;
+                return (dateB || '').localeCompare(dateA || '');
+            });
+            
+            if (combined.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = 'Brak aktywności';
+                empty.querySelector('p').textContent = 'Nie dodano jeszcze żadnych aktywności ani notatek.';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            list.innerHTML = combined.map(item => {
+                if (item.itemType === 'activity') {
+                    // Render aktywności
+                    const formatted = ActivitiesService.formatActivity(item);
+                    return `
+                        <div class="activity-item" style="border-left-color: ${formatted.typeColor}">
+                            <div class="activity-item-header">
+                                <span class="activity-item-icon">${formatted.typeIcon}</span>
+                                <span class="activity-item-type">${formatted.typeLabel}</span>
+                                <span class="activity-status ${item.status}">${formatted.statusLabel}</span>
+                            </div>
+                            <div class="activity-item-title">${escapeHtml(formatted.title)}</div>
+                            <div class="activity-item-date">${formatted.formattedDate}</div>
+                            ${formatted.notes ? `<div class="activity-item-notes">${escapeHtml(formatted.notes)}</div>` : ''}
+                            <div class="activity-item-actions">
+                                ${item.status === 'planned' ? `<button onclick="completeActivity('${item.id}')">✓ Ukończ</button>` : ''}
+                                <button onclick="deleteActivity('${item.id}')">🗑️ Usuń</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Render notatki
+                    return `
+                        <div class="history-item note">
+                            <div class="history-item-header">
+                                <span class="history-item-type">NOTATKA</span>
+                                <span class="history-item-meta">${DataService.formatDateTime(item.timestamp)}${item.user ? ' • ' + escapeHtml(formatUserName(item.user)) : ''}</span>
+                            </div>
+                            <div class="history-item-body">${escapeHtml(item.content || '')}</div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
         function openNoteModal(entityType, entityId) {
             if (!entityId) {
                 showStatus('Najpierw wybierz rekord', 'error');
