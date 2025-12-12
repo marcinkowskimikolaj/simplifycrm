@@ -2197,9 +2197,36 @@
 
         // ============= DATA LOADING =============
         async function loadData() {
-            await Promise.all([loadCompanies(), loadContacts()]);
-            await loadTagsData();
-            await Promise.all([loadCompanyHistory(), loadContactHistory()]);
+            // Show loading indicators
+            const companiesLoading = document.getElementById('companiesLoading');
+            const contactsLoading = document.getElementById('contactsLoading');
+            companiesLoading.style.display = 'block';
+            contactsLoading.style.display = 'block';
+
+            try {
+                // STEP 1: Load all data FIRST (no rendering yet!)
+                [companies, contacts] = await Promise.all([
+                    DataService.loadCompanies(),
+                    DataService.loadContacts()
+                ]);
+
+                // STEP 2: Load tags and history
+                await loadTagsData();
+                await Promise.all([loadCompanyHistory(), loadContactHistory()]);
+
+                // STEP 3: NOW render everything (all data is available)
+                renderCompanies();
+                renderAllContacts();
+
+                console.log('✓ Wszystkie dane załadowane i wyświetlone');
+            } catch (err) {
+                console.error('Błąd ładowania danych:', err);
+                showStatus('Błąd ładowania danych', 'error');
+            } finally {
+                // Hide loading indicators
+                companiesLoading.style.display = 'none';
+                contactsLoading.style.display = 'none';
+            }
         }
 
         async function loadCompanies() {
