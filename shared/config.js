@@ -22,7 +22,9 @@ export const CONFIG = {
         TAGS_COMPANIES: 'TagsFirm',
         TAGS_CONTACTS: 'TagsContact',
         COMPANY_TAGS_RELATIONS: 'CompanyTags',
-        CONTACT_TAGS_RELATIONS: 'ContactTags'
+        CONTACT_TAGS_RELATIONS: 'ContactTags',
+        // Arkusz preferencji użytkownika  
+        USER_PREFERENCES: 'UserPreferences'
     },
     
     // OAuth Scopes
