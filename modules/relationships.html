@@ -1413,33 +1413,156 @@
             height: 14px;
         }
 
-        /* Tag Badge (display in cards/lists) */
+        /* Tag Badge - Minimal bars for cards */
         .tag-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.25rem 0.65rem;
-            border-radius: 999px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-            color: white;
+            position: relative;
+            width: 4px;
+            height: 20px;
+            border-radius: 2px;
             cursor: pointer;
-            transition: all 0.18s ease;
-            border: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .tag-badge:hover {
-            filter: brightness(1.1);
+            height: 26px;
+            width: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        /* Tooltip for tag name on hover */
+        .tag-badge::before {
+            content: attr(data-tag-name);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) scale(0.95);
+            background: rgba(17, 24, 39, 0.97);
+            color: white;
+            padding: 0.45rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .tag-badge:hover::before {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* Small arrow for tooltip */
+        .tag-badge::after {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 2px);
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(17, 24, 39, 0.97);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tag-badge:hover::after {
+            opacity: 1;
         }
 
         .tags-container {
             display: flex;
             flex-wrap: wrap;
             gap: 0.4rem;
-            margin-top: 0.6rem;
+            align-items: center;
+        }
+
+        /* Tags bar in cards - horizontal layout */
+        .card .tags-container {
+            margin-top: 0.9rem;
+            padding-top: 0.9rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* Tags in detail view - elegant horizontal bar */
+        .detail-tags-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 1rem 1.3rem;
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.02), rgba(17, 24, 39, 0.04));
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .detail-tags-bar .tag-badge-detail {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 7px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: white;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .detail-tags-bar .tag-badge-detail:hover {
+            filter: brightness(1.08);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+
+        .detail-tags-bar .tag-badge-detail .remove-tag-btn {
+            margin-left: 0.35rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            line-height: 1;
+            transition: all 0.18s ease;
+            font-weight: 700;
+        }
+
+        .detail-tags-bar .tag-badge-detail .remove-tag-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        .detail-tags-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .detail-tags-empty {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            opacity: 0.7;
         }
 
         /* Empty state for tags */
@@ -2358,18 +2481,19 @@
                     <div class="detail-title">${escapeHtml(company.name)}</div>
                 </div>
                 ${company.industry ? `<div class="detail-meta">${escapeHtml(company.industry)}</div>` : ''}
+                
+                <!-- Tags Bar - at the top -->
+                ${renderDetailTags(company.id, 'company')}
+                
                 <div class="detail-info">${infoHtml || '<div class="detail-info-row"><div class="detail-info-label">Informacje</div><div class="detail-info-value">Brak dodatkowych informacji.</div></div>'}</div>
             
                 
-                <!-- Tags Section -->
-                <div class="detail-section">
-                    <div class="detail-section-header">
-                        <h3>Etykiety</h3>
+                <!-- Tag Assignment -->
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle);">
+                    <div style="margin-bottom: 0.8rem;">
+                        <span style="font-family: 'Outfit', sans-serif; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; color: var(--text-secondary);">Dodaj etykietę</span>
                     </div>
-                    <div class="tags-container" id="companyDetailTags">
-                        ${renderDetailTags(company.id, 'company')}
-                    </div>
-                    <div class="tag-assignment" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                    <div style="display: flex; gap: 0.5rem;">
                         <select id="companyTagSelect" class="form-input" style="flex: 1;">
                             <option value="">Wybierz etykietę...</option>
                             ${companyTags.map(tag => `
@@ -2454,7 +2578,29 @@
                     <div class="detail-title">${escapeHtml(contact.name)}</div>
                 </div>
                 ${contact.position ? `<div class="detail-meta">${escapeHtml(contact.position)}</div>` : ''}
+                
+                <!-- Tags Bar - at the top -->
+                ${renderDetailTags(contact.id, 'contact')}
+                
                 <div class="detail-info">${infoHtml || '<div class="detail-info-row"><div class="detail-info-label">Informacje</div><div class="detail-info-value">Brak dodatkowych informacji.</div></div>'}</div>
+                
+                <!-- Tag Assignment -->
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle);">
+                    <div style="margin-bottom: 0.8rem;">
+                        <span style="font-family: 'Outfit', sans-serif; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; color: var(--text-secondary);">Dodaj etykietę</span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <select id="contactTagSelect" class="form-input" style="flex: 1;">
+                            <option value="">Wybierz etykietę...</option>
+                            ${contactTags.map(tag => `
+                                <option value="${tag.id}">${escapeHtml(tag.name)}</option>
+                            `).join('')}
+                        </select>
+                        <button onclick="assignTagToContactDetail()" class="btn btn-secondary" style="white-space: nowrap;">
+                            + Dodaj
+                        </button>
+                    </div>
+                </div>
             `;
 
             const companyContainer = document.getElementById('contactCompanyCardContainer');
@@ -2474,29 +2620,7 @@
                             ${company.phone ? `<div class="card-info-row"><span class="emoji">📞</span><span>${escapeHtml(company.phone)}</span></div>` : ''}
                         </div>
                     </div>
-                
-                
-                <!-- Tags Section -->
-                <div class="detail-section">
-                    <div class="detail-section-header">
-                        <h3>Etykiety</h3>
-                    </div>
-                    <div class="tags-container" id="contactDetailTags">
-                        ${renderDetailTags(contact.id, 'contact')}
-                    </div>
-                    <div class="tag-assignment" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-                        <select id="contactTagSelect" class="form-input" style="flex: 1;">
-                            <option value="">Wybierz etykietę...</option>
-                            ${contactTags.map(tag => `
-                                <option value="${tag.id}">${escapeHtml(tag.name)}</option>
-                            `).join('')}
-                        </select>
-                        <button onclick="assignTagToContactDetail()" class="btn btn-secondary" style="white-space: nowrap;">
-                            + Dodaj
-                        </button>
-                    </div>
-                </div>
-            `;
+                `;
             } else {
                 companyContainer.innerHTML = '';
                 companyEmpty.style.display = 'block';
@@ -3277,15 +3401,15 @@ function renderEntityTags(entityId, type) {
     
     if (!tags || tags.length === 0) return '';
     
+    // Render minimal color bars for cards
     return `
         <div class="tags-container">
             ${tags.map(tag => `
-                <span class="tag-badge" 
-                      style="background-color: ${tag.color}"
-                      onclick="filterByTag('${tag.id}', '${escapeHtml(tag.name)}', '${tag.color}', '${type}')"
-                      title="${escapeHtml(tag.description || tag.name)}">
-                    ${escapeHtml(tag.name)}
-                </span>
+                <div class="tag-badge" 
+                     style="background-color: ${tag.color}"
+                     data-tag-name="${escapeHtml(tag.name)}"
+                     title="${escapeHtml(tag.description || tag.name)}">
+                </div>
             `).join('')}
         </div>
     `;
@@ -3319,7 +3443,7 @@ async function assignTagToEntity(entityId, tagId, type) {
 }
 
 /**
- * Render tags in detail view (with remove buttons)
+ * Render tags in detail view (elegant horizontal bar)
  */
 function renderDetailTags(entityId, type) {
     const allTags = type === 'company' ? companyTags : contactTags;
@@ -3330,22 +3454,28 @@ function renderDetailTags(entityId, type) {
         : DataService.getContactTags(entityId, allTags, allRelations);
     
     if (entityTags.length === 0) {
-        return '<div class="empty-state-small">Brak etykiet</div>';
+        return `
+            <div class="detail-tags-bar">
+                <span class="detail-tags-label">Etykiety:</span>
+                <span class="detail-tags-empty">Brak etykiet</span>
+            </div>
+        `;
     }
     
-    return entityTags.map(tag => `
-        <div class="tag-badge" style="background-color: ${tag.color}; position: relative; padding-right: 2rem;">
-            ${escapeHtml(tag.name)}
-            <button 
-                class="remove-tag-btn" 
-                onclick="removeTagFromDetail('${entityId}', '${tag.id}', '${type}')"
-                style="position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: white; cursor: pointer; font-size: 1rem; padding: 0; width: 1.2rem; height: 1.2rem; display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s;"
-                onmouseover="this.style.opacity='1'"
-                onmouseout="this.style.opacity='0.8'"
-                title="Usuń etykietę"
-            >×</button>
+    return `
+        <div class="detail-tags-bar">
+            <span class="detail-tags-label">Etykiety:</span>
+            ${entityTags.map(tag => `
+                <div class="tag-badge-detail" style="background-color: ${tag.color}">
+                    ${escapeHtml(tag.name)}
+                    <button 
+                        class="remove-tag-btn" 
+                        onclick="event.stopPropagation(); removeTagFromDetail('${entityId}', '${tag.id}', '${type}')"
+                        title="Usuń etykietę">×</button>
+                </div>
+            `).join('')}
         </div>
-    `).join('');
+    `;
 }
 
 /**
@@ -3366,13 +3496,22 @@ async function assignTagToCompanyDetail() {
     }
     
     try {
+        // Find tag name for logging
+        const tag = companyTags.find(t => t.id === tagId);
+        const tagName = tag ? tag.name : 'etykieta';
+        
         await assignTagToEntity(currentCompanyId, tagId, 'company');
         
-        // Reload tags
+        // Log to history
+        await DataService.logCompanyHistory(currentCompanyId, 'event', `Dodano etykietę: ${tagName}`);
+        
+        // Reload tags and history
         await loadTagsData();
+        await loadCompanyHistory();
         
         // Refresh detail view
         viewCompanyDetail(currentCompanyId);
+        renderCompanyHistory(currentCompanyId);
         
         // Reset select
         select.value = '';
@@ -3402,13 +3541,22 @@ async function assignTagToContactDetail() {
     }
     
     try {
+        // Find tag name for logging
+        const tag = contactTags.find(t => t.id === tagId);
+        const tagName = tag ? tag.name : 'etykieta';
+        
         await assignTagToEntity(currentContactId, tagId, 'contact');
         
-        // Reload tags
+        // Log to history
+        await DataService.logContactHistory(currentContactId, 'event', `Dodano etykietę: ${tagName}`);
+        
+        // Reload tags and history
         await loadTagsData();
+        await loadContactHistory();
         
         // Refresh detail view
         viewContactDetail(currentContactId);
+        renderContactHistory(currentContactId);
         
         // Reset select
         select.value = '';
@@ -3429,31 +3577,33 @@ async function removeTagFromDetail(entityId, tagId, type) {
     }
     
     try {
-        // Find relation
-        const allRelations = type === 'company' ? companyTagRelations : contactTagRelations;
-        const relation = allRelations.find(r => 
-            (type === 'company' ? r.companyId : r.contactId) === entityId && 
-            r.tagId === tagId
-        );
+        // Find tag name for logging
+        const allTags = type === 'company' ? companyTags : contactTags;
+        const tag = allTags.find(t => t.id === tagId);
+        const tagName = tag ? tag.name : 'etykieta';
         
-        if (!relation) {
-            showStatus('Nie znaleziono relacji', 'error');
-            return;
-        }
-        
-        // Find row index
-        const rowIndex = allRelations.indexOf(relation) + 1; // +1 bo nagłówek
-        
+        // Remove tag
         await removeTagFromEntity(entityId, tagId, type);
+        
+        // Log to history
+        if (type === 'company') {
+            await DataService.logCompanyHistory(entityId, 'event', `Usunięto etykietę: ${tagName}`);
+        } else {
+            await DataService.logContactHistory(entityId, 'event', `Usunięto etykietę: ${tagName}`);
+        }
         
         // Reload tags
         await loadTagsData();
         
-        // Refresh detail view
+        // Reload history
         if (type === 'company') {
+            await loadCompanyHistory();
             viewCompanyDetail(entityId);
+            renderCompanyHistory(entityId);
         } else {
+            await loadContactHistory();
             viewContactDetail(entityId);
+            renderContactHistory(entityId);
         }
         
         showStatus('Etykieta usunięta', 'success');
@@ -3465,9 +3615,16 @@ async function removeTagFromDetail(entityId, tagId, type) {
 
 async function removeTagFromEntity(entityId, tagId, type) {
     try {
-        // Find relation
-        const relations = type === 'company' ? companyTagRelations : contactTagRelations;
-        const relation = relations.find(r => 
+        // Reload relations from sheet to get accurate row indices
+        let allRelationsFromSheet;
+        if (type === 'company') {
+            allRelationsFromSheet = await DataService.loadCompanyTagRelations(null, false);
+        } else {
+            allRelationsFromSheet = await DataService.loadContactTagRelations(null, false);
+        }
+        
+        // Find relation in fresh data
+        const relation = allRelationsFromSheet.find(r => 
             (type === 'company' ? r.companyId : r.contactId) === entityId && r.tagId === tagId
         );
         
@@ -3476,7 +3633,9 @@ async function removeTagFromEntity(entityId, tagId, type) {
             return;
         }
         
-        const rowIndex = relations.indexOf(relation);
+        // Row index is position in array (0-based)
+        // DataService will add +2 for header row
+        const rowIndex = allRelationsFromSheet.indexOf(relation);
         
         if (type === 'company') {
             await DataService.removeTagFromCompany(relation.id, rowIndex);
@@ -3484,20 +3643,13 @@ async function removeTagFromEntity(entityId, tagId, type) {
             await DataService.removeTagFromContact(relation.id, rowIndex);
         }
         
-        showStatus('Etykieta usunięta', 'success');
-        
-        // Reload
+        // Reload local cache
         await loadTagsData();
         
-        // Refresh current view
-        if (type === 'company' && currentCompanyId === entityId) {
-            viewCompanyDetail(entityId);
-        } else if (type === 'contact' && currentContactId === entityId) {
-            viewContactDetail(entityId);
-        }
+        console.log('✓ Tag removed successfully');
     } catch (error) {
         console.error('Error removing tag:', error);
-        showStatus('Błąd przy usuwaniu etykiety', 'error');
+        throw error; // Re-throw to be caught by caller
     }
 }
 
