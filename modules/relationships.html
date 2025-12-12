@@ -175,15 +175,6 @@
             margin-bottom: 1.8rem;
         }
 
-<!-- TAG FILTERS - CONTACTS -->
-<div class="tag-filter-section" id="contactTagFilters" style="display: none;">
-    <span class="tag-filter-label">Filtruj:</span>
-    <div class="tag-filter-chips" id="contactTagFilterChips"></div>
-    <button class="clear-filter-btn" id="clearContactTagFilter" onclick="clearTagFilter()">
-        × Wyczyść
-    </button>
-</div>
-        
         .search-input-container {
             display: flex;
             align-items: center;
@@ -238,116 +229,6 @@
             color: var(--text-secondary);
         }
 
-/* ============= TAG FILTER CHIPS ============= */
-.tag-filter-section {
-    margin-top: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    flex-wrap: wrap;
-}
-
-.tag-filter-label {
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--text-secondary);
-    font-weight: 600;
-}
-
-.tag-filter-chips {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    flex: 1;
-}
-
-.tag-filter-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.35rem 0.8rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
-    position: relative;
-}
-
-.tag-filter-chip:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.tag-filter-chip.active {
-    border-color: currentColor;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-    transform: scale(1.05);
-}
-
-.tag-filter-chip .chip-name {
-    color: white;
-}
-
-.tag-filter-chip .chip-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 0.35rem;
-    background: rgba(255, 255, 255, 0.25);
-    border-radius: 999px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: white;
-}
-
-.tag-filter-chip.active .chip-count {
-    background: rgba(255, 255, 255, 0.4);
-}
-
-.clear-filter-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.35rem 0.8rem;
-    border-radius: 999px;
-    border: 1px solid var(--border-strong);
-    background: transparent;
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.clear-filter-btn.visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.clear-filter-btn:hover {
-    background: rgba(15,23,42,0.04);
-    border-color: var(--text-primary);
-    color: var(--text-primary);
-}
-
-.tag-filter-empty {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    font-style: italic;
-}
-        
         /* TABS */
 
         .tabs {
@@ -2211,15 +2092,6 @@
                     </div>
                 </div>
 
-<!-- TAG FILTERS - COMPANIES -->
-<div class="tag-filter-section" id="companyTagFilters" style="display: none;">
-    <span class="tag-filter-label">Filtruj:</span>
-    <div class="tag-filter-chips" id="companyTagFilterChips"></div>
-    <button class="clear-filter-btn" id="clearCompanyTagFilter" onclick="clearTagFilter()">
-        × Wyczyść
-    </button>
-</div>
-                
                 <div id="companiesLoading" class="loading" style="display: none;">
                     <div class="spinner"></div>
                     <p>Ładowanie firm...</p>
@@ -2575,8 +2447,6 @@
                 // STEP 3: NOW render everything (all data is available)
                 renderCompanies();
                 renderAllContacts();
-                renderCompanyTagFilterChips();
-                renderContactTagFilterChips();
 
                 console.log('✓ Wszystkie dane załadowane i wyświetlone');
             } catch (err) {
@@ -2892,160 +2762,6 @@
             }
         }
 
-/**
- * Renderuj chipy filtrów dla firm
- */
-function renderCompanyTagFilterChips() {
-    const container = document.getElementById('companyTagFilterChips');
-    const section = document.getElementById('companyTagFilters');
-    const clearBtn = document.getElementById('clearCompanyTagFilter');
-    
-    if (!companyTags || companyTags.length === 0) {
-        section.style.display = 'none';
-        return;
-    }
-    
-    section.style.display = 'flex';
-    
-    // Policz ile firm ma każdą etykietę
-    const tagCounts = {};
-    companyTags.forEach(tag => {
-        const count = DataService.getCompaniesByTag(
-            tag.id, 
-            companies, 
-            companyTagRelations
-        ).length;
-        tagCounts[tag.id] = count;
-    });
-    
-    // Renderuj tylko tagi które mają przypisane firmy
-    const tagsWithCompanies = companyTags.filter(tag => tagCounts[tag.id] > 0);
-    
-    if (tagsWithCompanies.length === 0) {
-        container.innerHTML = '<span class="tag-filter-empty">Brak etykiet do filtrowania</span>';
-        clearBtn.classList.remove('visible');
-        return;
-    }
-    
-    container.innerHTML = tagsWithCompanies.map(tag => {
-        const isActive = currentTagFilter && 
-                        currentTagFilter.id === tag.id && 
-                        currentTagFilter.type === 'company';
-        
-        return `
-            <div class="tag-filter-chip ${isActive ? 'active' : ''}" 
-                 style="background-color: ${tag.color}"
-                 onclick="toggleTagFilter('${tag.id}', '${escapeHtml(tag.name)}', '${tag.color}', 'company')"
-                 title="${escapeHtml(tag.description || tag.name)}">
-                <span class="chip-name">${escapeHtml(tag.name)}</span>
-                <span class="chip-count">${tagCounts[tag.id]}</span>
-            </div>
-        `;
-    }).join('');
-    
-    // Show/hide clear button
-    if (currentTagFilter && currentTagFilter.type === 'company') {
-        clearBtn.classList.add('visible');
-    } else {
-        clearBtn.classList.remove('visible');
-    }
-}
-
-/**
- * Renderuj chipy filtrów dla kontaktów
- */
-function renderContactTagFilterChips() {
-    const container = document.getElementById('contactTagFilterChips');
-    const section = document.getElementById('contactTagFilters');
-    const clearBtn = document.getElementById('clearContactTagFilter');
-    
-    if (!contactTags || contactTags.length === 0) {
-        section.style.display = 'none';
-        return;
-    }
-    
-    section.style.display = 'flex';
-    
-    // Policz ile kontaktów ma każdą etykietę
-    const tagCounts = {};
-    contactTags.forEach(tag => {
-        const count = DataService.getContactsByTag(
-            tag.id, 
-            contacts, 
-            contactTagRelations
-        ).length;
-        tagCounts[tag.id] = count;
-    });
-    
-    // Renderuj tylko tagi które mają przypisane kontakty
-    const tagsWithContacts = contactTags.filter(tag => tagCounts[tag.id] > 0);
-    
-    if (tagsWithContacts.length === 0) {
-        container.innerHTML = '<span class="tag-filter-empty">Brak etykiet do filtrowania</span>';
-        clearBtn.classList.remove('visible');
-        return;
-    }
-    
-    container.innerHTML = tagsWithContacts.map(tag => {
-        const isActive = currentTagFilter && 
-                        currentTagFilter.id === tag.id && 
-                        currentTagFilter.type === 'contact';
-        
-        return `
-            <div class="tag-filter-chip ${isActive ? 'active' : ''}" 
-                 style="background-color: ${tag.color}"
-                 onclick="toggleTagFilter('${tag.id}', '${escapeHtml(tag.name)}', '${tag.color}', 'contact')"
-                 title="${escapeHtml(tag.description || tag.name)}">
-                <span class="chip-name">${escapeHtml(tag.name)}</span>
-                <span class="chip-count">${tagCounts[tag.id]}</span>
-            </div>
-        `;
-    }).join('');
-    
-    // Show/hide clear button
-    if (currentTagFilter && currentTagFilter.type === 'contact') {
-        clearBtn.classList.add('visible');
-    } else {
-        clearBtn.classList.remove('visible');
-    }
-}
-
-/**
- * Toggle tag filter (activate/deactivate)
- */
-function toggleTagFilter(tagId, tagName, tagColor, type) {
-    // If clicking the same tag - clear filter
-    if (currentTagFilter && 
-        currentTagFilter.id === tagId && 
-        currentTagFilter.type === type) {
-        clearTagFilter();
-        return;
-    }
-    
-    // Set new filter
-    currentTagFilter = { id: tagId, name: tagName, color: tagColor, type: type };
-    
-    // Re-render views
-    if (type === 'company') {
-        renderCompanies();
-        renderCompanyTagFilterChips();
-    } else {
-        renderAllContacts();
-        renderContactTagFilterChips();
-    }
-}
-
-/**
- * Clear tag filter
- */
-function clearTagFilter() {
-    currentTagFilter = null;
-    renderCompanies();
-    renderAllContacts();
-    renderCompanyTagFilterChips();
-    renderContactTagFilterChips();
-}
-        
         // ============= COMPANY DETAIL =============
         function viewCompanyDetail(companyId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -4268,10 +3984,6 @@ function closeTagsManager() {
     document.getElementById('tagsManagerModal').classList.remove('active');
     resetCompanyTagForm();
     resetContactTagForm();
-
-    // Odśwież chipy filtrów
-    renderCompanyTagFilterChips();
-    renderContactTagFilterChips();
 }
 
 function switchTagsTab(type) {
@@ -4356,7 +4068,6 @@ async function saveCompanyTag(event) {
         await loadTagsData();
         renderCompanyTagsList();
         renderCompanies();
-        renderCompanyTagFilterChips();
         
         // Reset form
         resetCompanyTagForm();
@@ -4470,7 +4181,6 @@ async function saveContactTag(event) {
         await loadTagsData();
         renderContactTagsList();
         renderAllContacts();
-        renderContactTagFilterChips();
         
         // Reset form
         resetContactTagForm();
@@ -4896,8 +4606,6 @@ async function loadTagsData() {
         window.openActivityModal = openActivityModal;
         window.completeActivity = completeActivity;
         window.deleteActivity = deleteActivity;
-        window.toggleTagFilter = toggleTagFilter;
-        window.clearTagFilter = clearTagFilter;
 
 
         // ============= EVENT LISTENERS =============
