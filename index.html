@@ -169,6 +169,22 @@
             letter-spacing: 0.08em;
         }
 
+        .quick-actions-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.4rem;
+        }
+
+        .quick-actions-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
         .quick-actions-header {
             display: flex;
             align-items: center;
@@ -419,11 +435,12 @@
         .upcoming-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
             font-size: 0.8rem;
-            padding: 0.4rem;
+            padding: 0.5rem;
             border-radius: 6px;
             transition: background 0.15s ease;
+            cursor: pointer;
         }
 
         .upcoming-item:hover {
@@ -432,6 +449,7 @@
 
         .upcoming-item .icon {
             font-size: 1rem;
+            flex-shrink: 0;
         }
 
         .upcoming-item .text {
@@ -447,6 +465,7 @@
             color: var(--text-secondary);
             font-family: 'Outfit', sans-serif;
             font-weight: 600;
+            flex-shrink: 0;
         }
 
         /* Stats summary */
@@ -478,6 +497,133 @@
 
         .stat-item .label {
             color: var(--text-secondary);
+        }
+
+        /* ============= ACTIVITY PREVIEW MODAL ============= */
+        .activity-preview-modal .modal-content {
+            max-width: 600px;
+        }
+
+        .activity-preview-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-preview-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+        }
+
+        .activity-preview-title-block {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-preview-type {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .activity-preview-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .activity-preview-datetime {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .activity-preview-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .activity-preview-status.planned {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .activity-info-grid {
+            display: grid;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .activity-info-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .activity-info-value {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .activity-info-value.clickable {
+            color: var(--accent);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .activity-info-value.clickable:hover {
+            opacity: 0.8;
+        }
+
+        .activity-notes-section {
+            background: rgba(17, 24, 39, 0.02);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-notes-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-secondary);
+            margin-bottom: 0.6rem;
+        }
+
+        .activity-notes-content {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .activity-preview-actions {
+            display: flex;
+            gap: 0.8rem;
         }
 
         /* ============= MODULES GRID ============= */
@@ -881,6 +1027,11 @@
                 align-items: flex-start;
             }
 
+            .quick-actions-wrapper {
+                width: 100%;
+                align-items: flex-start;
+            }
+
             .quick-actions-header {
                 width: 100%;
                 flex-wrap: wrap;
@@ -935,19 +1086,24 @@
                     <h1 class="welcome-title" id="welcomeTitle">Witaj! 👋</h1>
                     <p class="welcome-date" id="welcomeDate"></p>
                 </div>
-                <div class="quick-actions-header">
-                    <button class="quick-action-btn-header" onclick="openAddContactModal()">
-                        <span class="icon">👤</span>
-                        <span>Kontakt</span>
-                    </button>
-                    <button class="quick-action-btn-header" onclick="openAddCompanyModal()">
-                        <span class="icon">🏢</span>
-                        <span>Firma</span>
-                    </button>
-                    <button class="quick-action-btn-header disabled">
-                        <span class="icon">💼</span>
-                        <span>Deal</span>
-                    </button>
+                <div class="quick-actions-wrapper">
+                    <div class="quick-actions-label">
+                        Szybkie dodawanie
+                    </div>
+                    <div class="quick-actions-header">
+                        <button class="quick-action-btn-header" onclick="openAddContactModal()">
+                            <span class="icon">➕</span>
+                            <span>Kontakt</span>
+                        </button>
+                        <button class="quick-action-btn-header" onclick="openAddCompanyModal()">
+                            <span class="icon">➕</span>
+                            <span>Firma</span>
+                        </button>
+                        <button class="quick-action-btn-header disabled">
+                            <span class="icon">➕</span>
+                            <span>Deal</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1068,6 +1224,20 @@
             </section>
         </div>
     </main>
+
+    <!-- MODAL: ACTIVITY PREVIEW -->
+    <div id="activityPreviewModal" class="modal activity-preview-modal">
+        <div class="modal-content">
+            <div class="modal-header" style="margin-bottom: 0;">
+                <div style="opacity: 0;">.</div>
+                <button class="close-btn" onclick="closeActivityPreview()">&times;</button>
+            </div>
+            
+            <div id="activityPreviewContent">
+                <!-- Content will be dynamically inserted -->
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL: PROFILE -->
     <div id="profileModal" class="modal">
@@ -1415,7 +1585,7 @@
             const meta = metaParts.join(' • ');
 
             return `
-                <div class="task-item ${isOverdue ? 'overdue' : task.type.toLowerCase()}" onclick="openTask('${task.id}')">
+                <div class="task-item ${isOverdue ? 'overdue' : task.type.toLowerCase()}" onclick="openActivityPreview('${task.id}')">
                     <div class="task-time">${time}</div>
                     <div class="task-icon">${formatted.typeIcon}</div>
                     <div class="task-content">
@@ -1426,7 +1596,7 @@
                         <button class="task-action-btn primary" onclick="event.stopPropagation(); completeTask('${task.id}')">
                             ✓
                         </button>
-                        <button class="task-action-btn" onclick="event.stopPropagation(); viewInRelationships('${task.companyId || task.contactId}', '${task.companyId ? 'company' : 'contact'}')">
+                        <button class="task-action-btn" onclick="event.stopPropagation(); openActivityPreview('${task.id}')">
                             👁️
                         </button>
                     </div>
@@ -1444,10 +1614,13 @@
                 minute: '2-digit'
             });
 
-            const text = contact ? escapeHtml(contact.name) : (company ? escapeHtml(company.name) : escapeHtml(task.title));
+            const textParts = [escapeHtml(task.title)];
+            if (contact) textParts.push(escapeHtml(contact.name));
+            if (company) textParts.push(escapeHtml(company.name));
+            const text = textParts.join(' • ');
 
             return `
-                <div class="upcoming-item" onclick="openTask('${task.id}')">
+                <div class="upcoming-item" onclick="openActivityPreview('${task.id}')">
                     <span class="icon">${formatted.typeIcon}</span>
                     <span class="text">${text}</span>
                     <span class="time">${time}</span>
@@ -1455,17 +1628,149 @@
             `;
         }
 
-        function openTask(taskId) {
-            const task = allActivities.find(a => a.id === taskId);
-            if (!task) return;
+        // ============= ACTIVITY PREVIEW MODAL =============
+        function openActivityPreview(activityId) {
+            const activity = allActivities.find(a => a.id === activityId);
+            if (!activity) return;
 
-            if (task.companyId) {
-                window.location.href = `./modules/relationships.html?company=${task.companyId}`;
-            } else if (task.contactId) {
-                window.location.href = `./modules/relationships.html?contact=${task.contactId}`;
+            const formatted = ActivitiesService.formatActivity(activity);
+            const company = allCompanies.find(c => c.id === activity.companyId);
+            const contact = allContacts.find(c => c.id === activity.contactId);
+
+            const dateFormatted = new Date(activity.date).toLocaleString('pl-PL', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            let content = `
+                <div class="activity-preview-header">
+                    <div class="activity-preview-icon">${formatted.typeIcon}</div>
+                    <div class="activity-preview-title-block">
+                        <div class="activity-preview-type">${formatted.typeLabel}</div>
+                        <div class="activity-preview-title">${escapeHtml(activity.title)}</div>
+                        <div class="activity-preview-datetime">${dateFormatted}</div>
+                    </div>
+                    <span class="activity-preview-status ${activity.status}">${formatted.statusLabel}</span>
+                </div>
+
+                <div class="activity-info-grid">
+            `;
+
+            if (contact) {
+                content += `
+                    <div class="activity-info-item">
+                        <div class="activity-info-label">Osoba kontaktowa</div>
+                        <div class="activity-info-value clickable" onclick="viewInRelationships('${contact.id}', 'contact')">
+                            👤 ${escapeHtml(contact.name)}${contact.position ? ` • ${escapeHtml(contact.position)}` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (company) {
+                content += `
+                    <div class="activity-info-item">
+                        <div class="activity-info-label">Firma</div>
+                        <div class="activity-info-value clickable" onclick="viewInRelationships('${company.id}', 'company')">
+                            🏢 ${escapeHtml(company.name)}${company.industry ? ` • ${escapeHtml(company.industry)}` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (contact && contact.email) {
+                content += `
+                    <div class="activity-info-item">
+                        <div class="activity-info-label">Email</div>
+                        <div class="activity-info-value">
+                            <a href="mailto:${escapeHtml(contact.email)}" style="color: var(--accent);">
+                                ${escapeHtml(contact.email)}
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (contact && contact.phone) {
+                content += `
+                    <div class="activity-info-item">
+                        <div class="activity-info-label">Telefon</div>
+                        <div class="activity-info-value">
+                            <a href="tel:${escapeHtml(contact.phone)}" style="color: var(--accent);">
+                                ${escapeHtml(contact.phone)}
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            content += `</div>`;
+
+            if (activity.notes) {
+                content += `
+                    <div class="activity-notes-section">
+                        <div class="activity-notes-title">Notatki</div>
+                        <div class="activity-notes-content">${escapeHtml(activity.notes)}</div>
+                    </div>
+                `;
+            }
+
+            content += `
+                <div class="activity-preview-actions">
+            `;
+
+            if (activity.status === 'planned') {
+                content += `
+                    <button class="btn btn-primary" onclick="completeActivityFromPreview('${activity.id}')">
+                        ✓ Oznacz jako ukończone
+                    </button>
+                `;
+            }
+
+            content += `
+                    <button class="btn btn-secondary" onclick="viewFullDetails('${activity.companyId || activity.contactId}', '${activity.companyId ? 'company' : 'contact'}')">
+                        Zobacz pełne szczegóły
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('activityPreviewContent').innerHTML = content;
+            document.getElementById('activityPreviewModal').classList.add('active');
+        }
+
+        function closeActivityPreview() {
+            document.getElementById('activityPreviewModal').classList.remove('active');
+        }
+
+        async function completeActivityFromPreview(activityId) {
+            try {
+                await ActivitiesService.completeActivity(activityId);
+                showStatus('Zadanie ukończone!', 'success');
+                
+                allActivities = await DataService.loadActivities();
+                renderAllSections();
+                closeActivityPreview();
+            } catch (error) {
+                console.error('Błąd:', error);
+                showStatus('Błąd: ' + error.message, 'error');
             }
         }
 
+        function viewFullDetails(id, type) {
+            closeActivityPreview();
+            viewInRelationships(id, type);
+        }
+
+        window.openActivityPreview = openActivityPreview;
+        window.closeActivityPreview = closeActivityPreview;
+        window.completeActivityFromPreview = completeActivityFromPreview;
+        window.viewFullDetails = viewFullDetails;
+
+        // ============= TASK ACTIONS =============
         async function completeTask(taskId) {
             try {
                 await ActivitiesService.completeActivity(taskId);
@@ -1488,7 +1793,6 @@
         }
 
         // Export to window
-        window.openTask = openTask;
         window.completeTask = completeTask;
         window.viewInRelationships = viewInRelationships;
 
@@ -1836,7 +2140,13 @@
             // Close modals on background click
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.addEventListener('click', (e) => {
-                    if (e.target === modal) modal.classList.remove('active');
+                    if (e.target === modal) {
+                        if (modal.id === 'activityPreviewModal') {
+                            closeActivityPreview();
+                        } else {
+                            modal.classList.remove('active');
+                        }
+                    }
                 });
             });
 
