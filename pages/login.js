@@ -149,6 +149,11 @@ import { DataService } from '../shared/data-service.js';
                     createdAt: userPref[2] || '',
                     updatedAt: userPref[3] || ''
                 };
+            } catch (error) {
+                console.warn('Nie można załadować preferencji użytkownika:', error);
+                return null;
+            }
+        }
 
         /**
          * Reset button state
