@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #f5f1ed;
+  --surface: #ffffff;
+  --surface-soft: rgba(255, 255, 255, 0.88);
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --border-subtle: rgba(17, 24, 39, 0.12);
+  --border-strong: rgba(17, 24, 39, 0.24);
+  --shadow-soft: 0 18px 55px rgba(15, 23, 42, 0.18);
+  --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.16);
+  --radius-card: 18px;
+  --radius-chip: 999px;
+  --accent: #2563eb;
+  --success: #16a34a;
+  --error: #dc2626;
+  --warning: #f59e0b;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ============= HEADER (shared) ============= */
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.app-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.app-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  user-select: none;
+}
+
+.app-logo:hover {
+  opacity: 0.7;
+}
+
+.app-logo-subtitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-secondary);
+}
+
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.user-email {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(15,23,42,0.03);
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 12px rgba(15,23,42,0.12);
+  transform: translateY(-1px);
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-chip);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  padding: 0.5rem 0.9rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(15,23,42,0.03);
+  border-color: var(--text-primary);
+  box-shadow: 0 8px 20px rgba(15,23,42,0.16);
+  transform: translateY(-1px);
+}
+
+/* ============= COMMON UI ============= */
+.loading {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(17, 24, 39, 0.18);
+  border-top-color: var(--text-primary);
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-secondary);
+}
+
+.status-message {
+  position: fixed;
+  top: 90px;
+  right: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  min-width: 240px;
+  box-shadow: var(--shadow-card);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  z-index: 5000;
+  animation: toastIn 0.2s ease-out;
+}
+
+.status-message::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 14px 0 0 14px;
+  background: var(--accent);
+}
+
+.status-message.success::before { background: var(--success); }
+.status-message.error::before { background: var(--error); }
+
+@keyframes toastIn {
+  from { transform: translateY(-6px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
