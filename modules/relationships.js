@@ -2,6 +2,7 @@ import { CONFIG } from '../shared/config.js';
         import { AuthService } from '../shared/auth.js';
         import { DataService } from '../shared/data-service.js';
         import { ActivitiesService } from '../shared/activities-service.js';
+import { bootstrapProtectedPage } from '../shared/app-shell.js';
 
         // ============= AUTH GUARD =============
         if (!AuthService.requireAuth()) {
@@ -47,23 +48,7 @@ import { CONFIG } from '../shared/config.js';
 
         // ============= INIT =============
         async function init() {
-            try {
-                // Set user email in header
-                const email = AuthService.getUserEmail();
-                if (email) {
-                    // Load user preferences
-                    await loadUserPreferences(email);
-                    
-                    // Display name or email
-                    const displayText = AuthService.getUserDisplayText();
-                    document.getElementById('userEmail').textContent = displayText;
-                }
-
-                // Initialize GAPI
-                await initializeGAPI();
-
-                // Set token
-                AuthService.setGAPIToken();
+            try {                const { email } = await bootstrapProtectedPage({ logoAction: 'dashboard' });
 
                 // Load data
                 await loadData();
@@ -74,29 +59,6 @@ import { CONFIG } from '../shared/config.js';
                 console.error('Błąd inicjalizacji modułu:', error);
                 alert('Wystąpił błąd podczas ładowania danych. Sprawdź konsolę.');
             }
-        }
-
-        // ============= GAPI INIT =============
-        async function initializeGAPI() {
-            return new Promise((resolve, reject) => {
-                if (typeof gapi === 'undefined') {
-                    reject(new Error('GAPI nie jest załadowane'));
-                    return;
-                }
-
-                gapi.load('client', async () => {
-                    try {
-                        await gapi.client.init({
-                            apiKey: '',
-                            discoveryDocs: CONFIG.API.DISCOVERY_DOCS,
-                        });
-                        console.log('✓ GAPI initialized');
-                        resolve();
-                    } catch (error) {
-                        reject(error);
-                    }
-                });
-            });
         }
 
         // ============= DATA LOADING =============
@@ -1370,19 +1332,6 @@ async function saveCompany(e) {
             return div.innerHTML;
         }
 
-        // ============= USER PREFERENCES =============
-        async function loadUserPreferences(email) {
-            try {
-                const prefs = await DataService.loadUserPreferences(email);
-                if (prefs && prefs.displayName) {
-                    AuthService.saveDisplayName(prefs.displayName);
-                    console.log('✓ Załadowano preferencje użytkownika:', prefs.displayName);
-                }
-            } catch (error) {
-                console.warn('Nie udało się załadować preferencji użytkownika:', error);
-                // Nie blokuj działania aplikacji
-            }
-        }
 
         /**
          * Konwertuje email na display name jeśli to jest aktualny użytkownik
@@ -2288,12 +2237,6 @@ async function loadTagsData() {
 
         // ============= EVENT LISTENERS =============
         document.addEventListener('DOMContentLoaded', () => {
-            // Logout
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                if (confirm('Czy na pewno chcesz się wylogować?')) {
-                    AuthService.logout();
-                }
-            });
 
             // Tabs
             document.querySelectorAll('.tab-btn').forEach(btn => {
