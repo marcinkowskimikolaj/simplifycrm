@@ -1133,40 +1133,67 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: transparent;
+            background: var(--surface);
             border: 1px solid var(--border-subtle);
             cursor: pointer;
             transition: all 0.18s ease;
-            color: var(--text-secondary);
             margin-right: 0;
         }
 
         .tags-manager-icon:hover {
             background: rgba(15,23,42,0.04);
             border-color: var(--border-strong);
-            color: var(--text-primary);
-        }
-
-        .tags-manager-icon:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(15,23,42,0.12);
+            box-shadow: 0 4px 10px rgba(15,23,42,0.16);
+            transform: translateY(-1px);
         }
 
         .tags-manager-icon svg {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             opacity: 0.7;
         }
 
-        .tags-manager-icon:hover svg {
-            opacity: 1;
+        
+
+        /* Tag Filter Button (match Tags Manager icon style) */
+        .tag-filter-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
         }
 
-        .tags-manager-icon:hover svg {
-            opacity: 1;
+        .tag-filter-btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.18s ease;
+            color: var(--text-primary);
         }
 
-        /* Tags Modal */
+        .tag-filter-btn:hover {
+            background: rgba(15,23,42,0.04);
+            border-color: var(--border-strong);
+            box-shadow: 0 4px 10px rgba(15,23,42,0.16);
+            transform: translateY(-1px);
+        }
+
+        .tag-filter-btn svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .tag-filter-btn:focus-visible {
+            outline: 2px solid rgba(77,109,227,0.35);
+            outline-offset: 2px;
+        }
+/* Tags Modal */
         .tags-modal .modal-content {
             max-width: 680px;
         }
