@@ -19,6 +19,10 @@
                 <div class="app-logo-subtitle">Moduł: Relacje</div>
             </div>
             <div class="app-header-right">
+    <button id="aiSettingsBtn" class="ai-settings-btn" title="Ustawienia AI">✨ AI</button>
+    <span class="user-email" id="userEmail"></span>
+    <button id="logoutBtn" class="logout-btn">Wyloguj</button>
+</div>
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">Wyloguj</button>
             </div>
@@ -169,16 +173,27 @@
         <div class="history-header">
             <div class="history-header-top">
                 <h2 class="history-title">Historia kontaktu</h2>
-                <div class="history-action-buttons">
-                    <button id="addContactActivityBtn" class="add-btn history-add-btn">
-                        <span class="plus">+</span>
-                        <span>Dodaj aktywność</span>
-                    </button>
-                    <button id="addContactNoteBtn" class="add-btn history-add-btn">
-                        <span class="plus">+</span>
-                        <span>Dodaj notatkę</span>
-                    </button>
-                </div>
+<div class="history-action-buttons">
+    <!-- AI Buttons -->
+    <button id="aiSummarizeCompanyBtn" class="ai-btn" title="Podsumuj AI">
+        <span class="ai-icon">✨</span>
+        <span>Podsumuj AI</span>
+    </button>
+    <button id="aiSuggestStepsBtn" class="ai-btn" title="Zaproponuj kroki">
+        <span class="ai-icon">🎯</span>
+        <span>Sugestie</span>
+    </button>
+    
+    <!-- Original Buttons -->
+    <button id="addCompanyActivityBtn" class="add-btn history-add-btn">
+        <span class="plus">+</span>
+        <span>Dodaj aktywność</span>
+    </button>
+    <button id="addCompanyNoteBtn" class="add-btn history-add-btn">
+        <span class="plus">+</span>
+        <span>Dodaj notatkę</span>
+    </button>
+</div>
             </div>
             <div class="history-controls">
                 <div class="history-tabs">
@@ -492,6 +507,7 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- CRM LOGIC -->
+        <script type="module" src="../shared/ai-service.js"></script>
         <script type="module" src="./relationships.js"></script>
 
 
@@ -642,5 +658,67 @@
             </form>
         </div>
     </div>
+
+<!-- MODAL: AI Response -->
+<div id="aiModal" class="modal">
+    <div class="modal-content ai-modal-content">
+        <div class="modal-header">
+            <h2 id="aiModalTitle">✨ Odpowiedź AI</h2>
+            <button class="close-btn" id="closeAiModalBtn">&times;</button>
+        </div>
+        <div id="aiModalBody" class="ai-modal-body">
+            <div class="ai-loading">
+                <div class="spinner"></div>
+                <p>AI analizuje dane...</p>
+            </div>
+        </div>
+        <div class="modal-actions" id="aiModalActions" style="display: none;">
+            <button type="button" class="btn btn-secondary" id="closeAiBtn">Zamknij</button>
+            <button type="button" class="btn btn-primary" id="copyAiBtn">📋 Kopiuj</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: AI Settings -->
+<div id="aiSettingsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>⚙️ Ustawienia AI</h2>
+            <button class="close-btn" onclick="closeAiSettings()">&times;</button>
+        </div>
+        <div class="ai-settings-content">
+            <div class="form-group">
+                <label for="aiApiKey">
+                    Gemini API Key
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" style="font-size: 0.65rem; margin-left: 0.5rem;">
+                        (Pobierz klucz →)
+                    </a>
+                </label>
+                <input type="password" id="aiApiKey" placeholder="AIzaSyC...">
+                <small style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
+                    Klucz jest zapisywany lokalnie w przeglądarce.
+                </small>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="aiConsent" style="width: auto; margin-right: 0.5rem;">
+                    Wyrażam zgodę na przetwarzanie danych przez AI (Google Gemini)
+                </label>
+                <small style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">
+                    Dane są anonimizowane przed wysłaniem.
+                </small>
+            </div>
+
+            <button type="button" class="btn btn-secondary" onclick="testAiConnection()" id="testAiBtn">
+                🧪 Testuj połączenie
+            </button>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeAiSettings()">Anuluj</button>
+            <button type="button" class="btn btn-primary" onclick="saveAiSettings()">Zapisz</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
