@@ -1,3 +1,4 @@
+import { AIService } from '../shared/ai-service.js';
 import { CONFIG } from '../shared/config.js';
         import { AuthService } from '../shared/auth.js';
         import { DataService } from '../shared/data-service.js';
@@ -52,7 +53,13 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
 
                 // Load data
                 await loadData();
-
+// Initialize AI
+                const savedApiKey = localStorage.getItem('ai_api_key');
+                const aiConsent = localStorage.getItem('ai_consent') === 'true';
+                if (savedApiKey && aiConsent) {
+                    AIService.init(savedApiKey);
+                    console.log('✓ AI Service initialized');
+                }
                 console.log('✓ Relationships module initialized');
 
             } catch (error) {
@@ -2601,8 +2608,181 @@ async function loadTagsData() {
                     }
                 }
             });
-        });
+                // AI buttons
+            const aiSummarizeBtn = document.getElementById('aiSummarizeCompanyBtn');
+            const aiSuggestBtn = document.getElementById('aiSuggestStepsBtn');
+            const aiSettingsBtn = document.getElementById('aiSettingsBtn');
+            const closeAiModalBtn = document.getElementById('closeAiModalBtn');
+            const closeAiBtn = document.getElementById('closeAiBtn');
+            const copyAiBtn = document.getElementById('copyAiBtn');
 
+            if (aiSummarizeBtn) aiSummarizeBtn.addEventListener('click', summarizeCompany);
+            if (aiSuggestBtn) aiSuggestBtn.addEventListener('click', suggestNextSteps);
+            if (aiSettingsBtn) aiSettingsBtn.addEventListener('click', showAiSettings);
+            if (closeAiModalBtn) closeAiModalBtn.addEventListener('click', closeAiModal);
+            if (closeAiBtn) closeAiBtn.addEventListener('click', closeAiModal);
+            if (copyAiBtn) copyAiBtn.addEventListener('click', copyAiResponse);
+        });
+// ============= AI FUNCTIONS =============
+
+        async function summarizeCompany() {
+            if (!currentCompanyId) return;
+            if (!AIService.enabled) {
+                showAiSettings();
+                return;
+            }
+
+            const company = companies.find(c => c.id === currentCompanyId);
+            const history = companyHistory.filter(h => h.companyId === currentCompanyId);
+            const companyContacts = contacts.filter(c => c.companyId === currentCompanyId);
+            const activities = companyActivities.filter(a => a.companyId === currentCompanyId);
+
+            showAiModal('Podsumowanie firmy', null);
+
+            try {
+                const summary = await AIService.summarizeCompany(company, history, companyContacts, activities);
+                showAiModal('Podsumowanie: ' + company.name, summary);
+            } catch (error) {
+                console.error('AI Error:', error);
+                showAiModal('Błąd AI', `Nie udało się wygenerować podsumowania:\n\n${error.message}`);
+            }
+        }
+
+        async function suggestNextSteps() {
+            if (!currentCompanyId) return;
+            if (!AIService.enabled) {
+                showAiSettings();
+                return;
+            }
+
+            const company = companies.find(c => c.id === currentCompanyId);
+            const history = companyHistory.filter(h => h.companyId === currentCompanyId);
+            const activities = companyActivities.filter(a => a.companyId === currentCompanyId);
+
+            showAiModal('Sugestie działań', null);
+
+            try {
+                const suggestions = await AIService.suggestNextSteps(company, history, activities);
+                showAiModal('Sugestie dla: ' + company.name, suggestions);
+            } catch (error) {
+                console.error('AI Error:', error);
+                showAiModal('Błąd AI', `Nie udało się wygenerować sugestii:\n\n${error.message}`);
+            }
+        }
+
+        function showAiModal(title, content) {
+            const modal = document.getElementById('aiModal');
+            const titleEl = document.getElementById('aiModalTitle');
+            const bodyEl = document.getElementById('aiModalBody');
+            const actionsEl = document.getElementById('aiModalActions');
+
+            titleEl.textContent = '✨ ' + title;
+
+            if (content === null) {
+                bodyEl.innerHTML = `
+                    <div class="ai-loading">
+                        <div class="spinner"></div>
+                        <p>AI analizuje dane...</p>
+                    </div>
+                `;
+                actionsEl.style.display = 'none';
+            } else {
+                bodyEl.innerHTML = `<div class="ai-response">${content.replace(/\n/g, '<br>')}</div>`;
+                actionsEl.style.display = 'flex';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeAiModal() {
+            document.getElementById('aiModal').classList.remove('active');
+        }
+
+        function copyAiResponse() {
+            const response = document.querySelector('.ai-response');
+            if (!response) return;
+            const text = response.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showStatus('Skopiowano do schowka', 'success');
+            });
+        }
+
+        function showAiSettings() {
+            const modal = document.getElementById('aiSettingsModal');
+            const apiKeyInput = document.getElementById('aiApiKey');
+            const consentCheckbox = document.getElementById('aiConsent');
+            apiKeyInput.value = localStorage.getItem('ai_api_key') || '';
+            consentCheckbox.checked = localStorage.getItem('ai_consent') === 'true';
+            modal.classList.add('active');
+        }
+
+        function closeAiSettings() {
+            document.getElementById('aiSettingsModal').classList.remove('active');
+        }
+
+        function saveAiSettings() {
+            const apiKey = document.getElementById('aiApiKey').value.trim();
+            const consent = document.getElementById('aiConsent').checked;
+
+            if (!consent && apiKey) {
+                alert('Musisz wyrazić zgodę na przetwarzanie danych przez AI.');
+                return;
+            }
+
+            if (apiKey && consent) {
+                localStorage.setItem('ai_api_key', apiKey);
+                localStorage.setItem('ai_consent', 'true');
+                AIService.init(apiKey);
+                showStatus('Ustawienia AI zapisane', 'success');
+            } else {
+                localStorage.removeItem('ai_api_key');
+                localStorage.removeItem('ai_consent');
+                AIService.enabled = false;
+                showStatus('AI wyłączone', 'success');
+            }
+
+            closeAiSettings();
+        }
+
+        async function testAiConnection() {
+            const apiKey = document.getElementById('aiApiKey').value.trim();
+            const btn = document.getElementById('testAiBtn');
+            
+            if (!apiKey) {
+                alert('Wprowadź API key');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Testuję...';
+
+            const tempEnabled = AIService.enabled;
+            const tempKey = AIService.API_KEY;
+            AIService.init(apiKey);
+
+            try {
+                const works = await AIService.testConnection();
+                if (works) {
+                    showStatus('✅ Połączenie działa!', 'success');
+                } else {
+                    showStatus('❌ Test nie powiódł się', 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Błąd: ' + error.message, 'error');
+            }
+
+            AIService.enabled = tempEnabled;
+            AIService.API_KEY = tempKey;
+            btn.disabled = false;
+            btn.textContent = '🧪 Testuj połączenie';
+        }
+
+        window.summarizeCompany = summarizeCompany;
+        window.suggestNextSteps = suggestNextSteps;
+        window.showAiSettings = showAiSettings;
+        window.closeAiSettings = closeAiSettings;
+        window.saveAiSettings = saveAiSettings;
+        window.testAiConnection = testAiConnection;
         // ============= START =============
         if (typeof gapi !== 'undefined') {
             init();
