@@ -2838,7 +2838,7 @@ function updateAiProviderUI() {
         link.href = 'https://platform.openai.com/api-keys';
     } else if (provider === 'llm7') {
         label.childNodes[0].textContent = 'LLM7 API Key ';
-        link.href = 'https://console.llm7.io/api-keys'; // Zakładany link do konsoli
+        link.href = 'https://token.llm7.io/'; // Zakładany link do konsoli
     }
 }
 
