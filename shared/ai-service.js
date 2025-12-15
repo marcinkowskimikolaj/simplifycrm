@@ -5,18 +5,6 @@ export class AIService {
     static API_KEY = null;
     static enabled = false;
 
-    // --- MODELE: kolejność ma znaczenie (od preferowanego do backupu) ---
-    // Ustaw tu swoją listę fallbacków.
-    // Tip: jeśli Gemma często ma 503 (overloaded), daj Gemini jako pierwszy.
-    static MODEL_FALLBACK = [
-        'gemma-3-12b-it',
-        'gemini-2.5-flash-lite',
-        'gemini-2.5-flash'
-    ];
-
-    // Błędy przejściowe: retry ma sens
-    static TRANSIENT_HTTP = new Set([429, 500, 503, 504]);
-
     /**
      * Initialize AI service with user's API key
      */
@@ -30,137 +18,56 @@ export class AIService {
         return true;
     }
 
-    static sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    static isTransientError(err) {
-        const msg = String(err?.message || '').toLowerCase();
-        if (err?.status && this.TRANSIENT_HTTP.has(err.status)) return true;
-        if (msg.includes('overloaded')) return true;
-        if (msg.includes('try again later')) return true;
-        if (msg.includes('timeout')) return true;
-        return false;
-    }
-
     /**
-     * Niski poziom: wywołanie jednego, konkretnego modelu
+     * Main Gemini API call
      */
-    static async callGeminiModel(modelName, prompt, systemPrompt = '', temperature = 0.7) {
+    static async callGemini(prompt, systemPrompt = '', temperature = 0.7) {
         if (!this.enabled || !this.API_KEY) {
             throw new Error('AI is not enabled. Please add API key in settings.');
         }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${this.API_KEY}`;
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: systemPrompt + '\n\n' + prompt }]
-                }],
-                generationConfig: {
-                    temperature: temperature,
-                    maxOutputTokens: 1500,
-                    topK: 40,
-                    topP: 0.95,
-                },
-                safetySettings: [
-                    {
-                        category: "HARM_CATEGORY_HARASSMENT",
-                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                    },
-                    {
-                        category: "HARM_CATEGORY_HATE_SPEECH",
-                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                    }
-                ]
-            })
-        });
-
-        if (!response.ok) {
-            let payload = null;
-            try { payload = await response.json(); } catch { /* ignore */ }
-
-            const message = payload?.error?.message || `API call failed (${response.status})`;
-            const err = new Error(message);
-            err.status = response.status;
-            err.model = modelName;
-            throw err;
-        }
-
-        const data = await response.json();
-
-        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-            const err = new Error('No response from AI');
-            err.status = 502;
-            err.model = modelName;
-            throw err;
-        }
-
-        return data.candidates[0].content.parts[0].text;
-    }
-
-    /**
-     * Średni poziom: retry dla 503/429/5xx na jednym modelu
-     */
-    static async callGeminiModelWithRetry(modelName, prompt, systemPrompt = '', temperature = 0.7, maxAttempts = 3) {
-        let lastErr = null;
-
-        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-            try {
-                return await this.callGeminiModel(modelName, prompt, systemPrompt, temperature);
-            } catch (err) {
-                lastErr = err;
-
-                // NIE retryuj błędów typu 400/401/403 (złe żądanie/klucz/permissions)
-                if (!this.isTransientError(err)) throw err;
-
-                // exponential backoff + jitter
-                const base = 600 * Math.pow(2, attempt - 1); // 600ms, 1200ms, 2400ms...
-                const jitter = Math.floor(base * (0.3 * Math.random())); // do 30% losowo
-                await this.sleep(base + jitter);
-            }
-        }
-
-        throw lastErr;
-    }
-
-    /**
-     * Wysoki poziom: fallback chain po modelach.
-     * Jeśli model A nie da rady (dowolny błąd), próbuj B, potem C...
-     */
-    static async callGeminiWithFallback(prompt, systemPrompt = '', temperature = 0.7, models = null) {
-        const modelList = Array.isArray(models) && models.length ? models : this.MODEL_FALLBACK;
-
-        const errors = [];
-        for (const modelName of modelList) {
-            try {
-                const text = await this.callGeminiModelWithRetry(modelName, prompt, systemPrompt, temperature, 3);
-                return text;
-            } catch (err) {
-                console.warn(`[AI] Model failed: ${modelName}`, err);
-                errors.push({ model: modelName, status: err?.status, message: err?.message });
-                // lecimy dalej do kolejnego modelu
-            }
-        }
-
-        const combined = new Error(
-            'All models failed. ' +
-            errors.map(e => `${e.model}(${e.status || 'n/a'}): ${e.message}`).join(' | ')
-        );
-        combined.details = errors;
-        throw combined;
-    }
-
-    /**
-     * Main Gemini API call (kompatybilne z resztą kodu)
-     * Pod spodem używa fallback chain.
-     */
-    static async callGemini(prompt, systemPrompt = '', temperature = 0.7) {
         try {
-            return await this.callGeminiWithFallback(prompt, systemPrompt, temperature);
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${this.API_KEY}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: systemPrompt + '\n\n' + prompt }]
+                        }],
+                        generationConfig: {
+                            temperature: temperature,
+                            maxOutputTokens: 1500,
+                            topK: 40,
+                            topP: 0.95,
+                        },
+                        safetySettings: [
+                            {
+                                category: "HARM_CATEGORY_HARASSMENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_HATE_SPEECH",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            }
+                        ]
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'API call failed');
+            }
+
+            const data = await response.json();
+            
+            if (!data.candidates || !data.candidates[0]) {
+                throw new Error('No response from AI');
+            }
+
+            return data.candidates[0].content.parts[0].text;
         } catch (error) {
             console.error('Gemini API Error:', error);
             throw error;
@@ -172,7 +79,7 @@ export class AIService {
      */
     static anonymize(text) {
         if (!text) return '';
-
+        
         return text
             // Email addresses
             .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[EMAIL]')
@@ -194,16 +101,16 @@ export class AIService {
         const month = now.getMonth() + 1;
         const day = now.getDate();
         const dayOfWeek = now.getDay();
-
-        const dateStr = now.toLocaleDateString('pl-PL', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+        
+        const dateStr = now.toLocaleDateString('pl-PL', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
         });
-
+        
         let context = `Dzisiaj jest: ${dateStr}\n`;
-
+        
         // Święta i specjalne okresy
         if (month === 12 && day >= 20) {
             context += 'Kontekst: Okres przedświąteczny (Boże Narodzenie). Ludzie są zabiegani, ale otwarci na życzenia i ciepłe kontakty.\n';
@@ -224,14 +131,14 @@ export class AIService {
         } else if ((month === 1 || month === 4 || month === 7 || month === 10) && day <= 10) {
             context += 'Kontekst: Początek kwartału. Dobry moment na nowe inicjatywy i planowanie.\n';
         }
-
+        
         // Dzień tygodnia
         if (dayOfWeek === 1) {
             context += 'To poniedziałek - początek tygodnia pracy.\n';
         } else if (dayOfWeek === 5) {
             context += 'To piątek - koniec tygodnia pracy, ludzie myślą o weekendzie.\n';
         }
-
+        
         return context;
     }
 
@@ -261,7 +168,7 @@ export class AIService {
     static async summarizeCompany(entity, history, contacts, activities) {
         const entityType = this.detectEntityType(entity, contacts);
         const dateContext = this.getCurrentDateContext();
-
+        
         if (entityType === 'contact') {
             // ANALIZA OSOBY KONTAKTOWEJ - miękkie, relacyjne podejście
             const systemPrompt = `Jesteś empatycznym doradcą relacji biznesowych. 
@@ -320,7 +227,7 @@ Napisz ciepłe, empatyczne podsumowanie (3-4 zdania) zawierające:
 Pamiętaj: To analiza OSOBY, nie firmy. Bądź ciepły, partnerski i nienachalny.`;
 
             return await this.callGemini(prompt, systemPrompt, 0.8);
-
+            
         } else {
             // ANALIZA FIRMY - analityczne, strukturalne podejście
             const systemPrompt = `Jesteś strategicznym analitykiem biznesowym CRM.
@@ -343,7 +250,7 @@ Branża: ${entity.industry || 'brak informacji'}
 Liczba powiązanych kontaktów: ${contacts.length}
 Liczba aktywności: ${activities.length}`;
 
-            const contactsList = contacts.length > 0
+            const contactsList = contacts.length > 0 
                 ? contacts.slice(0, 5).map(c => `- ${c.name}${c.position ? ` (${c.position})` : ''}`).join('\n')
                 : 'Brak przypisanych osób kontaktowych';
 
@@ -396,7 +303,7 @@ Pamiętaj: To analiza FIRMY, nie osoby. Bądź analityczny, strategiczny i konkr
     static async suggestNextSteps(entity, history, activities) {
         const entityType = this.detectEntityType(entity, []);
         const dateContext = this.getCurrentDateContext();
-
+        
         if (entityType === 'contact') {
             // SUGESTIE DLA OSOBY KONTAKTOWEJ - miękkie, relacyjne
             const systemPrompt = `Jesteś empatycznym doradcą relacji biznesowych.
@@ -414,7 +321,7 @@ Format: numerowana lista (3 kroki).
 Odpowiadaj TYLKO po polsku.`;
 
             const lastActivity = activities[0];
-            const lastActivityInfo = lastActivity
+            const lastActivityInfo = lastActivity 
                 ? `Ostatnia aktywność: ${lastActivity.type} - "${this.anonymize(lastActivity.title)}" (${new Date(lastActivity.date).toLocaleDateString('pl-PL')})`
                 : 'Brak ostatniej aktywności';
 
@@ -448,7 +355,7 @@ Format odpowiedzi:
 3. [Trzeci krok - długoterminowy]`;
 
             return await this.callGemini(prompt, systemPrompt, 0.8);
-
+            
         } else {
             // SUGESTIE DLA FIRMY - strategiczne, biznesowe
             const systemPrompt = `Jesteś strategicznym doradcą biznesowym CRM.
@@ -466,7 +373,7 @@ Format: numerowana lista (3 kroki).
 Odpowiadaj TYLKO po polsku.`;
 
             const lastActivity = activities[0];
-            const lastActivityInfo = lastActivity
+            const lastActivityInfo = lastActivity 
                 ? `Ostatnia aktywność: ${lastActivity.type} - "${this.anonymize(lastActivity.title)}" (${new Date(lastActivity.date).toLocaleDateString('pl-PL')})`
                 : 'Brak ostatniej aktywności';
 
@@ -510,8 +417,8 @@ Format odpowiedzi:
         const systemPrompt = `Jesteś asystentem biznesowym. Piszesz profesjonalne emaile biznesowe.
 Odpowiadaj TYLKO po polsku. Email powinien być zwięzły, konkretny i profesjonalny.`;
 
-        const contactInfo = contact.position
-            ? `${contact.position}`
+        const contactInfo = contact.position 
+            ? `${contact.position}` 
             : 'Kontakt';
 
         const prompt = `Napisz profesjonalny email do osoby:
