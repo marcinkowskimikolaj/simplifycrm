@@ -55,10 +55,12 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
                 await loadData();
 // Initialize AI
                 const savedApiKey = localStorage.getItem('ai_api_key');
+                const savedProvider = localStorage.getItem('ai_provider') || 'gemini'; // Domyślnie Gemini
                 const aiConsent = localStorage.getItem('ai_consent') === 'true';
+                
                 if (savedApiKey && aiConsent) {
-                    AIService.init(savedApiKey);
-                    console.log('✓ AI Service initialized');
+                    AIService.init(savedApiKey, savedProvider);
+                    console.log(`✓ AI Service initialized with ${savedProvider}`);
                 }
                 console.log('✓ Relationships module initialized');
 
@@ -2804,13 +2806,40 @@ function copyAiResponse() {
     });
 }
 
+// ========== AI SETTINGS LOGIC ==========
+
 function showAiSettings() {
     const modal = document.getElementById('aiSettingsModal');
     const apiKeyInput = document.getElementById('aiApiKey');
+    const providerSelect = document.getElementById('aiProvider');
     const consentCheckbox = document.getElementById('aiConsent');
+    
+    // Wczytaj zapisane dane
     apiKeyInput.value = localStorage.getItem('ai_api_key') || '';
+    providerSelect.value = localStorage.getItem('ai_provider') || 'gemini';
     consentCheckbox.checked = localStorage.getItem('ai_consent') === 'true';
+    
+    // Zaktualizuj wygląd linków w zależności od wybranego dostawcy
+    updateAiProviderUI();
+    
     modal.classList.add('active');
+}
+
+function updateAiProviderUI() {
+    const provider = document.getElementById('aiProvider').value;
+    const label = document.getElementById('aiApiKeyLabel');
+    const link = document.getElementById('aiApiKeyLink');
+    
+    if (provider === 'gemini') {
+        label.childNodes[0].textContent = 'Gemini API Key ';
+        link.href = 'https://aistudio.google.com/app/apikey';
+    } else if (provider === 'openai') {
+        label.childNodes[0].textContent = 'OpenAI API Key ';
+        link.href = 'https://platform.openai.com/api-keys';
+    } else if (provider === 'llm7') {
+        label.childNodes[0].textContent = 'LLM7 API Key ';
+        link.href = 'https://console.llm7.io/api-keys'; // Zakładany link do konsoli
+    }
 }
 
 function closeAiSettings() {
@@ -2819,6 +2848,7 @@ function closeAiSettings() {
 
 function saveAiSettings() {
     const apiKey = document.getElementById('aiApiKey').value.trim();
+    const provider = document.getElementById('aiProvider').value;
     const consent = document.getElementById('aiConsent').checked;
 
     if (!consent && apiKey) {
@@ -2828,11 +2858,16 @@ function saveAiSettings() {
 
     if (apiKey && consent) {
         localStorage.setItem('ai_api_key', apiKey);
+        localStorage.setItem('ai_provider', provider);
         localStorage.setItem('ai_consent', 'true');
-        AIService.init(apiKey);
+        
+        // Re-inicjalizacja serwisu z nowymi danymi
+        AIService.init(apiKey, provider);
+        
         showStatus('Ustawienia AI zapisane', 'success');
     } else {
         localStorage.removeItem('ai_api_key');
+        localStorage.removeItem('ai_provider');
         localStorage.removeItem('ai_consent');
         AIService.enabled = false;
         showStatus('AI wyłączone', 'success');
@@ -2840,9 +2875,9 @@ function saveAiSettings() {
 
     closeAiSettings();
 }
-
 async function testAiConnection() {
     const apiKey = document.getElementById('aiApiKey').value.trim();
+    const provider = document.getElementById('aiProvider').value;
     const btn = document.getElementById('testAiBtn');
     
     if (!apiKey) {
@@ -2853,14 +2888,16 @@ async function testAiConnection() {
     btn.disabled = true;
     btn.textContent = 'Testuję...';
 
-    const tempEnabled = AIService.enabled;
-    const tempKey = AIService.API_KEY;
-    AIService.init(apiKey);
+    // Tymczasowa inicjalizacja do testu
+    const prevKey = AIService.API_KEY;
+    const prevProvider = AIService.PROVIDER;
+    
+    AIService.init(apiKey, provider);
 
     try {
         const works = await AIService.testConnection();
         if (works) {
-            showStatus('✅ Połączenie działa!', 'success');
+            showStatus(`✅ Połączenie z ${provider} działa!`, 'success');
         } else {
             showStatus('❌ Test nie powiódł się', 'error');
         }
@@ -2868,8 +2905,11 @@ async function testAiConnection() {
         showStatus('❌ Błąd: ' + error.message, 'error');
     }
 
-    AIService.enabled = tempEnabled;
-    AIService.API_KEY = tempKey;
+    // Przywrócenie stanu (jeśli nie zapisano)
+    if (!localStorage.getItem('ai_api_key')) {
+        AIService.init(prevKey, prevProvider); 
+    }
+    
     btn.disabled = false;
     btn.textContent = '🧪 Testuj połączenie';
 }
@@ -2882,6 +2922,7 @@ window.showAiSettings = showAiSettings;
 window.closeAiSettings = closeAiSettings;
 window.saveAiSettings = saveAiSettings;
 window.testAiConnection = testAiConnection;
+window.updateAiProviderUI = updateAiProviderUI;
 
 // ============= START =============
 if (typeof gapi !== 'undefined') {
