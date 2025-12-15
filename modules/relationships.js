@@ -2608,20 +2608,29 @@ async function loadTagsData() {
                     }
                 }
             });
-                // AI buttons
-            const aiSummarizeBtn = document.getElementById('aiSummarizeCompanyBtn');
-            const aiSuggestBtn = document.getElementById('aiSuggestStepsBtn');
-            const aiSettingsBtn = document.getElementById('aiSettingsBtn');
-            const closeAiModalBtn = document.getElementById('closeAiModalBtn');
-            const closeAiBtn = document.getElementById('closeAiBtn');
-            const copyAiBtn = document.getElementById('copyAiBtn');
-
-            if (aiSummarizeBtn) aiSummarizeBtn.addEventListener('click', summarizeCompany);
-            if (aiSuggestBtn) aiSuggestBtn.addEventListener('click', suggestNextSteps);
-            if (aiSettingsBtn) aiSettingsBtn.addEventListener('click', showAiSettings);
-            if (closeAiModalBtn) closeAiModalBtn.addEventListener('click', closeAiModal);
-            if (closeAiBtn) closeAiBtn.addEventListener('click', closeAiModal);
-            if (copyAiBtn) copyAiBtn.addEventListener('click', copyAiResponse);
+                // AI buttons - używamy event delegation bo przyciski są w detail view
+document.addEventListener('click', (e) => {
+    if (e.target.closest('#aiSummarizeCompanyBtn')) {
+        e.preventDefault();
+        summarizeCompany();
+    }
+    if (e.target.closest('#aiSuggestStepsBtn')) {
+        e.preventDefault();
+        suggestNextSteps();
+    }
+    if (e.target.closest('#aiSettingsBtn')) {
+        e.preventDefault();
+        showAiSettings();
+    }
+    if (e.target.closest('#closeAiModalBtn') || e.target.closest('#closeAiBtn')) {
+        e.preventDefault();
+        closeAiModal();
+    }
+    if (e.target.closest('#copyAiBtn')) {
+        e.preventDefault();
+        copyAiResponse();
+    }
+});
         });
 // ============= AI FUNCTIONS =============
 
