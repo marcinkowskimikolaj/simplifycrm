@@ -134,4 +134,11 @@ export const CONFIG = {
 // Export dla kompatybilności bez ES6 modules
 if (typeof window !== 'undefined') {
     window.CRM_CONFIG = CONFIG;
+
+    // AI Settings
+    AI: {
+        ENABLED: false,
+        API_KEY: '',
+        PROVIDER: 'gemini'
+    }
 }
