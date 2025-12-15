@@ -2437,177 +2437,229 @@ async function loadTagsData() {
         // ============= EVENT LISTENERS =============
         document.addEventListener('DOMContentLoaded', () => {
 
-            // Tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (btn.dataset.tab === 'contacts') backToContactsList();
-                    else if (btn.dataset.tab === 'companies') backToCompaniesList();
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                    btn.classList.add('active');
-                    document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
-                });
-            });
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.dataset.tab === 'contacts') backToContactsList();
+            else if (btn.dataset.tab === 'companies') backToCompaniesList();
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
+        });
+    });
 
-            // Search
-            const globalSearchInput = document.getElementById('globalSearchInput');
-            const clearSearchBtn = document.getElementById('clearSearchBtn');
-            if (globalSearchInput) {
-                globalSearchInput.addEventListener('input', (e) => {
-                    currentSearchTerm = e.target.value || '';
-                    renderAllContacts();
-                    renderCompanies();
-                    if (currentCompanyId) renderCompanyContacts(currentCompanyId);
-                });
+    // Search
+    const globalSearchInput = document.getElementById('globalSearchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    if (globalSearchInput) {
+        globalSearchInput.addEventListener('input', (e) => {
+            currentSearchTerm = e.target.value || '';
+            renderAllContacts();
+            renderCompanies();
+            if (currentCompanyId) renderCompanyContacts(currentCompanyId);
+        });
+    }
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', () => {
+            currentSearchTerm = '';
+            if (globalSearchInput) globalSearchInput.value = '';
+            renderAllContacts();
+            renderCompanies();
+        });
+    }
+
+    // Companies
+    document.getElementById('addCompanyBtn').addEventListener('click', openCompanyModal);
+    document.getElementById('closeCompanyModalBtn').addEventListener('click', closeCompanyModal);
+    document.getElementById('cancelCompanyBtn').addEventListener('click', closeCompanyModal);
+    document.getElementById('companyForm').addEventListener('submit', saveCompany);
+    document.getElementById('backToCompaniesBtn').addEventListener('click', backToCompaniesList);
+
+    // Contacts
+    document.getElementById('addContactBtn').addEventListener('click', () => openContactModal());
+    document.getElementById('addCompanyContactBtn').addEventListener('click', () => openContactModal(currentCompanyId));
+    document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
+    document.getElementById('cancelContactBtn').addEventListener('click', closeContactModal);
+    document.getElementById('contactForm').addEventListener('submit', saveContact);
+    document.getElementById('backToContactsBtn').addEventListener('click', backToContactsList);
+
+    // Company picker
+    companyInputEl = document.getElementById('contactCompanyInput');
+    companyIdEl = document.getElementById('contactCompanyId');
+    companySuggestionsEl = document.getElementById('companySuggestions');
+
+    if (companyInputEl) {
+        const onInput = () => {
+            companyIdEl.value = '';
+            showCompanySuggestions(companyInputEl.value);
+        };
+        companyInputEl.addEventListener('input', onInput);
+        companyInputEl.addEventListener('focus', onInput);
+    }
+
+    if (companySuggestionsEl) {
+        companySuggestionsEl.addEventListener('click', (e) => {
+            const item = e.target.closest('.company-suggestion-item');
+            if (!item) return;
+            if (item.dataset.id) {
+                const company = companies.find(c => c.id === item.dataset.id);
+                if (company) {
+                    companyInputEl.value = company.name;
+                    companyIdEl.value = company.id;
+                }
             }
-            if (clearSearchBtn) {
-                clearSearchBtn.addEventListener('click', () => {
-                    currentSearchTerm = '';
-                    if (globalSearchInput) globalSearchInput.value = '';
-                    renderAllContacts();
-                    renderCompanies();
-                });
+            hideCompanySuggestions();
+        });
+    }
+
+    // Auto-match company by email domain
+    const contactEmailEl = document.getElementById('contactEmail');
+    if (contactEmailEl && companyInputEl && companyIdEl) {
+        contactEmailEl.addEventListener('blur', () => {
+            const email = contactEmailEl.value.trim();
+            if (!email || !email.includes('@')) return;
+            if (companyInputEl.value.trim() || companyIdEl.value) return;
+            const domain = DataService.extractDomain(email);
+            const matchedCompany = DataService.findCompanyByDomain(companies, domain);
+            if (matchedCompany) {
+                companyInputEl.value = matchedCompany.name;
+                companyIdEl.value = matchedCompany.id;
+                showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
             }
+        });
+    }
 
-            // Companies
-            document.getElementById('addCompanyBtn').addEventListener('click', openCompanyModal);
-            document.getElementById('closeCompanyModalBtn').addEventListener('click', closeCompanyModal);
-            document.getElementById('cancelCompanyBtn').addEventListener('click', closeCompanyModal);
-            document.getElementById('companyForm').addEventListener('submit', saveCompany);
-            document.getElementById('backToCompaniesBtn').addEventListener('click', backToCompaniesList);
+    // Note modal
+    noteEntityTypeEl = document.getElementById('noteEntityType');
+    noteEntityIdEl = document.getElementById('noteEntityId');
+    noteContentEl = document.getElementById('noteContent');
 
-            // Contacts
-            document.getElementById('addContactBtn').addEventListener('click', () => openContactModal());
-            document.getElementById('addCompanyContactBtn').addEventListener('click', () => openContactModal(currentCompanyId));
-            document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
-            document.getElementById('cancelContactBtn').addEventListener('click', closeContactModal);
-            document.getElementById('contactForm').addEventListener('submit', saveContact);
-            document.getElementById('backToContactsBtn').addEventListener('click', backToContactsList);
+    document.getElementById('closeNoteModalBtn').addEventListener('click', closeNoteModal);
+    document.getElementById('cancelNoteBtn').addEventListener('click', closeNoteModal);
+    document.getElementById('noteForm').addEventListener('submit', saveNote);
 
-            // Company picker
-            companyInputEl = document.getElementById('contactCompanyInput');
-            companyIdEl = document.getElementById('contactCompanyId');
-            companySuggestionsEl = document.getElementById('companySuggestions');
+    // Note buttons - używamy event delegation
+    document.addEventListener('click', (e) => {
+        // Company note button
+        if (e.target.closest('#addCompanyNoteBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            openNoteModal('company', currentCompanyId);
+        }
+        // Contact note button
+        if (e.target.closest('#addContactNoteBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            openNoteModal('contact', currentContactId);
+        }
+    });
 
-            if (companyInputEl) {
-                const onInput = () => {
-                    companyIdEl.value = '';
-                    showCompanySuggestions(companyInputEl.value);
-                };
-                companyInputEl.addEventListener('input', onInput);
-                companyInputEl.addEventListener('focus', onInput);
-            }
-
-            if (companySuggestionsEl) {
-                companySuggestionsEl.addEventListener('click', (e) => {
-                    const item = e.target.closest('.company-suggestion-item');
-                    if (!item) return;
-                    if (item.dataset.id) {
-                        const company = companies.find(c => c.id === item.dataset.id);
-                        if (company) {
-                            companyInputEl.value = company.name;
-                            companyIdEl.value = company.id;
-                        }
-                    }
-                    hideCompanySuggestions();
-                });
-            }
-
-            // Auto-match company by email domain
-            const contactEmailEl = document.getElementById('contactEmail');
-            if (contactEmailEl && companyInputEl && companyIdEl) {
-                contactEmailEl.addEventListener('blur', () => {
-                    const email = contactEmailEl.value.trim();
-                    if (!email || !email.includes('@')) return;
-                    if (companyInputEl.value.trim() || companyIdEl.value) return;
-                    const domain = DataService.extractDomain(email);
-                    const matchedCompany = DataService.findCompanyByDomain(companies, domain);
-                    if (matchedCompany) {
-                        companyInputEl.value = matchedCompany.name;
-                        companyIdEl.value = matchedCompany.id;
-                        showStatus(`🎯 Auto-dopasowano firmę: ${matchedCompany.name}`, 'success');
-                    }
-                });
-            }
-
-            // Note modal
-            noteEntityTypeEl = document.getElementById('noteEntityType');
-            noteEntityIdEl = document.getElementById('noteEntityId');
-            noteContentEl = document.getElementById('noteContent');
-
-            document.getElementById('closeNoteModalBtn').addEventListener('click', closeNoteModal);
-            document.getElementById('cancelNoteBtn').addEventListener('click', closeNoteModal);
-            document.getElementById('noteForm').addEventListener('submit', saveNote);
-
-            document.getElementById('addCompanyNoteBtn').addEventListener('click', () => openNoteModal('company', currentCompanyId));
-            document.getElementById('addContactNoteBtn').addEventListener('click', () => openNoteModal('contact', currentContactId));
-
-            // History tabs
-            document.querySelectorAll('.history-tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const entity = btn.dataset.entity;
-                    const scope = btn.dataset.scope;
-                    document.querySelectorAll(`.history-tab-btn[data-entity="${entity}"]`).forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    if (entity === 'company') {
-                        currentCompanyHistoryScope = scope;
-                        if (currentCompanyId) {
-                            if (scope === 'activities') {
-                                renderCompanyActivities(currentCompanyId);
-                            } else {
-                                renderCompanyHistory(currentCompanyId);
-                            }
-                        }
-                    } else if (entity === 'contact') {
-                        currentContactHistoryScope = scope;
-                        if (currentContactId) {
-                            if (scope === 'activities') {
-                                renderContactActivities(currentContactId);
-                            } else {
-                                renderContactHistory(currentContactId);
-                            }
-                        }
-                    }
-                });
-            });
-
-            // Activity modal
-            document.getElementById('closeActivityModalBtn').addEventListener('click', closeActivityModal);
-            document.getElementById('cancelActivityBtn').addEventListener('click', closeActivityModal);
-            document.getElementById('activityForm').addEventListener('submit', saveActivity);
-            document.getElementById('addCompanyActivityBtn').addEventListener('click', () => openActivityModal('company', currentCompanyId));
-            document.getElementById('addContactActivityBtn').addEventListener('click', () => openActivityModal('contact', currentContactId));
-
-            // Activity type selector
-            document.querySelectorAll('.activity-type-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.activity-type-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentActivityType = btn.dataset.type;
-                    document.getElementById('activityType').value = btn.dataset.type;
-                });
-            });
-
-            // Close activity modal on background click
-            document.getElementById('activityModal').addEventListener('click', (e) => {
-                if (e.target.id === 'activityModal') closeActivityModal();
-            });
-
-            // Close modals on background click
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) modal.classList.remove('active');
-                });
-            });
-
-            // Hide company suggestions when clicking outside
-            document.addEventListener('click', (e) => {
-                if (companyInputEl && companyInputEl.closest('.company-picker') && companySuggestionsEl) {
-                    if (!companyInputEl.closest('.company-picker').contains(e.target)) {
-                        hideCompanySuggestions();
+    // History tabs
+    document.querySelectorAll('.history-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const entity = btn.dataset.entity;
+            const scope = btn.dataset.scope;
+            document.querySelectorAll(`.history-tab-btn[data-entity="${entity}"]`).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (entity === 'company') {
+                currentCompanyHistoryScope = scope;
+                if (currentCompanyId) {
+                    if (scope === 'activities') {
+                        renderCompanyActivities(currentCompanyId);
+                    } else {
+                        renderCompanyHistory(currentCompanyId);
                     }
                 }
-            });
+            } else if (entity === 'contact') {
+                currentContactHistoryScope = scope;
+                if (currentContactId) {
+                    if (scope === 'activities') {
+                        renderContactActivities(currentContactId);
+                    } else {
+                        renderContactHistory(currentContactId);
+                    }
+                }
+            }
+        });
+    });
+
+    // Activity modal
+    document.getElementById('closeActivityModalBtn').addEventListener('click', closeActivityModal);
+    document.getElementById('cancelActivityBtn').addEventListener('click', closeActivityModal);
+    document.getElementById('activityForm').addEventListener('submit', saveActivity);
+    
+    // Activity buttons - używamy event delegation
+    document.addEventListener('click', (e) => {
+        // Company activity button
+        if (e.target.closest('#addCompanyActivityBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            openActivityModal('company', currentCompanyId);
+        }
+        // Contact activity button
+        if (e.target.closest('#addContactActivityBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            openActivityModal('contact', currentContactId);
+        }
+    });
+
+    // Activity type selector
+    document.querySelectorAll('.activity-type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.activity-type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentActivityType = btn.dataset.type;
+            document.getElementById('activityType').value = btn.dataset.type;
+        });
+    });
+
+    // AI buttons - używamy event delegation
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('#aiSummarizeCompanyBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            summarizeCompany();
+        }
+        if (e.target.closest('#aiSuggestStepsBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            suggestNextSteps();
+        }
+        if (e.target.closest('#aiSettingsBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            showAiSettings();
+        }
+        if (e.target.closest('#closeAiModalBtn') || e.target.closest('#closeAiBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeAiModal();
+        }
+        if (e.target.closest('#copyAiBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            copyAiResponse();
+        }
+    });
+
+    // Close modals on background click
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+    });
+
+    // Hide company suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (companyInputEl && companyInputEl.closest('.company-picker') && companySuggestionsEl) {
+            if (!companyInputEl.closest('.company-picker').contains(e.target)) {
+                hideCompanySuggestions();
+            }
+        }
+    });
+});
                 // AI buttons - używamy event delegation bo przyciski są w detail view
 document.addEventListener('click', (e) => {
     if (e.target.closest('#aiSummarizeCompanyBtn')) {
