@@ -2716,7 +2716,8 @@ function exportAllCompanies() {
         window.exportAllContacts = exportAllContacts;
         window.exportSelectedCompanies = exportSelectedCompanies;
         window.exportAllCompanies = exportAllCompanies;
-
+        window.toggleExportDropdown = toggleExportDropdown;
+        window.toggleSelectionMode = toggleSelectionMode;
 
 
         // ============= EVENT LISTENERS =============
