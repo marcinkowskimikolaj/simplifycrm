@@ -5,8 +5,8 @@ export class AIService {
     static API_KEY = null;
     static PROVIDER = 'gemini'; // 'gemini', 'openai', 'llm7'
     static enabled = false;
-    static responseCache = new Map(); // Cache dla odpowiedzi AI
     static CACHE_TTL = 10 * 60 * 1000; // 10 minut w milisekundach
+    static CACHE_STORAGE_KEY = 'ai_response_cache'; // localStorage key
 
     /**
      * Initialize AI service with user's settings
@@ -19,6 +19,10 @@ export class AIService {
         this.API_KEY = apiKey;
         this.PROVIDER = provider;
         this.enabled = true;
+        
+        // Wyczyść wygasłe cache entries przy inicjalizacji
+        this.cleanExpiredCache();
+        
         return true;
     }
 
@@ -35,17 +39,11 @@ export class AIService {
         const cacheKey = this.generateCacheKey(prompt, systemPrompt, temperature);
 
         // Sprawdź cache (jeśli nie force refresh)
-        if (!forceRefresh && this.responseCache.has(cacheKey)) {
-            const cached = this.responseCache.get(cacheKey);
-            const now = Date.now();
-            
-            // Sprawdź czy cache nie wygasł (10 minut)
-            if (now - cached.timestamp < this.CACHE_TTL) {
+        if (!forceRefresh) {
+            const cached = this.getCachedResponse(cacheKey);
+            if (cached) {
                 console.log('📦 AI Response loaded from cache');
-                return cached.response;
-            } else {
-                // Cache wygasł, usuń go
-                this.responseCache.delete(cacheKey);
+                return cached;
             }
         }
 
@@ -61,13 +59,87 @@ export class AIService {
             response = await this.callGemini(prompt, systemPrompt, temperature);
         }
 
-        // Zapisz do cache
-        this.responseCache.set(cacheKey, {
-            response: response,
-            timestamp: Date.now()
-        });
+        // Zapisz do cache (localStorage)
+        this.setCachedResponse(cacheKey, response);
 
         return response;
+    }
+
+    /**
+     * Pobierz odpowiedź z localStorage cache
+     */
+    static getCachedResponse(cacheKey) {
+        try {
+            const cacheData = localStorage.getItem(this.CACHE_STORAGE_KEY);
+            if (!cacheData) return null;
+
+            const cache = JSON.parse(cacheData);
+            const entry = cache[cacheKey];
+
+            if (!entry) return null;
+
+            const now = Date.now();
+            
+            // Sprawdź czy cache nie wygasł (10 minut)
+            if (now - entry.timestamp < this.CACHE_TTL) {
+                return entry.response;
+            } else {
+                // Cache wygasł, usuń go
+                delete cache[cacheKey];
+                localStorage.setItem(this.CACHE_STORAGE_KEY, JSON.stringify(cache));
+                return null;
+            }
+        } catch (error) {
+            console.error('Cache read error:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Zapisz odpowiedź do localStorage cache
+     */
+    static setCachedResponse(cacheKey, response) {
+        try {
+            const cacheData = localStorage.getItem(this.CACHE_STORAGE_KEY);
+            const cache = cacheData ? JSON.parse(cacheData) : {};
+
+            cache[cacheKey] = {
+                response: response,
+                timestamp: Date.now()
+            };
+
+            localStorage.setItem(this.CACHE_STORAGE_KEY, JSON.stringify(cache));
+        } catch (error) {
+            console.error('Cache write error:', error);
+        }
+    }
+
+    /**
+     * Wyczyść wygasłe cache entries (wywołane przy init)
+     */
+    static cleanExpiredCache() {
+        try {
+            const cacheData = localStorage.getItem(this.CACHE_STORAGE_KEY);
+            if (!cacheData) return;
+
+            const cache = JSON.parse(cacheData);
+            const now = Date.now();
+            let cleaned = false;
+
+            Object.keys(cache).forEach(key => {
+                if (now - cache[key].timestamp >= this.CACHE_TTL) {
+                    delete cache[key];
+                    cleaned = true;
+                }
+            });
+
+            if (cleaned) {
+                localStorage.setItem(this.CACHE_STORAGE_KEY, JSON.stringify(cache));
+                console.log('🧹 Expired cache entries cleaned');
+            }
+        } catch (error) {
+            console.error('Cache cleanup error:', error);
+        }
     }
 
     /**
@@ -95,8 +167,31 @@ export class AIService {
      * Wyczyść cały cache (opcjonalnie)
      */
     static clearCache() {
-        this.responseCache.clear();
-        console.log('🗑️ AI Cache cleared');
+        try {
+            localStorage.removeItem(this.CACHE_STORAGE_KEY);
+            console.log('🗑️ AI Cache cleared');
+        } catch (error) {
+            console.error('Cache clear error:', error);
+        }
+    }
+
+    /**
+     * Pobierz statystyki cache (do debugowania)
+     */
+    static getCacheStats() {
+        try {
+            const cacheData = localStorage.getItem(this.CACHE_STORAGE_KEY);
+            if (!cacheData) return { entries: 0, size: 0 };
+
+            const cache = JSON.parse(cacheData);
+            const entries = Object.keys(cache).length;
+            const size = new Blob([cacheData]).size;
+
+            return { entries, size };
+        } catch (error) {
+            console.error('Cache stats error:', error);
+            return { entries: 0, size: 0 };
+        }
     }
 
     // ==========================================
