@@ -51,6 +51,8 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
 // Export & Selection variables
 let selectedContactIds = [];
 let selectedCompanyIds = [];
+let contactsSelectionMode = false;
+let companiesSelectionMode = false;
 // AI Request Tracking (for regenerate functionality)
         let lastAiRequest = null; // { type: 'summary'|'suggestions', entityType: 'company'|'contact', entityId: string }
         let lastAiResponse = null; // Ostatnia odpowiedź AI
@@ -2464,17 +2466,19 @@ async function loadTagsData() {
         
         // ============= SELECTION FUNCTIONS - CONTACTS =============
 
-        function toggleContactSelection(contactId, event) {
-            if (event) event.stopPropagation();
-
-            const index = selectedContactIds.indexOf(contactId);
-            if (index > -1) {
-                selectedContactIds.splice(index, 1);
-            } else {
-                selectedContactIds.push(contactId);
-            }
-
-            updateContactSelectionUI();
+function toggleContactSelection(contactId, event) {
+    if (event) event.stopPropagation();
+    
+    const index = selectedContactIds.indexOf(contactId);
+    if (index > -1) {
+        selectedContactIds.splice(index, 1);
+    } else {
+        selectedContactIds.push(contactId);
+    }
+    
+    updateContactSelectionUI();
+    renderAllContacts(); // Re-render to update visual state
+}
 
             // Toggle visual state on card (grid view)
             if (event && event.target) {
@@ -2522,17 +2526,19 @@ async function loadTagsData() {
 
         // ============= SELECTION FUNCTIONS - COMPANIES =============
 
-        function toggleCompanySelection(companyId, event) {
-            if (event) event.stopPropagation();
-
-            const index = selectedCompanyIds.indexOf(companyId);
-            if (index > -1) {
-                selectedCompanyIds.splice(index, 1);
-            } else {
-                selectedCompanyIds.push(companyId);
-            }
-
-            updateCompanySelectionUI();
+function toggleCompanySelection(companyId, event) {
+    if (event) event.stopPropagation();
+    
+    const index = selectedCompanyIds.indexOf(companyId);
+    if (index > -1) {
+        selectedCompanyIds.splice(index, 1);
+    } else {
+        selectedCompanyIds.push(companyId);
+    }
+    
+    updateCompanySelectionUI();
+    renderCompanies(); // Re-render to update visual state
+}
 
             // Toggle visual state on card (grid view)
             if (event && event.target) {
@@ -2581,15 +2587,58 @@ async function loadTagsData() {
         // ============= EXPORT FUNCTIONS - CONTACTS =============
 
         function exportSelectedContacts() {
-            if (selectedContactIds.length === 0) {
-                showStatus('Zaznacz przynajmniej jeden kontakt', 'error');
-                return;
-            }
+    if (selectedContactIds.length === 0) {
+        showStatus('Zaznacz przynajmniej jeden kontakt', 'error');
+        return;
+    }
+    
+    const selectedContacts = contacts.filter(c => selectedContactIds.includes(c.id));
+    generateContactsCSV(selectedContacts, `kontakty_zaznaczone_${getCurrentDateString()}.csv`);
+    showStatus(`Wyeksportowano ${selectedContacts.length} kontaktów`, 'success');
+    
+    // Zamknij dropdown
+    document.getElementById('contactsExportDropdown').classList.remove('visible');
+}
 
-            const selectedContacts = contacts.filter(c => selectedContactIds.includes(c.id));
-            generateContactsCSV(selectedContacts, `kontakty_zaznaczone_${getCurrentDateString()}.csv`);
-            showStatus(`Wyeksportowano ${selectedContacts.length} kontaktów`, 'success');
-        }
+function exportAllContacts() {
+    if (contacts.length === 0) {
+        showStatus('Brak kontaktów do eksportu', 'error');
+        return;
+    }
+    
+    generateContactsCSV(contacts, `kontakty_wszystkie_${getCurrentDateString()}.csv`);
+    showStatus(`Wyeksportowano ${contacts.length} kontaktów`, 'success');
+    
+    // Zamknij dropdown
+    document.getElementById('contactsExportDropdown').classList.remove('visible');
+}
+
+function exportSelectedCompanies() {
+    if (selectedCompanyIds.length === 0) {
+        showStatus('Zaznacz przynajmniej jedną firmę', 'error');
+        return;
+    }
+    
+    const selectedCompanies = companies.filter(c => selectedCompanyIds.includes(c.id));
+    generateCompaniesCSV(selectedCompanies, `firmy_zaznaczone_${getCurrentDateString()}.csv`);
+    showStatus(`Wyeksportowano ${selectedCompanies.length} firm`, 'success');
+    
+    // Zamknij dropdown
+    document.getElementById('companiesExportDropdown').classList.remove('visible');
+}
+
+function exportAllCompanies() {
+    if (companies.length === 0) {
+        showStatus('Brak firm do eksportu', 'error');
+        return;
+    }
+    
+    generateCompaniesCSV(companies, `firmy_wszystkie_${getCurrentDateString()}.csv`);
+    showStatus(`Wyeksportowano ${companies.length} firm`, 'success');
+    
+    // Zamknij dropdown
+    document.getElementById('companiesExportDropdown').classList.remove('visible');
+}
 
         function exportAllContacts() {
             if (contacts.length === 0) {
@@ -3013,6 +3062,8 @@ async function loadTagsData() {
     });
 });
 
+
+
 // ============= AI FUNCTIONS =============
 
 async function summarizeCompany() {
@@ -3410,6 +3461,127 @@ window.closeAiSettings = closeAiSettings;
 window.saveAiSettings = saveAiSettings;
 window.testAiConnection = testAiConnection;
 window.updateAiProviderUI = updateAiProviderUI;
+
+// ============= EXPORT DROPDOWN =============
+
+function toggleExportDropdown(type) {
+    const dropdown = document.getElementById(`${type}ExportDropdown`);
+    const btn = document.getElementById(`${type}ExportBtn`);
+    const isVisible = dropdown.classList.contains('visible');
+    
+    // Zamknij wszystkie inne dropdown'y
+    document.querySelectorAll('.export-dropdown').forEach(d => {
+        if (d !== dropdown) d.classList.remove('visible');
+    });
+    document.querySelectorAll('.export-icon').forEach(b => {
+        if (b !== btn && !b.classList.contains('active')) b.classList.remove('active');
+    });
+    
+    // Toggle current dropdown
+    if (isVisible) {
+        dropdown.classList.remove('visible');
+    } else {
+        dropdown.classList.add('visible');
+    }
+}
+
+// Zamknij dropdown po kliknięciu poza nim
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.export-wrapper')) {
+        document.querySelectorAll('.export-dropdown').forEach(d => {
+            d.classList.remove('visible');
+        });
+    }
+});
+
+// ============= SELECTION MODE =============
+
+function toggleSelectionMode(type) {
+    if (type === 'contacts') {
+        contactsSelectionMode = !contactsSelectionMode;
+        
+        // Update checkbox
+        const toggle = document.getElementById('contactsSelectionModeToggle');
+        if (toggle) toggle.checked = contactsSelectionMode;
+        
+        // Update icon
+        const btn = document.getElementById('contactsExportBtn');
+        if (contactsSelectionMode) {
+            btn.classList.add('active');
+            document.body.setAttribute('data-contacts-selection-mode', 'true');
+        } else {
+            btn.classList.remove('active');
+            document.body.removeAttribute('data-contacts-selection-mode');
+            // Reset selections when turning off
+            selectedContactIds = [];
+            updateContactSelectionUI();
+        }
+        
+        // Re-render to show/hide checkboxes
+        renderAllContacts();
+        
+    } else if (type === 'companies') {
+        companiesSelectionMode = !companiesSelectionMode;
+        
+        // Update checkbox
+        const toggle = document.getElementById('companiesSelectionModeToggle');
+        if (toggle) toggle.checked = companiesSelectionMode;
+        
+        // Update icon
+        const btn = document.getElementById('companiesExportBtn');
+        if (companiesSelectionMode) {
+            btn.classList.add('active');
+            document.body.setAttribute('data-companies-selection-mode', 'true');
+        } else {
+            btn.classList.remove('active');
+            document.body.removeAttribute('data-companies-selection-mode');
+            // Reset selections when turning off
+            selectedCompanyIds = [];
+            updateCompanySelectionUI();
+        }
+        
+        // Re-render to show/hide checkboxes
+        renderCompanies();
+    }
+}
+
+// ============= SELECTION UI UPDATE =============
+
+function updateContactSelectionUI() {
+    const count = selectedContactIds.length;
+    const countSpan = document.getElementById('contactsExportCount');
+    const exportItem = document.getElementById('contactsExportSelectedItem');
+    
+    if (countSpan) {
+        countSpan.textContent = `(${count})`;
+    }
+    
+    if (exportItem) {
+        if (count === 0) {
+            exportItem.classList.add('disabled');
+        } else {
+            exportItem.classList.remove('disabled');
+        }
+    }
+}
+
+function updateCompanySelectionUI() {
+    const count = selectedCompanyIds.length;
+    const countSpan = document.getElementById('companiesExportCount');
+    const exportItem = document.getElementById('companiesExportSelectedItem');
+    
+    if (countSpan) {
+        countSpan.textContent = `(${count})`;
+    }
+    
+    if (exportItem) {
+        if (count === 0) {
+            exportItem.classList.add('disabled');
+        } else {
+            exportItem.classList.remove('disabled');
+        }
+    }
+}
 
 // ============= START =============
 if (typeof gapi !== 'undefined') {
