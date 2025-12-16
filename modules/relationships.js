@@ -3016,18 +3016,30 @@ async function summarizeContact() {
     const history = contactHistory.filter(h => h.contactId === currentContactId);
     const activities = contactActivities.filter(a => a.contactId === currentContactId);
 
+    const company = (contact && contact.companyId) ? companies.find(c => c.id === contact.companyId) : null;
+    const contactForAi = contact ? {
+        ...contact,
+        linkedCompany: company ? {
+            id: company.id,
+            name: company.name,
+            industry: company.industry,
+            city: company.city,
+            country: company.country
+        } : null
+    } : contact;
+
     // Zapisz info o requescie (do regeneracji)
     lastAiRequest = {
         type: 'summary',
         entityType: 'contact',
         entityId: currentContactId,
-        data: { contact, history, activities }
+        data: { contact: contactForAi, history, activities }
     };
 
     showAiModal('Podsumowanie kontaktu', null);
 
     try {
-        const summary = await AIService.summarizeCompany(contact, history, [], activities);
+        const summary = await AIService.summarizeCompany(contactForAi, history, [], activities);
         lastAiResponse = summary;
         showAiModal('Podsumowanie: ' + contact.name, summary);
     } catch (error) {
@@ -3082,18 +3094,30 @@ async function suggestContactNextSteps() {
     const history = contactHistory.filter(h => h.contactId === currentContactId);
     const activities = contactActivities.filter(a => a.contactId === currentContactId);
 
+    const company = (contact && contact.companyId) ? companies.find(c => c.id === contact.companyId) : null;
+    const contactForAi = contact ? {
+        ...contact,
+        linkedCompany: company ? {
+            id: company.id,
+            name: company.name,
+            industry: company.industry,
+            city: company.city,
+            country: company.country
+        } : null
+    } : contact;
+
     // Zapisz info o requescie (do regeneracji)
     lastAiRequest = {
         type: 'suggestions',
         entityType: 'contact',
         entityId: currentContactId,
-        data: { contact, history, activities }
+        data: { contact: contactForAi, history, activities }
     };
 
     showAiModal('Sugestie działań', null);
 
     try {
-        const suggestions = await AIService.suggestNextSteps(contact, history, activities);
+        const suggestions = await AIService.suggestNextSteps(contactForAi, history, activities);
         lastAiResponse = suggestions;
         showAiModal('Sugestie dla: ' + contact.name, suggestions);
     } catch (error) {
