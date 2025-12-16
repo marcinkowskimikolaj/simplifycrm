@@ -2544,7 +2544,6 @@ function toggleCompanySelection(companyId, event) {
                 const card = event.target.closest('.card');
                 if (card) card.classList.toggle('selected', selectedCompanyIds.includes(companyId));
             }
-        }
 
         function selectAllCompanies() {
             const filtered = getFilteredCompanies();
