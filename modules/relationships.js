@@ -2479,13 +2479,6 @@ function toggleContactSelection(contactId, event) {
     updateContactSelectionUI();
     renderAllContacts(); // Re-render to update visual state
 }
-
-            // Toggle visual state on card (grid view)
-            if (event && event.target) {
-                const card = event.target.closest('.card');
-                if (card) card.classList.toggle('selected', selectedContactIds.includes(contactId));
-            }
-
         function selectAllContacts() {
             const filtered = getFilteredContacts();
             selectedContactIds = filtered.map(c => c.id);
@@ -2497,30 +2490,6 @@ function toggleContactSelection(contactId, event) {
             selectedContactIds = [];
             updateContactSelectionUI();
             renderAllContacts(); // Re-render with checkboxes unchecked
-        }
-
-        function updateContactSelectionUI() {
-            const count = selectedContactIds.length;
-            const counter = document.getElementById('contactsSelectionCount');
-            const controls = document.getElementById('contactsSelectionControls');
-            const exportBtn = document.getElementById('exportSelectedContactsBtn');
-            const exportBtnText = exportBtn ? exportBtn.querySelector('span') : null;
-
-            // Update counter
-            if (counter) counter.textContent = `Zaznaczono: ${count}`;
-
-            // Show/hide controls
-            if (controls) {
-                controls.style.display = count > 0 ? 'flex' : 'none';
-            }
-
-            // Update export button
-            if (exportBtn) {
-                exportBtn.disabled = count === 0;
-            }
-            if (exportBtnText) {
-                exportBtnText.textContent = `Eksportuj (${count})`;
-            }
         }
 
         // ============= SELECTION FUNCTIONS - COMPANIES =============
@@ -2538,13 +2507,6 @@ function toggleCompanySelection(companyId, event) {
     updateCompanySelectionUI();
     renderCompanies(); // Re-render to update visual state
 }
-
-            // Toggle visual state on card (grid view)
-            if (event && event.target) {
-                const card = event.target.closest('.card');
-                if (card) card.classList.toggle('selected', selectedCompanyIds.includes(companyId));
-            }
-
         function selectAllCompanies() {
             const filtered = getFilteredCompanies();
             selectedCompanyIds = filtered.map(c => c.id);
@@ -2558,44 +2520,19 @@ function toggleCompanySelection(companyId, event) {
             renderCompanies(); // Re-render with checkboxes unchecked
         }
 
-        function updateCompanySelectionUI() {
-            const count = selectedCompanyIds.length;
-            const counter = document.getElementById('companiesSelectionCount');
-            const controls = document.getElementById('companiesSelectionControls');
-            const exportBtn = document.getElementById('exportSelectedCompaniesBtn');
-            const exportBtnText = exportBtn ? exportBtn.querySelector('span') : null;
-
-            // Update counter
-            if (counter) counter.textContent = `Zaznaczono: ${count}`;
-
-            // Show/hide controls
-            if (controls) {
-                controls.style.display = count > 0 ? 'flex' : 'none';
-            }
-
-            // Update export button
-            if (exportBtn) {
-                exportBtn.disabled = count === 0;
-            }
-            if (exportBtnText) {
-                exportBtnText.textContent = `Eksportuj (${count})`;
-            }
-        }
-
-        // ============= EXPORT FUNCTIONS - CONTACTS =============
-
         function exportSelectedContacts() {
     if (selectedContactIds.length === 0) {
         showStatus('Zaznacz przynajmniej jeden kontakt', 'error');
         return;
     }
-    
+
     const selectedContacts = contacts.filter(c => selectedContactIds.includes(c.id));
     generateContactsCSV(selectedContacts, `kontakty_zaznaczone_${getCurrentDateString()}.csv`);
     showStatus(`Wyeksportowano ${selectedContacts.length} kontaktów`, 'success');
-    
+
     // Zamknij dropdown
-    document.getElementById('contactsExportDropdown').classList.remove('visible');
+    const dropdown = document.getElementById('contactsExportDropdown');
+    if (dropdown) dropdown.classList.remove('visible');
 }
 
 function exportAllContacts() {
@@ -2638,16 +2575,6 @@ function exportAllCompanies() {
     document.getElementById('companiesExportDropdown').classList.remove('visible');
 }
 
-        function exportAllContacts() {
-            if (contacts.length === 0) {
-                showStatus('Brak kontaktów do eksportu', 'error');
-                return;
-            }
-
-            generateContactsCSV(contacts, `kontakty_wszystkie_${getCurrentDateString()}.csv`);
-            showStatus(`Wyeksportowano ${contacts.length} kontaktów`, 'success');
-        }
-
         function generateContactsCSV(contactsList, filename) {
             // CSV Header (stałe kolumny)
             let csv = 'Imię i nazwisko,Firma,Stanowisko,E-mail,Numer telefonu\n';
@@ -2678,27 +2605,6 @@ function exportAllCompanies() {
         }
 
         // ============= EXPORT FUNCTIONS - COMPANIES =============
-
-        function exportSelectedCompanies() {
-            if (selectedCompanyIds.length === 0) {
-                showStatus('Zaznacz przynajmniej jedną firmę', 'error');
-                return;
-            }
-
-            const selectedCompanies = companies.filter(c => selectedCompanyIds.includes(c.id));
-            generateCompaniesCSV(selectedCompanies, `firmy_zaznaczone_${getCurrentDateString()}.csv`);
-            showStatus(`Wyeksportowano ${selectedCompanies.length} firm`, 'success');
-        }
-
-        function exportAllCompanies() {
-            if (companies.length === 0) {
-                showStatus('Brak firm do eksportu', 'error');
-                return;
-            }
-
-            generateCompaniesCSV(companies, `firmy_wszystkie_${getCurrentDateString()}.csv`);
-            showStatus(`Wyeksportowano ${companies.length} firm`, 'success');
-        }
 
         function generateCompaniesCSV(companiesList, filename) {
             // CSV Header (stałe kolumny)
@@ -3547,37 +3453,63 @@ function toggleSelectionMode(type) {
 
 function updateContactSelectionUI() {
     const count = selectedContactIds.length;
+
+    // Legacy selection controls (if present)
+    const counter = document.getElementById('contactsSelectionCount');
+    const controls = document.getElementById('contactsSelectionControls');
+    const exportBtn = document.getElementById('exportSelectedContactsBtn');
+    const exportBtnText = exportBtn ? exportBtn.querySelector('span') : null;
+
+    if (counter) counter.textContent = `Zaznaczono: ${count}`;
+    if (controls) controls.style.display = count > 0 ? 'flex' : 'none';
+    if (exportBtn) exportBtn.disabled = count === 0;
+    if (exportBtnText) exportBtnText.textContent = `Eksportuj (${count})`;
+
+    // Export dropdown selection-mode UI (if present)
     const countSpan = document.getElementById('contactsExportCount');
     const exportItem = document.getElementById('contactsExportSelectedItem');
-    
-    if (countSpan) {
-        countSpan.textContent = `(${count})`;
-    }
-    
-    if (exportItem) {
-        if (count === 0) {
-            exportItem.classList.add('disabled');
-        } else {
-            exportItem.classList.remove('disabled');
-        }
+
+    if (countSpan) countSpan.textContent = `(${count})`;
+    if (exportItem) exportItem.classList.toggle('disabled', count === 0);
+
+    // Select-all checkbox in list view (if present)
+    const selectAll = document.getElementById('selectAllContactsCheckbox');
+    if (selectAll) {
+        const filtered = getFilteredContacts();
+        const total = filtered.length;
+        selectAll.checked = total > 0 && count === total;
+        selectAll.indeterminate = count > 0 && count < total;
     }
 }
 
 function updateCompanySelectionUI() {
     const count = selectedCompanyIds.length;
+
+    // Legacy selection controls (if present)
+    const counter = document.getElementById('companiesSelectionCount');
+    const controls = document.getElementById('companiesSelectionControls');
+    const exportBtn = document.getElementById('exportSelectedCompaniesBtn');
+    const exportBtnText = exportBtn ? exportBtn.querySelector('span') : null;
+
+    if (counter) counter.textContent = `Zaznaczono: ${count}`;
+    if (controls) controls.style.display = count > 0 ? 'flex' : 'none';
+    if (exportBtn) exportBtn.disabled = count === 0;
+    if (exportBtnText) exportBtnText.textContent = `Eksportuj (${count})`;
+
+    // Export dropdown selection-mode UI (if present)
     const countSpan = document.getElementById('companiesExportCount');
     const exportItem = document.getElementById('companiesExportSelectedItem');
-    
-    if (countSpan) {
-        countSpan.textContent = `(${count})`;
-    }
-    
-    if (exportItem) {
-        if (count === 0) {
-            exportItem.classList.add('disabled');
-        } else {
-            exportItem.classList.remove('disabled');
-        }
+
+    if (countSpan) countSpan.textContent = `(${count})`;
+    if (exportItem) exportItem.classList.toggle('disabled', count === 0);
+
+    // Select-all checkbox in list view (if present)
+    const selectAll = document.getElementById('selectAllCompaniesCheckbox');
+    if (selectAll) {
+        const filtered = getFilteredCompanies();
+        const total = filtered.length;
+        selectAll.checked = total > 0 && count === total;
+        selectAll.indeterminate = count > 0 && count < total;
     }
 }
 
