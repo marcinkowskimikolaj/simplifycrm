@@ -5,6 +5,8 @@ export class AIService {
     static API_KEY = null;
     static PROVIDER = 'gemini'; // 'gemini', 'openai', 'llm7'
     static enabled = false;
+    static responseCache = new Map(); // Cache dla odpowiedzi AI
+    static CACHE_TTL = 10 * 60 * 1000; // 10 minut w milisekundach
 
     /**
      * Initialize AI service with user's settings
@@ -22,21 +24,79 @@ export class AIService {
 
     /**
      * CENTRALNA METODA: Wybiera odpowiedniego dostawcę i wysyła zapytanie
+     * @param {boolean} forceRefresh - Jeśli true, pomija cache i generuje nową odpowiedź
      */
-    static async generateContent(prompt, systemPrompt = '', temperature = 0.7) {
+    static async generateContent(prompt, systemPrompt = '', temperature = 0.7, forceRefresh = false) {
         if (!this.enabled || !this.API_KEY) {
             throw new Error('AI is not enabled. Please check settings.');
         }
 
-        console.log(`🤖 AI Request via: ${this.PROVIDER}`);
+        // Generuj klucz cache na podstawie prompta i system prompta
+        const cacheKey = this.generateCacheKey(prompt, systemPrompt, temperature);
 
-        if (this.PROVIDER === 'openai') {
-            return await this.callOpenAI(prompt, systemPrompt, temperature);
-        } else if (this.PROVIDER === 'llm7') {
-            return await this.callLLM7(prompt, systemPrompt, temperature);
-        } else {
-            return await this.callGemini(prompt, systemPrompt, temperature);
+        // Sprawdź cache (jeśli nie force refresh)
+        if (!forceRefresh && this.responseCache.has(cacheKey)) {
+            const cached = this.responseCache.get(cacheKey);
+            const now = Date.now();
+            
+            // Sprawdź czy cache nie wygasł (10 minut)
+            if (now - cached.timestamp < this.CACHE_TTL) {
+                console.log('📦 AI Response loaded from cache');
+                return cached.response;
+            } else {
+                // Cache wygasł, usuń go
+                this.responseCache.delete(cacheKey);
+            }
         }
+
+        console.log(`🤖 AI Request via: ${this.PROVIDER}${forceRefresh ? ' (force refresh)' : ''}`);
+
+        // Wywołaj odpowiedniego providera
+        let response;
+        if (this.PROVIDER === 'openai') {
+            response = await this.callOpenAI(prompt, systemPrompt, temperature);
+        } else if (this.PROVIDER === 'llm7') {
+            response = await this.callLLM7(prompt, systemPrompt, temperature);
+        } else {
+            response = await this.callGemini(prompt, systemPrompt, temperature);
+        }
+
+        // Zapisz do cache
+        this.responseCache.set(cacheKey, {
+            response: response,
+            timestamp: Date.now()
+        });
+
+        return response;
+    }
+
+    /**
+     * Generuje unikalny klucz cache na podstawie parametrów
+     */
+    static generateCacheKey(prompt, systemPrompt, temperature) {
+        const combined = `${systemPrompt}|${prompt}|${temperature}`;
+        return this.simpleHash(combined);
+    }
+
+    /**
+     * Prosty hash function dla cache keys
+     */
+    static simpleHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return hash.toString(36);
+    }
+
+    /**
+     * Wyczyść cały cache (opcjonalnie)
+     */
+    static clearCache() {
+        this.responseCache.clear();
+        console.log('🗑️ AI Cache cleared');
     }
 
     // ==========================================
@@ -218,8 +278,9 @@ export class AIService {
 
     /**
      * Funkcja 1: Podsumuj historię (Firma lub Kontakt)
+     * @param {boolean} forceRefresh - Jeśli true, pomija cache
      */
-    static async summarizeCompany(entity, history, contacts, activities) {
+    static async summarizeCompany(entity, history, contacts, activities, forceRefresh = false) {
         const entityType = this.detectEntityType(entity, contacts);
         const dateContext = this.getCurrentDateContext();
         
@@ -277,7 +338,7 @@ Napisz ciepłe, empatyczne podsumowanie (3-4 zdania) zawierające:
 4. Jeśli kontekst czasowy sprzyja kontaktowi - wspomnij o tym naturalnie`;
 
             // UŻYWA GENERIC LOADERA
-            return await this.generateContent(prompt, systemPrompt, 0.8);
+            return await this.generateContent(prompt, systemPrompt, 0.8, forceRefresh);
             
         } else {
             // PROMPT DLA FIRMY
@@ -340,14 +401,15 @@ Napisz rzeczowe, analityczne podsumowanie (3-4 zdania) zawierające:
 4. Konkretne, logiczne rekomendacje dalszych kroków`;
 
             // UŻYWA GENERIC LOADERA
-            return await this.generateContent(prompt, systemPrompt, 0.7);
+            return await this.generateContent(prompt, systemPrompt, 0.7, forceRefresh);
         }
     }
 
     /**
      * Funkcja 2: Zaproponuj następne kroki
+     * @param {boolean} forceRefresh - Jeśli true, pomija cache
      */
-    static async suggestNextSteps(entity, history, activities) {
+    static async suggestNextSteps(entity, history, activities, forceRefresh = false) {
         const entityType = this.detectEntityType(entity, []);
         const dateContext = this.getCurrentDateContext();
         
@@ -389,7 +451,7 @@ ${recentNotes || 'Brak notatek'}
 
 Zaproponuj 3 subtelne, naturalne kroki na najbliższe 7-14 dni.`;
 
-            return await this.generateContent(prompt, systemPrompt, 0.8);
+            return await this.generateContent(prompt, systemPrompt, 0.8, forceRefresh);
             
         } else {
             // SUGESTIE DLA FIRMY
@@ -429,7 +491,7 @@ ${recentNotes || 'Brak notatek'}
 
 Zaproponuj 3 konkretne, strategiczne kroki na najbliższe 7-14 dni.`;
 
-            return await this.generateContent(prompt, systemPrompt, 0.7);
+            return await this.generateContent(prompt, systemPrompt, 0.7, forceRefresh);
         }
     }
 
