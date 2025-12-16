@@ -47,7 +47,11 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
         let contactsViewMode = 'grid';
         let companiesViewMode = 'grid';
 
-        // AI Request Tracking (for regenerate functionality)
+        
+// Export & Selection variables
+let selectedContactIds = [];
+let selectedCompanyIds = [];
+// AI Request Tracking (for regenerate functionality)
         let lastAiRequest = null; // { type: 'summary'|'suggestions', entityType: 'company'|'contact', entityId: string }
         let lastAiResponse = null; // Ostatnia odpowiedź AI
 
@@ -101,6 +105,10 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
                 renderCompanies();
                 renderAllContacts();
                 renderTagFilterDropdowns();
+
+                // Initialize selection UI
+                updateCompanySelectionUI();
+                updateContactSelectionUI();
 
                 console.log('✓ Wszystkie dane załadowane i wyświetlone');
             } catch (err) {
@@ -256,6 +264,12 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
                     <table class="list-view-table">
                         <thead>
                             <tr>
+                                <th style="width: 40px;">
+                                    <input type="checkbox" 
+                                           id="selectAllCompaniesCheckbox" 
+                                           onchange="handleSelectAllCompanies(this)"
+                                           ${selectedCompanyIds.length > 0 && selectedCompanyIds.length === list.length ? 'checked' : ''}>
+                                </th>
                                 <th>Nazwa firmy</th>
                                 <th>Branża</th>
                                 <th>Miasto</th>
@@ -268,8 +282,14 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
                             ${list.map(company => {
                                 const companyContacts = contacts.filter(c => c.companyId === company.id);
                                 const idx = companies.indexOf(company);
+                                const isSelected = selectedCompanyIds.includes(company.id);
                                 return `
                                     <tr onclick="viewCompanyDetail('${company.id}')">
+                                        <td onclick="event.stopPropagation()">
+                                            <input type="checkbox" 
+                                                   onchange="toggleCompanySelection('${company.id}', event)"
+                                                   ${isSelected ? 'checked' : ''}>
+                                        </td>
                                         <td><strong>${escapeHtml(company.name)}</strong></td>
                                         <td>${company.industry ? escapeHtml(company.industry) : '-'}</td>
                                         <td>${company.city ? escapeHtml(company.city) : '-'}</td>
@@ -290,6 +310,7 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
             } else {
                 grid.innerHTML = list.map(company => {
                     const companyContacts = contacts.filter(c => c.companyId === company.id);
+                    const isSelected = selectedCompanyIds.includes(company.id);
                     let infoRows = '';
 
                     if (company.website) {
@@ -305,7 +326,12 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
 
                     const idx = companies.indexOf(company);
                     return `
-                        <div class="card clickable" onclick="viewCompanyDetail('${company.id}')">
+                        <div class="card clickable ${isSelected ? 'selected' : ''}" onclick="viewCompanyDetail('${company.id}')">
+                            <div class="card-checkbox" onclick="event.stopPropagation()">
+                                <input type="checkbox" 
+                                       onchange="toggleCompanySelection('${company.id}', event)"
+                                       ${isSelected ? 'checked' : ''}>
+                            </div>
                             <div class="card-header">
                                 <div>
                                     <div class="card-title">${escapeHtml(company.name)}</div>
@@ -317,7 +343,7 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
                                 </div>
                             </div>
                             ${infoRows ? `<div class="card-body">${infoRows}</div>` : ''}
-                            
+
                             ${renderEntityTags(company.id, 'company')}
                             <div class="card-badge"><span>👥</span><span>${companyContacts.length} kontaktów</span></div>
                         </div>
@@ -326,7 +352,16 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
             }
         }
 
-        // ============= RENDER CONTACTS =============
+        function handleSelectAllCompanies(checkbox) {
+            if (checkbox.checked) {
+                selectAllCompanies();
+            } else {
+                deselectAllCompanies();
+            }
+        }
+
+
+// ============= RENDER CONTACTS =============
         function renderAllContacts() {
             const grid = document.getElementById('contactsGrid');
             const listView = document.getElementById('contactsList');
@@ -356,6 +391,12 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
                     <table class="list-view-table">
                         <thead>
                             <tr>
+                                <th style="width: 40px;">
+                                    <input type="checkbox" 
+                                           id="selectAllContactsCheckbox" 
+                                           onchange="handleSelectAllContacts(this)"
+                                           ${selectedContactIds.length > 0 && selectedContactIds.length === list.length ? 'checked' : ''}>
+                                </th>
                                 <th>Imię i nazwisko</th>
                                 <th>Firma</th>
                                 <th>Stanowisko</th>
@@ -368,8 +409,14 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
                             ${list.map(contact => {
                                 const index = contacts.findIndex(c => c.id === contact.id);
                                 const company = companies.find(c => c.id === contact.companyId);
+                                const isSelected = selectedContactIds.includes(contact.id);
                                 return `
                                     <tr onclick="viewContactDetail('${contact.id}')">
+                                        <td onclick="event.stopPropagation()">
+                                            <input type="checkbox" 
+                                                   onchange="toggleContactSelection('${contact.id}', event)"
+                                                   ${isSelected ? 'checked' : ''}>
+                                        </td>
                                         <td><strong>${escapeHtml(contact.name)}</strong></td>
                                         <td>${company ? escapeHtml(company.name) : '<span style="color: var(--text-secondary);">Brak</span>'}</td>
                                         <td>${contact.position ? escapeHtml(contact.position) : '-'}</td>
@@ -391,8 +438,14 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
                 grid.innerHTML = list.map(contact => {
                     const index = contacts.findIndex(c => c.id === contact.id);
                     const company = companies.find(c => c.id === contact.companyId);
+                    const isSelected = selectedContactIds.includes(contact.id);
                     return `
-                        <div class="card clickable" onclick="viewContactDetail('${contact.id}')">
+                        <div class="card clickable ${isSelected ? 'selected' : ''}" onclick="viewContactDetail('${contact.id}')">
+                            <div class="card-checkbox" onclick="event.stopPropagation()">
+                                <input type="checkbox" 
+                                       onchange="toggleContactSelection('${contact.id}', event)"
+                                       ${isSelected ? 'checked' : ''}>
+                            </div>
                             <div class="card-header">
                                 <div>
                                     <div class="card-title">${escapeHtml(contact.name)}</div>
@@ -407,7 +460,7 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
                                 ${company ? `<div class="card-info-row"><span class="emoji">🏢</span><span>${escapeHtml(company.name)}</span></div>` : `<div class="card-badge no-company"><span>⚠️</span><span>Brak firmy</span></div>`}
                                 ${contact.email ? `<div class="card-info-row"><span class="emoji">📧</span><span>${escapeHtml(contact.email)}</span></div>` : ''}
                                 ${contact.phone ? `<div class="card-info-row"><span class="emoji">📱</span><span>${escapeHtml(contact.phone)}</span></div>` : ''}
-                            
+
                             ${renderEntityTags(contact.id, 'contact')}
                         </div>
                         </div>
@@ -416,7 +469,16 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
             }
         }
 
-        // ============= COMPANY DETAIL =============
+        function handleSelectAllContacts(checkbox) {
+            if (checkbox.checked) {
+                selectAllContacts();
+            } else {
+                deselectAllContacts();
+            }
+        }
+
+
+// ============= COMPANY DETAIL =============
         function viewCompanyDetail(companyId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -2399,7 +2461,252 @@ async function loadTagsData() {
         
 
         
-        // ============= MAKE FUNCTIONS GLOBAL =============
+        
+        // ============= SELECTION FUNCTIONS - CONTACTS =============
+
+        function toggleContactSelection(contactId, event) {
+            if (event) event.stopPropagation();
+
+            const index = selectedContactIds.indexOf(contactId);
+            if (index > -1) {
+                selectedContactIds.splice(index, 1);
+            } else {
+                selectedContactIds.push(contactId);
+            }
+
+            updateContactSelectionUI();
+
+            // Toggle visual state on card (grid view)
+            if (event && event.target) {
+                const card = event.target.closest('.card');
+                if (card) card.classList.toggle('selected', selectedContactIds.includes(contactId));
+            }
+        }
+
+        function selectAllContacts() {
+            const filtered = getFilteredContacts();
+            selectedContactIds = filtered.map(c => c.id);
+            updateContactSelectionUI();
+            renderAllContacts(); // Re-render with checkboxes checked
+        }
+
+        function deselectAllContacts() {
+            selectedContactIds = [];
+            updateContactSelectionUI();
+            renderAllContacts(); // Re-render with checkboxes unchecked
+        }
+
+        function updateContactSelectionUI() {
+            const count = selectedContactIds.length;
+            const counter = document.getElementById('contactsSelectionCount');
+            const controls = document.getElementById('contactsSelectionControls');
+            const exportBtn = document.getElementById('exportSelectedContactsBtn');
+            const exportBtnText = exportBtn ? exportBtn.querySelector('span') : null;
+
+            // Update counter
+            if (counter) counter.textContent = `Zaznaczono: ${count}`;
+
+            // Show/hide controls
+            if (controls) {
+                controls.style.display = count > 0 ? 'flex' : 'none';
+            }
+
+            // Update export button
+            if (exportBtn) {
+                exportBtn.disabled = count === 0;
+            }
+            if (exportBtnText) {
+                exportBtnText.textContent = `Eksportuj (${count})`;
+            }
+        }
+
+        // ============= SELECTION FUNCTIONS - COMPANIES =============
+
+        function toggleCompanySelection(companyId, event) {
+            if (event) event.stopPropagation();
+
+            const index = selectedCompanyIds.indexOf(companyId);
+            if (index > -1) {
+                selectedCompanyIds.splice(index, 1);
+            } else {
+                selectedCompanyIds.push(companyId);
+            }
+
+            updateCompanySelectionUI();
+
+            // Toggle visual state on card (grid view)
+            if (event && event.target) {
+                const card = event.target.closest('.card');
+                if (card) card.classList.toggle('selected', selectedCompanyIds.includes(companyId));
+            }
+        }
+
+        function selectAllCompanies() {
+            const filtered = getFilteredCompanies();
+            selectedCompanyIds = filtered.map(c => c.id);
+            updateCompanySelectionUI();
+            renderCompanies(); // Re-render with checkboxes checked
+        }
+
+        function deselectAllCompanies() {
+            selectedCompanyIds = [];
+            updateCompanySelectionUI();
+            renderCompanies(); // Re-render with checkboxes unchecked
+        }
+
+        function updateCompanySelectionUI() {
+            const count = selectedCompanyIds.length;
+            const counter = document.getElementById('companiesSelectionCount');
+            const controls = document.getElementById('companiesSelectionControls');
+            const exportBtn = document.getElementById('exportSelectedCompaniesBtn');
+            const exportBtnText = exportBtn ? exportBtn.querySelector('span') : null;
+
+            // Update counter
+            if (counter) counter.textContent = `Zaznaczono: ${count}`;
+
+            // Show/hide controls
+            if (controls) {
+                controls.style.display = count > 0 ? 'flex' : 'none';
+            }
+
+            // Update export button
+            if (exportBtn) {
+                exportBtn.disabled = count === 0;
+            }
+            if (exportBtnText) {
+                exportBtnText.textContent = `Eksportuj (${count})`;
+            }
+        }
+
+        // ============= EXPORT FUNCTIONS - CONTACTS =============
+
+        function exportSelectedContacts() {
+            if (selectedContactIds.length === 0) {
+                showStatus('Zaznacz przynajmniej jeden kontakt', 'error');
+                return;
+            }
+
+            const selectedContacts = contacts.filter(c => selectedContactIds.includes(c.id));
+            generateContactsCSV(selectedContacts, `kontakty_zaznaczone_${getCurrentDateString()}.csv`);
+            showStatus(`Wyeksportowano ${selectedContacts.length} kontaktów`, 'success');
+        }
+
+        function exportAllContacts() {
+            if (contacts.length === 0) {
+                showStatus('Brak kontaktów do eksportu', 'error');
+                return;
+            }
+
+            generateContactsCSV(contacts, `kontakty_wszystkie_${getCurrentDateString()}.csv`);
+            showStatus(`Wyeksportowano ${contacts.length} kontaktów`, 'success');
+        }
+
+        function generateContactsCSV(contactsList, filename) {
+            // CSV Header (stałe kolumny)
+            let csv = 'Imię i nazwisko,Firma,Stanowisko,E-mail,Numer telefonu\n';
+
+            // CSV Rows
+            contactsList.forEach(contact => {
+                const company = companies.find(c => c.id === contact.companyId);
+                const companyName = company ? company.name : '';
+
+                // Escape values for CSV (handle commas, quotes)
+                const escapeCsv = (value) => {
+                    if (!value) return '';
+                    const str = String(value);
+                    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                        return `"${str.replace(/"/g, '""')}"`;
+                    }
+                    return str;
+                };
+
+                csv += `${escapeCsv(contact.name)},`;
+                csv += `${escapeCsv(companyName)},`;
+                csv += `${escapeCsv(contact.position)},`;
+                csv += `${escapeCsv(contact.email)},`;
+                csv += `${escapeCsv(contact.phone)}\n`;
+            });
+
+            downloadCSV(csv, filename);
+        }
+
+        // ============= EXPORT FUNCTIONS - COMPANIES =============
+
+        function exportSelectedCompanies() {
+            if (selectedCompanyIds.length === 0) {
+                showStatus('Zaznacz przynajmniej jedną firmę', 'error');
+                return;
+            }
+
+            const selectedCompanies = companies.filter(c => selectedCompanyIds.includes(c.id));
+            generateCompaniesCSV(selectedCompanies, `firmy_zaznaczone_${getCurrentDateString()}.csv`);
+            showStatus(`Wyeksportowano ${selectedCompanies.length} firm`, 'success');
+        }
+
+        function exportAllCompanies() {
+            if (companies.length === 0) {
+                showStatus('Brak firm do eksportu', 'error');
+                return;
+            }
+
+            generateCompaniesCSV(companies, `firmy_wszystkie_${getCurrentDateString()}.csv`);
+            showStatus(`Wyeksportowano ${companies.length} firm`, 'success');
+        }
+
+        function generateCompaniesCSV(companiesList, filename) {
+            // CSV Header (stałe kolumny)
+            let csv = 'Nazwa firmy,Branża,Telefon firmowy,Domena\n';
+
+            // CSV Rows
+            companiesList.forEach(company => {
+                // Escape values for CSV
+                const escapeCsv = (value) => {
+                    if (!value) return '';
+                    const str = String(value);
+                    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                        return `"${str.replace(/"/g, '""')}"`;
+                    }
+                    return str;
+                };
+
+                csv += `${escapeCsv(company.name)},`;
+                csv += `${escapeCsv(company.industry)},`;
+                csv += `${escapeCsv(company.phone)},`;
+                csv += `${escapeCsv(company.domain)}\n`;
+            });
+
+            downloadCSV(csv, filename);
+        }
+
+        // ============= CSV DOWNLOAD HELPER =============
+
+        function downloadCSV(csvContent, filename) {
+            // Add BOM for proper UTF-8 encoding in Excel
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function getCurrentDateString() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+// ============= MAKE FUNCTIONS GLOBAL =============
         // Make all functions available for onclick handlers
         
         // Basic functions
@@ -2438,6 +2745,25 @@ async function loadTagsData() {
         window.openActivityModal = openActivityModal;
         window.completeActivity = completeActivity;
         window.deleteActivity = deleteActivity;
+
+        // Export & selection functions
+        window.toggleContactSelection = toggleContactSelection;
+        window.selectAllContacts = selectAllContacts;
+        window.deselectAllContacts = deselectAllContacts;
+        window.updateContactSelectionUI = updateContactSelectionUI;
+        window.handleSelectAllContacts = handleSelectAllContacts;
+
+        window.toggleCompanySelection = toggleCompanySelection;
+        window.selectAllCompanies = selectAllCompanies;
+        window.deselectAllCompanies = deselectAllCompanies;
+        window.updateCompanySelectionUI = updateCompanySelectionUI;
+        window.handleSelectAllCompanies = handleSelectAllCompanies;
+
+        window.exportSelectedContacts = exportSelectedContacts;
+        window.exportAllContacts = exportAllContacts;
+        window.exportSelectedCompanies = exportSelectedCompanies;
+        window.exportAllCompanies = exportAllCompanies;
+
 
 
         // ============= EVENT LISTENERS =============
