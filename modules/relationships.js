@@ -2485,7 +2485,6 @@ function toggleContactSelection(contactId, event) {
                 const card = event.target.closest('.card');
                 if (card) card.classList.toggle('selected', selectedContactIds.includes(contactId));
             }
-        }
 
         function selectAllContacts() {
             const filtered = getFilteredContacts();
