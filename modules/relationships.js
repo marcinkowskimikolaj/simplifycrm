@@ -47,6 +47,10 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
         let contactsViewMode = 'grid';
         let companiesViewMode = 'grid';
 
+        // AI Request Tracking (for regenerate functionality)
+        let lastAiRequest = null; // { type: 'summary'|'suggestions', entityType: 'company'|'contact', entityId: string }
+        let lastAiResponse = null; // Ostatnia odpowiedź AI
+
         // ============= INIT =============
         async function init() {
             try {                const { email } = await bootstrapProtectedPage({ logoAction: 'dashboard' });
@@ -2650,15 +2654,20 @@ async function loadTagsData() {
             e.stopPropagation();
             showAiSettings();
         }
-        if (e.target.closest('#closeAiModalBtn') || e.target.closest('#closeAiBtn')) {
+        if (e.target.closest('#closeAiModalBtn')) {
             e.preventDefault();
             e.stopPropagation();
             closeAiModal();
         }
-        if (e.target.closest('#copyAiBtn')) {
+        if (e.target.closest('#regenerateAiBtn')) {
             e.preventDefault();
             e.stopPropagation();
-            copyAiResponse();
+            regenerateLastAiRequest();
+        }
+        if (e.target.closest('#saveAiNoteBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            saveAiResponseAsNote();
         }
     });
     // Close modals on background click
@@ -2692,13 +2701,24 @@ async function summarizeCompany() {
     const companyContacts = contacts.filter(c => c.companyId === currentCompanyId);
     const activities = companyActivities.filter(a => a.companyId === currentCompanyId);
 
+    // Zapisz info o requescie (do regeneracji)
+    lastAiRequest = {
+        type: 'summary',
+        entityType: 'company',
+        entityId: currentCompanyId,
+        data: { company, history, companyContacts, activities }
+    };
+
     showAiModal('Podsumowanie firmy', null);
 
     try {
         const summary = await AIService.summarizeCompany(company, history, companyContacts, activities);
+        lastAiResponse = summary;
         showAiModal('Podsumowanie: ' + company.name, summary);
     } catch (error) {
         console.error('AI Error:', error);
+        lastAiRequest = null;
+        lastAiResponse = null;
         showAiModal('Błąd AI', `Nie udało się wygenerować podsumowania:\n\n${error.message}`);
     }
 }
@@ -2714,13 +2734,24 @@ async function summarizeContact() {
     const history = contactHistory.filter(h => h.contactId === currentContactId);
     const activities = contactActivities.filter(a => a.contactId === currentContactId);
 
+    // Zapisz info o requescie (do regeneracji)
+    lastAiRequest = {
+        type: 'summary',
+        entityType: 'contact',
+        entityId: currentContactId,
+        data: { contact, history, activities }
+    };
+
     showAiModal('Podsumowanie kontaktu', null);
 
     try {
         const summary = await AIService.summarizeCompany(contact, history, [], activities);
+        lastAiResponse = summary;
         showAiModal('Podsumowanie: ' + contact.name, summary);
     } catch (error) {
         console.error('AI Error:', error);
+        lastAiRequest = null;
+        lastAiResponse = null;
         showAiModal('Błąd AI', `Nie udało się wygenerować podsumowania:\n\n${error.message}`);
     }
 }
@@ -2736,13 +2767,24 @@ async function suggestNextSteps() {
     const history = companyHistory.filter(h => h.companyId === currentCompanyId);
     const activities = companyActivities.filter(a => a.companyId === currentCompanyId);
 
+    // Zapisz info o requescie (do regeneracji)
+    lastAiRequest = {
+        type: 'suggestions',
+        entityType: 'company',
+        entityId: currentCompanyId,
+        data: { company, history, activities }
+    };
+
     showAiModal('Sugestie działań', null);
 
     try {
         const suggestions = await AIService.suggestNextSteps(company, history, activities);
+        lastAiResponse = suggestions;
         showAiModal('Sugestie dla: ' + company.name, suggestions);
     } catch (error) {
         console.error('AI Error:', error);
+        lastAiRequest = null;
+        lastAiResponse = null;
         showAiModal('Błąd AI', `Nie udało się wygenerować sugestii:\n\n${error.message}`);
     }
 }
@@ -2758,13 +2800,24 @@ async function suggestContactNextSteps() {
     const history = contactHistory.filter(h => h.contactId === currentContactId);
     const activities = contactActivities.filter(a => a.contactId === currentContactId);
 
+    // Zapisz info o requescie (do regeneracji)
+    lastAiRequest = {
+        type: 'suggestions',
+        entityType: 'contact',
+        entityId: currentContactId,
+        data: { contact, history, activities }
+    };
+
     showAiModal('Sugestie działań', null);
 
     try {
         const suggestions = await AIService.suggestNextSteps(contact, history, activities);
+        lastAiResponse = suggestions;
         showAiModal('Sugestie dla: ' + contact.name, suggestions);
     } catch (error) {
         console.error('AI Error:', error);
+        lastAiRequest = null;
+        lastAiResponse = null;
         showAiModal('Błąd AI', `Nie udało się wygenerować sugestii:\n\n${error.message}`);
     }
 }
@@ -2804,6 +2857,122 @@ function copyAiResponse() {
     navigator.clipboard.writeText(text).then(() => {
         showStatus('Skopiowano do schowka', 'success');
     });
+}
+
+/**
+ * Regeneruj ostatnie AI zapytanie (bypass cache)
+ */
+async function regenerateLastAiRequest() {
+    if (!lastAiRequest) {
+        showStatus('Brak poprzedniego zapytania do regeneracji', 'error');
+        return;
+    }
+
+    const { type, entityType, entityId, data } = lastAiRequest;
+
+    // Pokaż loading state
+    const titleText = type === 'summary' ? 'Podsumowanie' : 'Sugestie działań';
+    showAiModal(titleText, null);
+
+    try {
+        let response;
+        
+        // Wywołaj odpowiednią funkcję z forceRefresh=true
+        if (type === 'summary') {
+            if (entityType === 'company') {
+                response = await AIService.summarizeCompany(
+                    data.company, 
+                    data.history, 
+                    data.companyContacts, 
+                    data.activities,
+                    true // forceRefresh - pomija cache
+                );
+            } else {
+                response = await AIService.summarizeCompany(
+                    data.contact, 
+                    data.history, 
+                    [], 
+                    data.activities,
+                    true // forceRefresh
+                );
+            }
+        } else if (type === 'suggestions') {
+            if (entityType === 'company') {
+                response = await AIService.suggestNextSteps(
+                    data.company, 
+                    data.history, 
+                    data.activities,
+                    true // forceRefresh
+                );
+            } else {
+                response = await AIService.suggestNextSteps(
+                    data.contact, 
+                    data.history, 
+                    data.activities,
+                    true // forceRefresh
+                );
+            }
+        }
+
+        lastAiResponse = response;
+        const entityName = data.company?.name || data.contact?.name || 'Entity';
+        const fullTitle = type === 'summary' 
+            ? `Podsumowanie: ${entityName}` 
+            : `Sugestie dla: ${entityName}`;
+        showAiModal(fullTitle, response);
+        showStatus('✨ Wygenerowano nową odpowiedź', 'success');
+        
+    } catch (error) {
+        console.error('Regenerate AI Error:', error);
+        showAiModal('Błąd AI', `Nie udało się wygenerować odpowiedzi:\n\n${error.message}`);
+        showStatus('Błąd podczas regeneracji', 'error');
+    }
+}
+
+/**
+ * Zapisz odpowiedź AI jako notatkę w CRM
+ */
+async function saveAiResponseAsNote() {
+    if (!lastAiResponse || !lastAiRequest) {
+        showStatus('Brak odpowiedzi AI do zapisania', 'error');
+        return;
+    }
+
+    const { entityType, entityId } = lastAiRequest;
+
+    // Przygotuj dane notatki
+    const noteData = {
+        type: 'note',
+        content: `[AI] ${lastAiResponse}`,
+        timestamp: new Date().toISOString(),
+        user: AuthService.getCurrentUser()?.email || 'unknown'
+    };
+
+    try {
+        // Zapisz notatkę w odpowiednim miejscu
+        if (entityType === 'company') {
+            noteData.companyId = entityId;
+            companyHistory.push(noteData);
+            await DataService.saveCompanyHistory(companyHistory);
+            renderCompanyHistory(entityId);
+            showStatus('💾 Zapisano jako notatkę w firmie', 'success');
+        } else if (entityType === 'contact') {
+            noteData.contactId = entityId;
+            contactHistory.push(noteData);
+            await DataService.saveContactHistory(contactHistory);
+            renderContactHistory(entityId);
+            showStatus('💾 Zapisano jako notatkę w kontakcie', 'success');
+        }
+
+        // Zamknij modal po zapisaniu
+        setTimeout(() => {
+            closeAiModal();
+        }, 1000);
+
+    } catch (error) {
+        console.error('Save AI Note Error:', error);
+        showStatus('Błąd podczas zapisywania notatki', 'error');
+    }
 }
 
 // ========== AI SETTINGS LOGIC ==========
