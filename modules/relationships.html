@@ -86,34 +86,42 @@
                             <div class="tag-filter-dropdown" id="contactsTagFilterDropdown"></div>
                         </div>
 
-<!-- Selection Counter & Export Buttons -->
-<div class="selection-controls" id="contactsSelectionControls" style="display: none;">
-    <span class="selection-count" id="contactsSelectionCount">Zaznaczono: 0</span>
-    <button class="select-all-btn" id="contactsSelectAllBtn" onclick="selectAllContacts()" title="Zaznacz wszystkie">
-        ☑ Wszystkie
+<!-- Export Dropdown -->
+<div class="export-wrapper" id="contactsExportWrapper">
+    <button class="export-icon" id="contactsExportBtn" onclick="toggleExportDropdown('contacts')" title="Eksportuj">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
     </button>
-    <button class="deselect-all-btn" id="contactsDeselectAllBtn" onclick="deselectAllContacts()" title="Odznacz wszystkie">
-        ☐ Wyczyść
-    </button>
+    <div class="export-dropdown" id="contactsExportDropdown">
+        <div class="export-dropdown-header">
+            <h4>Eksport</h4>
+        </div>
+        <div class="export-dropdown-item toggle-item" onclick="toggleSelectionMode('contacts')">
+            <input type="checkbox" id="contactsSelectionModeToggle" onclick="event.stopPropagation()">
+            <span>Tryb zaznaczania</span>
+        </div>
+        <div class="export-dropdown-separator"></div>
+        <div class="export-dropdown-item" id="contactsExportSelectedItem" onclick="exportSelectedContacts()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4"></path>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span>Eksportuj zaznaczone</span>
+            <span class="export-count" id="contactsExportCount">(0)</span>
+        </div>
+        <div class="export-dropdown-item" onclick="exportAllContacts()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="9" x2="15" y2="9"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <span>Eksportuj wszystkie</span>
+        </div>
+    </div>
 </div>
-
-<!-- Export Buttons -->
-<button class="export-btn" id="exportSelectedContactsBtn" onclick="exportSelectedContacts()" disabled title="Eksportuj zaznaczone">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-    </svg>
-    <span>Eksportuj (0)</span>
-</button>
-<button class="export-btn secondary" onclick="exportAllContacts()" title="Eksportuj wszystkie kontakty">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-    </svg>
-    <span>Eksportuj wszystkie</span>
-</button>
                         
                         <!-- Active Filter Chip (hidden by default) -->
                         <div class="active-tag-filter" id="contactsActiveFilter" style="display: none;">
@@ -272,41 +280,49 @@
                             </button>
                             <div class="tag-filter-dropdown" id="companiesTagFilterDropdown"></div>
                         </div>
-                        
+                        <!-- Export Dropdown -->
+<div class="export-wrapper" id="companiesExportWrapper">
+    <button class="export-icon" id="companiesExportBtn" onclick="toggleExportDropdown('companies')" title="Eksportuj">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+    </button>
+    <div class="export-dropdown" id="companiesExportDropdown">
+        <div class="export-dropdown-header">
+            <h4>Eksport</h4>
+        </div>
+        <div class="export-dropdown-item toggle-item" onclick="toggleSelectionMode('companies')">
+            <input type="checkbox" id="companiesSelectionModeToggle" onclick="event.stopPropagation()">
+            <span>Tryb zaznaczania</span>
+        </div>
+        <div class="export-dropdown-separator"></div>
+        <div class="export-dropdown-item" id="companiesExportSelectedItem" onclick="exportSelectedCompanies()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4"></path>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span>Eksportuj zaznaczone</span>
+            <span class="export-count" id="companiesExportCount">(0)</span>
+        </div>
+        <div class="export-dropdown-item" onclick="exportAllCompanies()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="9" x2="15" y2="9"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <span>Eksportuj wszystkie</span>
+        </div>
+    </div>
+</div>
                         <!-- Active Filter Chip (hidden by default) -->
                         <div class="active-tag-filter" id="companiesActiveFilter" style="display: none;">
                             <span class="filter-color"></span>
                             <span class="filter-name"></span>
                             <button class="filter-clear" onclick="clearTagFilter()">&times;</button>
                         </div>
-<!-- Selection Counter & Export Buttons -->
-<div class="selection-controls" id="companiesSelectionControls" style="display: none;">
-    <span class="selection-count" id="companiesSelectionCount">Zaznaczono: 0</span>
-    <button class="select-all-btn" id="companiesSelectAllBtn" onclick="selectAllCompanies()" title="Zaznacz wszystkie">
-        ☑ Wszystkie
-    </button>
-    <button class="deselect-all-btn" id="companiesDeselectAllBtn" onclick="deselectAllCompanies()" title="Odznacz wszystkie">
-        ☐ Wyczyść
-    </button>
-</div>
 
-<!-- Export Buttons -->
-<button class="export-btn" id="exportSelectedCompaniesBtn" onclick="exportSelectedCompanies()" disabled title="Eksportuj zaznaczone">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-    </svg>
-    <span>Eksportuj (0)</span>
-</button>
-<button class="export-btn secondary" onclick="exportAllCompanies()" title="Eksportuj wszystkie firmy">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-    </svg>
-    <span>Eksportuj wszystkie</span>
-</button>
                         <div class="view-switcher">
                             <button class="view-btn active" data-view="grid" title="Widok kafelków" onclick="switchCompaniesView('grid')">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
