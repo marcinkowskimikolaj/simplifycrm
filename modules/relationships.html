@@ -85,6 +85,35 @@
                             </button>
                             <div class="tag-filter-dropdown" id="contactsTagFilterDropdown"></div>
                         </div>
+
+<!-- Selection Counter & Export Buttons -->
+<div class="selection-controls" id="contactsSelectionControls" style="display: none;">
+    <span class="selection-count" id="contactsSelectionCount">Zaznaczono: 0</span>
+    <button class="select-all-btn" id="contactsSelectAllBtn" onclick="selectAllContacts()" title="Zaznacz wszystkie">
+        ☑ Wszystkie
+    </button>
+    <button class="deselect-all-btn" id="contactsDeselectAllBtn" onclick="deselectAllContacts()" title="Odznacz wszystkie">
+        ☐ Wyczyść
+    </button>
+</div>
+
+<!-- Export Buttons -->
+<button class="export-btn" id="exportSelectedContactsBtn" onclick="exportSelectedContacts()" disabled title="Eksportuj zaznaczone">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+    <span>Eksportuj (0)</span>
+</button>
+<button class="export-btn secondary" onclick="exportAllContacts()" title="Eksportuj wszystkie kontakty">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+    <span>Eksportuj wszystkie</span>
+</button>
                         
                         <!-- Active Filter Chip (hidden by default) -->
                         <div class="active-tag-filter" id="contactsActiveFilter" style="display: none;">
@@ -250,7 +279,34 @@
                             <span class="filter-name"></span>
                             <button class="filter-clear" onclick="clearTagFilter()">&times;</button>
                         </div>
+<!-- Selection Counter & Export Buttons -->
+<div class="selection-controls" id="companiesSelectionControls" style="display: none;">
+    <span class="selection-count" id="companiesSelectionCount">Zaznaczono: 0</span>
+    <button class="select-all-btn" id="companiesSelectAllBtn" onclick="selectAllCompanies()" title="Zaznacz wszystkie">
+        ☑ Wszystkie
+    </button>
+    <button class="deselect-all-btn" id="companiesDeselectAllBtn" onclick="deselectAllCompanies()" title="Odznacz wszystkie">
+        ☐ Wyczyść
+    </button>
+</div>
 
+<!-- Export Buttons -->
+<button class="export-btn" id="exportSelectedCompaniesBtn" onclick="exportSelectedCompanies()" disabled title="Eksportuj zaznaczone">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+    <span>Eksportuj (0)</span>
+</button>
+<button class="export-btn secondary" onclick="exportAllCompanies()" title="Eksportuj wszystkie firmy">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+    <span>Eksportuj wszystkie</span>
+</button>
                         <div class="view-switcher">
                             <button class="view-btn active" data-view="grid" title="Widok kafelków" onclick="switchCompaniesView('grid')">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
