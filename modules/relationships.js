@@ -2940,26 +2940,18 @@ async function saveAiResponseAsNote() {
 
     const { entityType, entityId } = lastAiRequest;
 
-    // Przygotuj dane notatki
-    const noteData = {
-        type: 'note',
-        content: `[AI] ${lastAiResponse}`,
-        timestamp: new Date().toISOString(),
-        user: AuthService.getUserEmail() || 'unknown'
-    };
-
     try {
-        // Zapisz notatkę w odpowiednim miejscu
+        // Zapisz notatkę w odpowiednim miejscu używając logHistory
         if (entityType === 'company') {
-            noteData.companyId = entityId;
-            companyHistory.push(noteData);
-            await DataService.saveCompanyHistory(companyHistory);
+            await DataService.logCompanyHistory(entityId, 'note', `[AI] ${lastAiResponse}`);
+            // Przeładuj CAŁĄ historię firm z backendu (bez cache)
+            companyHistory = await DataService.loadCompanyHistory(null, false);
             renderCompanyHistory(entityId);
             showStatus('💾 Zapisano jako notatkę w firmie', 'success');
         } else if (entityType === 'contact') {
-            noteData.contactId = entityId;
-            contactHistory.push(noteData);
-            await DataService.saveContactHistory(contactHistory);
+            await DataService.logContactHistory(entityId, 'note', `[AI] ${lastAiResponse}`);
+            // Przeładuj CAŁĄ historię kontaktów z backendu (bez cache)
+            contactHistory = await DataService.loadContactHistory(null, false);
             renderContactHistory(entityId);
             showStatus('💾 Zapisano jako notatkę w kontakcie', 'success');
         }
