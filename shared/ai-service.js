@@ -387,16 +387,29 @@ Analizujesz historię kontaktu z OSOBĄ KONTAKTOWĄ.
 Twoje podejście:
 - Miękkie, relacyjne, kontekstowe
 - Skupiasz się na potencjale relacji interpersonalnej
+- Bierzesz pod uwagę, czy osoba jest powiązana z firmą i jaką rolę w niej pełni
 - Analizujesz historię i dynamikę kontaktu
 - Sugerujesz możliwe okazje do podtrzymania lub pogłębienia relacji
 
 Ton: empatyczny, partnerski, naturalny, nienachalny.
 Odpowiadaj TYLKO po polsku.`;
 
+            const companyLine = (() => {
+                const c = entity.linkedCompany;
+                if (c && (c.name || c.id)) {
+                    const loc = [c.city, c.country].filter(Boolean).join(', ');
+                    const meta = [c.industry, loc].filter(Boolean).join(' • ');
+                    return `Powiązana firma: ${c.name || 'Nieznana'}${meta ? ` (${meta})` : ''}`;
+                }
+                if (entity.companyId) return 'Powiązana firma: Tak (brak szczegółów)';
+                return 'Powiązana firma: Brak';
+            })();
+
             const contactInfo = `Osoba: ${entity.name}
 ${entity.position ? `Stanowisko: ${entity.position}` : ''}
 ${entity.email ? `Email: [EMAIL]` : ''}
 ${entity.phone ? `Telefon: [TELEFON]` : ''}
+${companyLine}
 Liczba aktywności: ${activities.length}`;
 
             const recentHistory = history
@@ -427,7 +440,7 @@ Ostatnie aktywności:
 ${recentActivities || 'Brak aktywności'}
 
 Napisz ciepłe, empatyczne podsumowanie (3-4 zdania) zawierające:
-1. Jakość i potencjał relacji z tą osobą
+1. Jakość i potencjał relacji z tą osobą (uwzględnij powiązaną firmę, jeśli jest)
 2. Dynamikę kontaktu (czy jest regularny, czy ustał)
 3. Subtelne sugestie jak podtrzymać lub pogłębić relację
 4. Jeśli kontekst czasowy sprzyja kontaktowi - wspomnij o tym naturalnie`;
@@ -516,6 +529,7 @@ Proponujesz subtelne, naturalne kroki do podtrzymania lub pogłębienia relacji 
 Twoje sugestie:
 - Są naturalne i nienachalne
 - Koncentrują się na budowaniu relacji, nie na sprzedaży
+- Uwzględniają powiązanie osoby z firmą (jeśli istnieje) i wynikające z tego możliwości
 - Uwzględniają kontekst czasowy i okoliczności
 - Są wykonalne i konkretne
 
@@ -534,10 +548,22 @@ Odpowiadaj TYLKO po polsku.`;
                 .map(h => this.anonymize(h.content))
                 .join('\n');
 
+            const companyLine = (() => {
+                const c = entity.linkedCompany;
+                if (c && (c.name || c.id)) {
+                    const loc = [c.city, c.country].filter(Boolean).join(', ');
+                    const meta = [c.industry, loc].filter(Boolean).join(' • ');
+                    return `Firma: ${c.name || 'Nieznana'}${meta ? ` (${meta})` : ''}`;
+                }
+                if (entity.companyId) return 'Firma: Tak (brak szczegółów)';
+                return 'Firma: Brak';
+            })();
+
             const prompt = `${dateContext}
 
 Osoba kontaktowa: ${entity.name}
 ${entity.position ? `Stanowisko: ${entity.position}` : ''}
+${companyLine}
 
 ${lastActivityInfo}
 
