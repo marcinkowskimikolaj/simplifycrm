@@ -2945,7 +2945,7 @@ async function saveAiResponseAsNote() {
         type: 'note',
         content: `[AI] ${lastAiResponse}`,
         timestamp: new Date().toISOString(),
-        user: AuthService.getCurrentUser()?.email || 'unknown'
+        user: AuthService.getUserEmail() || 'unknown'
     };
 
     try {
