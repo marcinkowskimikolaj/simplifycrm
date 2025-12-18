@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <link rel="stylesheet" href="./styles/base.css">
-        <link rel="stylesheet" href="./styles/dashboard.css">
-
+        \1        <link rel="stylesheet" href="./styles/custom-fields.css">
 </head>
 <body>
     <!-- HEADER -->
@@ -24,6 +23,8 @@
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                 </button>
+<button id="settingsBtn" class="icon-btn" title="Ustawienia CRM">⚙️</button>
+
                 <button id="logoutBtn" class="logout-btn">Wyloguj</button>
             </div>
         </div>
@@ -281,7 +282,13 @@
                     <label for="companyNotes">Notatki <span class="optional">(opcjonalnie)</span></label>
                     <textarea id="companyNotes" placeholder="Dodatkowe informacje"></textarea>
                 </div>
-                <div class="modal-actions">
+                
+                <div class="custom-fields-section" id="companyCustomFieldsSection" style="display:none;">
+                    <div class="custom-fields-title">Pola własne</div>
+                    <div id="companyCustomFieldsContainer" class="custom-fields-grid"></div>
+                    <div class="custom-fields-hint">Zarządzaj w Ustawieniach CRM (⚙️)</div>
+                </div>
+<div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="cancelCompanyBtn">Anuluj</button>
                     <button type="submit" class="btn btn-primary">Zapisz</button>
                 </div>
@@ -321,7 +328,13 @@
                     <label for="contactPhone">Telefon <span class="optional">(opcjonalnie)</span></label>
                     <input type="tel" id="contactPhone">
                 </div>
-                <div class="modal-actions">
+                
+                <div class="custom-fields-section" id="contactCustomFieldsSection" style="display:none;">
+                    <div class="custom-fields-title">Pola własne</div>
+                    <div id="contactCustomFieldsContainer" class="custom-fields-grid"></div>
+                    <div class="custom-fields-hint">Zarządzaj w Ustawieniach CRM (⚙️)</div>
+                </div>
+<div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="cancelContactBtn">Anuluj</button>
                     <button type="submit" class="btn btn-primary">Zapisz</button>
                 </div>
