@@ -3683,7 +3683,9 @@ async function saveContactCustomFieldValues(contactId, values) {
 }
 
 async function renderCompanyDetailCustomFields(companyId) {
-    const detailInfo = document.querySelector('#companyDetailModal .detail-info');
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    const detailInfo = document.querySelector('#companyDetailContent .detail-info');
     if (!detailInfo || companyCustomFields.length === 0) {
         return;
     }
@@ -3696,26 +3698,23 @@ async function renderCompanyDetailCustomFields(companyId) {
         
         if (customFieldsHtml) {
             const customSection = `
-                <div class="detail-section custom-fields-section">
-                    <h3 class="detail-section-title">Pola własne</h3>
+                <div class="detail-section custom-fields-section" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                    <h3 style="font-size: 0.85rem; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 0.75rem;">Pola własne</h3>
                     ${customFieldsHtml}
                 </div>
             `;
             
-            const historySection = detailInfo.querySelector('.history-section');
-            if (historySection) {
-                historySection.insertAdjacentHTML('beforebegin', customSection);
-            } else {
-                detailInfo.insertAdjacentHTML('beforeend', customSection);
-            }
+            detailInfo.insertAdjacentHTML('beforeend', customSection);
         }
     } catch (error) {
-        console.warn('Nie udało się załadować custom fields dla detail view:', error);
+        console.warn('Nie udało się załadować custom fields dla firmy:', error);
     }
 }
 
 async function renderContactDetailCustomFields(contactId) {
-    const detailInfo = document.querySelector('#contactDetailModal .detail-info');
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    const detailInfo = document.querySelector('#contactDetailContent .detail-info');
     if (!detailInfo || contactCustomFields.length === 0) {
         return;
     }
@@ -3728,21 +3727,16 @@ async function renderContactDetailCustomFields(contactId) {
         
         if (customFieldsHtml) {
             const customSection = `
-                <div class="detail-section custom-fields-section">
-                    <h3 class="detail-section-title">Pola własne</h3>
+                <div class="detail-section custom-fields-section" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                    <h3 style="font-size: 0.85rem; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 0.75rem;">Pola własne</h3>
                     ${customFieldsHtml}
                 </div>
             `;
             
-            const historySection = detailInfo.querySelector('.history-section');
-            if (historySection) {
-                historySection.insertAdjacentHTML('beforebegin', customSection);
-            } else {
-                detailInfo.insertAdjacentHTML('beforeend', customSection);
-            }
+            detailInfo.insertAdjacentHTML('beforeend', customSection);
         }
     } catch (error) {
-        console.warn('Nie udało się załadować custom fields dla detail view:', error);
+        console.warn('Nie udało się załadować custom fields dla kontaktu:', error);
     }
 }
 
