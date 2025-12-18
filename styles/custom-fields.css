@@ -1,103 +1,71 @@
-/* Custom Fields (Kontakty/Firmy) - shared styling */
+/* Custom Fields - shared styles (used by settings page and entity forms) */
 
 .custom-fields-section {
-  margin: 0.75rem 0 0.25rem;
-  padding: 0.75rem;
-  border: 1px solid var(--border-subtle, rgba(15,23,42,0.12));
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.03);
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px dashed var(--border-subtle);
 }
 
 .custom-fields-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: var(--text-primary, #0f172a);
-  margin-bottom: 0.6rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
 }
 
 .custom-fields-container {
-  display: grid;
-  gap: 0.65rem;
-}
-
-.custom-fields-container .form-group {
-  margin: 0;
-}
-
-.custom-fields-container label {
-  display: block;
-  margin-bottom: 0.35rem;
-  font-size: 0.8rem;
-  color: var(--text-secondary, rgba(15,23,42,0.7));
-}
-
-.custom-fields-container input,
-.custom-fields-container select,
-.custom-fields-container textarea {
-  width: 100%;
-}
-
-.custom-fields-empty {
-  font-size: 0.8rem;
-  color: var(--text-secondary, rgba(15,23,42,0.7));
-  line-height: 1.5;
-}
-
-/* Detail view: simple rows */
-.detail-custom-fields {
-  margin-top: 0.75rem;
-  border-top: 1px dashed var(--border-subtle, rgba(15,23,42,0.18));
-  padding-top: 0.75rem;
-}
-
-.detail-custom-fields .detail-info-row {
-  margin-top: 0.45rem;
-}
-
-/* Added for dynamic custom fields sections */
-
-.custom-fields-section {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(15,23,42,0.08);
-}
-
-.custom-fields-title {
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-}
-
-.custom-fields-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
 }
 
-.custom-fields-hint {
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
-  color: rgba(15, 23, 42, 0.7);
+.custom-field-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 0.75rem;
+  align-items: start;
 }
 
-.custom-field textarea {
-  min-height: 80px;
+.custom-field-row label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding-top: 0.55rem;
 }
 
-.custom-field-checkbox {
-  display: flex;
-  align-items: center;
-  height: 40px;
+.custom-field-row .required {
+  color: var(--error);
+  margin-left: 0.25rem;
+  font-weight: 700;
 }
 
-.detail-custom-fields {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(15,23,42,0.08);
+.custom-field-input input,
+.custom-field-input select,
+.custom-field-input textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  background: #fff;
+  font-size: 0.95rem;
+  outline: none;
 }
 
-@media (max-width: 720px) {
-  .custom-fields-grid {
-    grid-template-columns: 1fr;
-  }
+.custom-field-input textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.custom-field-input input:focus,
+.custom-field-input select:focus,
+.custom-field-input textarea:focus {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.custom-fields-help {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
 }
