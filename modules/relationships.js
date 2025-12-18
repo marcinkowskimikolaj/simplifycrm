@@ -3086,9 +3086,9 @@ Dane z CRM:
 ${companyInfo}
 
 W notatce uwzględnij:
-Czym firma się zajmuje (możesz szukać w internecie) oraz Jakie mogą być typowe potrzeby/problemy, które CRM może pomóc rozwiązać (ogólnie, bez wciskania)
+Czym firma się zajmuje (możesz szukać w internecie)
 
-Nie wymyślaj faktów jako pewników.`;
+Nie wymyślaj faktów jako pewników. Format odpowiedz to ciągły tekst, bez formatowania, bez informacji jak podawanie strony www, lokalizacji. Preferowanie zaczynaj od nazwy firmy później przechodź do opisu działalności, opisz jakie mają usługi po krótce, czym się charakteryzują, nie pisz o dalszych krokach z firmą`;
 
     // zapamiętaj request do regeneracji i do "Zapisz"
     lastAiRequest = {
