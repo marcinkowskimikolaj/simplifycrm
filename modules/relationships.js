@@ -3064,10 +3064,10 @@ async function enrichCompanyNotes(companyId = currentCompanyId) {
     const company = companies.find(c => c.id === companyId);
     if (!company) return;
 
-    // Przygotuj prompt enrichment (bez udawania, że masz dostęp do internetu)
+    // Przygotuj prompt enrichment
     const systemPrompt = `Jesteś analitykiem B2B i asystentem handlowca pracującego w CRM.
-Twoim zadaniem jest przygotować "enrichment notatki" o firmie na podstawie dostępnych pól z CRM.
-Jeśli czegoś nie wiesz – jasno oznacz to jako hipotezę i zaproponuj, jakie dane warto uzupełnić (np. www, oferta, wielkość, klient docelowy).
+Twoim zadaniem jest przygotować "enrichment notatki" o firmie.
+Jeśli czegoś nie wiesz – jasno oznacz to jako hipotezę..
 Odpowiadaj TYLKO po polsku.
 Format: krótka, gotowa do wklejenia notatka dla handlowca (konkret, bez lania wody).`;
 
@@ -3086,11 +3086,7 @@ Dane z CRM:
 ${companyInfo}
 
 W notatce uwzględnij:
-1) Czym firma się zajmuje (jeśli brak danych -> hipoteza + co doprecyzować)
-2) Jakie mogą być typowe potrzeby/problemy, które CRM może pomóc rozwiązać (ogólnie, bez wciskania)
-3) Możliwe punkty zaczepienia do rozmowy (2–4)
-4) 5 pytań discovery, które warto zadać
-5) Proponowany next step (1 zdanie)
+Czym firma się zajmuje (możesz szukać w internecie) oraz Jakie mogą być typowe potrzeby/problemy, które CRM może pomóc rozwiązać (ogólnie, bez wciskania)
 
 Nie wymyślaj faktów jako pewników.`;
 
