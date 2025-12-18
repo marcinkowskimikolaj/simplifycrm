@@ -1,9 +1,10 @@
-import { AIService } from '../shared/ai-service.js'; 
-import { CONFIG } from '../shared/config.js';
+        import { AIService } from '../shared/ai-service.js'; 
+        import { CONFIG } from '../shared/config.js';
         import { AuthService } from '../shared/auth.js';
         import { DataService } from '../shared/data-service.js';
         import { ActivitiesService } from '../shared/activities-service.js';
-import { bootstrapProtectedPage } from '../shared/app-shell.js';
+        import { bootstrapProtectedPage } from '../shared/app-shell.js';
+        import { CustomFieldsUI } from '../shared/custom-fields-ui.js';
 
         // ============= AUTH GUARD =============
         if (!AuthService.requireAuth()) {
@@ -47,6 +48,11 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
         let contactsViewMode = 'grid';
         let companiesViewMode = 'grid';
 
+        // Custom Fields variables
+        let customFieldsDefinitions = [];
+        let companyCustomFields = [];
+        let contactCustomFields = [];
+
         
 // Export & Selection variables
 let selectedContactIds = [];
@@ -61,7 +67,9 @@ let selectedCompanyIds = [];
 
                 // Load data
                 await loadData();
-// Initialize AI
+                // Load custom fields
+                await loadCustomFieldsDefinitions();
+                // Initialize AI
                 const savedApiKey = localStorage.getItem('ai_api_key');
                 const savedProvider = localStorage.getItem('ai_provider') || 'gemini'; // Domyślnie Gemini
                 const aiConsent = localStorage.getItem('ai_consent') === 'true';
