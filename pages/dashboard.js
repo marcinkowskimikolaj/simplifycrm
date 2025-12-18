@@ -1,5 +1,6 @@
 import { AuthService } from '../shared/auth.js';
 import { DataService } from '../shared/data-service.js';
+import { CustomFieldsUI } from '../shared/custom-fields-ui.js';
 import { ActivitiesService } from '../shared/activities-service.js';
 import { bootstrapProtectedPage } from '../shared/app-shell.js';
 
@@ -23,6 +24,15 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
         async function init() {
             try {
                 const { email, displayName } = await bootstrapProtectedPage({ logoAction: 'reload' });
+
+                // ⚙️ Settings shortcut
+                const settingsBtn = document.getElementById('settingsBtn');
+                if (settingsBtn) {
+                    settingsBtn.addEventListener('click', () => {
+                        window.location.href = './modules/settings.html';
+                    });
+                }
+
 
                 if (email) {
                     if (displayName) {
@@ -399,12 +409,68 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
             document.getElementById('dashboardContent').style.display = 'block';
         }
 
+        
+        // ============= CUSTOM FIELDS (Dynamic) =============
+        let _customFieldDefinitions = null;
+
+        async function ensureCustomFieldDefinitionsLoaded() {
+            if (_customFieldDefinitions) return _customFieldDefinitions;
+            const defs = await DataService.loadCustomFieldDefinitions(true);
+            _customFieldDefinitions = Array.isArray(defs) ? defs : [];
+            return _customFieldDefinitions;
+        }
+
+        function getActiveDefsFor(entityType) {
+            const defs = _customFieldDefinitions || [];
+            return defs.filter(d => (d.enabled ?? true) && (d.entityType === entityType || d.entityType === 'both'));
+        }
+
+        async function renderDashboardCustomFields(entityType, entityId) {
+            await ensureCustomFieldDefinitionsLoaded();
+            const sectionId = entityType === 'company' ? 'companyCustomFieldsSection' : 'contactCustomFieldsSection';
+            const containerId = entityType === 'company' ? 'companyCustomFieldsContainer' : 'contactCustomFieldsContainer';
+
+            const sectionEl = document.getElementById(sectionId);
+            const containerEl = document.getElementById(containerId);
+            if (!sectionEl || !containerEl) return;
+
+            const defs = getActiveDefsFor(entityType);
+            if (!defs.length) {
+                sectionEl.style.display = 'none';
+                containerEl.innerHTML = '';
+                return;
+            }
+
+            sectionEl.style.display = '';
+            let values = {};
+            if (entityId) {
+                const payload = await DataService.loadCustomFieldValues(entityType, entityId, true);
+                values = payload?.values || {};
+            }
+            CustomFieldsUI.mount(containerEl, defs, values, `${entityType}_`);
+        }
+
+        async function saveDashboardCustomFields(entityType, entityId) {
+            await ensureCustomFieldDefinitionsLoaded();
+            const containerId = entityType === 'company' ? 'companyCustomFieldsContainer' : 'contactCustomFieldsContainer';
+            const containerEl = document.getElementById(containerId);
+            if (!containerEl) return;
+
+            const defs = getActiveDefsFor(entityType);
+            if (!defs.length) return;
+
+            const values = CustomFieldsUI.collect(containerEl, defs, `${entityType}_`);
+            await DataService.saveCustomFieldValues(entityType, entityId, values);
+        }
+
         // ============= COMPANY MODAL =============
-        window.openAddCompanyModal = function() {
+        window.openAddCompanyModal = async function() {
             editingCompanyIndex = null;
             document.getElementById('companyModalTitle').textContent = 'Dodaj firmę';
             document.getElementById('companyForm').reset();
             document.getElementById('companyModal').classList.add('active');
+            // Render custom fields (blank for new)
+            renderDashboardCustomFields('company', editingCompanyIndex !== null ? (allCompanies[editingCompanyIndex]?.id || null) : null);
         };
 
         function closeCompanyModal() {
@@ -434,6 +500,8 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
 
             try {
                 await DataService.saveCompany(company, editingCompanyIndex);
+                // Save custom fields to sheet
+                await saveDashboardCustomFields('company', company.id);
                 
                 if (editingCompanyIndex !== null) {
                     allCompanies[editingCompanyIndex] = company;
@@ -453,12 +521,14 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
         }
 
         // ============= CONTACT MODAL =============
-        window.openAddContactModal = function() {
+        window.openAddContactModal = async function() {
             editingContactIndex = null;
             document.getElementById('contactModalTitle').textContent = 'Dodaj kontakt';
             document.getElementById('contactForm').reset();
             hideCompanySuggestions();
             document.getElementById('contactModal').classList.add('active');
+            // Render custom fields (blank for new)
+            renderDashboardCustomFields('contact', editingContactIndex !== null ? (allContacts[editingContactIndex]?.id || null) : null);
         };
 
         function closeContactModal() {
@@ -534,6 +604,8 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
                 };
 
                 await DataService.saveContact(contact, editingContactIndex);
+                // Save custom fields to sheet
+                await saveDashboardCustomFields('contact', contact.id);
 
                 if (editingContactIndex !== null) {
                     allContacts[editingContactIndex] = contact;
