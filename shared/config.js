@@ -27,7 +27,7 @@ export const CONFIG = {
         USER_PREFERENCES: 'UserPreferences',
         // Arkusz aktywności
         ACTIVITIES: 'Activities',
-        // Pola własne (Custom Fields)
+        // Custom fields
         CUSTOM_FIELDS: 'CustomFields',
         CUSTOM_FIELD_VALUES: 'CustomFieldValues'
     },
