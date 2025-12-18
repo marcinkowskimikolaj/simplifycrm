@@ -15,7 +15,7 @@
     <header class="app-header">
         <div class="app-header-inner">
             <div class="app-header-left">
-                <div class="app-logo">Simplify CRM</div>
+                <div class="app-logo" id="logoBlock">Simplify CRM</div>
                 <div class="app-logo-subtitle">Ustawienia CRM</div>
             </div>
             <div class="app-header-right">
@@ -24,6 +24,8 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </button>
                 <button id="logoutBtn" class="logout-btn">Wyloguj</button>
             </div>
         </div>
@@ -196,7 +198,7 @@
           </div>
 
           <div class="form-group" style="grid-column: 1 / -1;">
-            <label for="fieldOptions">Opcje (tylko dla „Lista wyboru”)</label>
+            <label for="fieldOptions">Opcje (tylko dla „Lista wyboru")</label>
             <textarea id="fieldOptions" placeholder="Jedna opcja na linię&#10;np. Polecenie&#10;Reklama&#10;LinkedIn"></textarea>
             <div class="muted" style="margin-top:0.35rem;">W arkuszu zapisujemy jako JSON (tablica stringów).</div>
           </div>
@@ -210,6 +212,53 @@
     </form>
   </div>
 </div>
+
+<!-- MODAL: PROFILE -->
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Personalizacja konta</h2>
+            <button class="close-btn" id="closeProfileBtn">&times;</button>
+        </div>
+        <form id="profileForm">
+            <div class="form-group">
+                <label for="displayName">Twoje imię</label>
+                <input 
+                    type="text" 
+                    id="displayName" 
+                    placeholder="np. Anna, Marcin..."
+                    maxlength="50"
+                >
+                <p class="form-hint">
+                    💡 To imię będzie wyświetlane zamiast emaila.
+                </p>
+                <div class="form-current">
+                    <strong>Obecnie:</strong> <span id="currentDisplay">ładowanie...</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Twój email</label>
+                <input 
+                    type="email" 
+                    id="userEmailDisplay" 
+                    disabled
+                    style="opacity: 0.7; cursor: not-allowed;"
+                >
+                <p class="form-hint">
+                    Email jest przypisany do konta Google.
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="cancelProfileBtn">Anuluj</button>
+                <button type="submit" class="btn btn-primary">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Google APIs -->
+<script src="https://apis.google.com/js/api.js" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <script type="module" src="./settings.js"></script>
 </body>
