@@ -685,14 +685,9 @@ ${recentNotes || 'Brak'}
 Ostatnie aktywności:
 ${recentActivities || 'Brak'}
 
-Wygeneruj "enrichment notatkę" w tym układzie:
-1) PROFIL (1–2 zdania): czym firma może się zajmować. Jeśli nie masz danych — podaj 2–3 HIPOTEZY (wyraźnie oznaczone jako hipotezy).
-2) MOŻLIWE POTRZEBY / PAIN POINTS (3–5 punktów): dopasowane do branży i kontekstu z CRM.
-3) PYTANIA DISCOVERY (3 krótkie pytania).
-4) POMYSŁY NA PIERWSZY KONTAKT (3 propozycje: mail / telefon / LinkedIn).
-5) DALSZE KROKI W CRM (2–3 bardzo konkretne działania).
+Wygeneruj "enrichment notatkę": (1–2 zdania): czym firma może się zajmować. Jeśli nie masz danych — podaj 2–3 HIPOTEZY (wyraźnie oznaczone jako hipotezy). MOŻLIWE POTRZEBY / PAIN POINTS (3–5 punktów): dopasowane do branży i kontekstu.
 
-Nie podawaj "twardych faktów" ani nazw klientów/produktów firmy, jeśli nie wynikają z danych wejściowych.`;
+Skondensowana notatka ma mieć praktyczną wartość dla handlowca`;
 
         return await this.generateContent(prompt, systemPrompt, 0.7, forceRefresh);
     }
