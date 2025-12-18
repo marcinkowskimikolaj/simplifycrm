@@ -1,7 +1,8 @@
-import { AIService } from '../shared/ai-service.js';
+import { AIService } from '../shared/ai-service.js'; 
 import { CONFIG } from '../shared/config.js';
         import { AuthService } from '../shared/auth.js';
         import { DataService } from '../shared/data-service.js';
+import { CustomFieldsUI } from '../shared/custom-fields-ui.js';
         import { ActivitiesService } from '../shared/activities-service.js';
 import { bootstrapProtectedPage } from '../shared/app-shell.js';
 
@@ -51,8 +52,6 @@ import { bootstrapProtectedPage } from '../shared/app-shell.js';
 // Export & Selection variables
 let selectedContactIds = [];
 let selectedCompanyIds = [];
-let contactsSelectionMode = false;
-let companiesSelectionMode = false;
 // AI Request Tracking (for regenerate functionality)
         let lastAiRequest = null; // { type: 'summary'|'suggestions', entityType: 'company'|'contact', entityId: string }
         let lastAiResponse = null; // Ostatnia odpowiedź AI
@@ -60,6 +59,15 @@ let companiesSelectionMode = false;
         // ============= INIT =============
         async function init() {
             try {                const { email } = await bootstrapProtectedPage({ logoAction: 'dashboard' });
+
+            // ⚙️ Settings shortcut
+            const settingsBtn = document.getElementById('settingsBtn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', () => {
+                    window.location.href = './settings.html';
+                });
+            }
+
 
                 // Load data
                 await loadData();
@@ -491,6 +499,8 @@ let companiesSelectionMode = false;
             const company = companies.find(c => c.id === companyId);
             if (!company) return;
 
+            const aiReady = AIService?.enabled && !!localStorage.getItem('ai_api_key') && localStorage.getItem('ai_consent') === 'true';
+
             document.getElementById('companiesListView').style.display = 'none';
             document.getElementById('companyDetailView').classList.add('active');
 
@@ -508,6 +518,7 @@ let companiesSelectionMode = false;
 
             document.getElementById('companyDetailContent').innerHTML = `
                 <div style="position: relative;">
+                    <button class="icon-btn ai-enrich-btn" onclick="enrichCompanyNotes('${company.id}')" title="${aiReady ? 'AI: Enrichment notatki' : 'AI nieaktywne – ustaw klucz API w ⚙️ Ustawienia AI'}" style="position: absolute; top: 0; right: 40px;" ${aiReady ? '' : 'disabled'}>🔍</button>
                     <button class="icon-btn" onclick="editCompanyFromDetail('${company.id}')" title="Edytuj firmę" style="position: absolute; top: 0; right: 0;">✏️</button>
                     <div class="detail-title">${escapeHtml(company.name)}</div>
                 </div>
@@ -519,6 +530,8 @@ let companiesSelectionMode = false;
                     ${renderDetailTags(company.id, 'company')}
                 </div>
             `;
+            renderDetailCustomFields('company', company.id, 'companyCustomFieldsDetail');
+
             
             // Setup tag dropdown toggle
             const addBtn = document.getElementById('addCompanyTagBtn');
@@ -607,6 +620,8 @@ let companiesSelectionMode = false;
                     ${renderDetailTags(contact.id, 'contact')}
                 </div>
             `;
+            renderDetailCustomFields('contact', contact.id, 'contactCustomFieldsDetail');
+
             
             // Setup tag dropdown toggle
             const addBtn = document.getElementById('addContactTagBtn');
@@ -655,6 +670,8 @@ let companiesSelectionMode = false;
             document.getElementById('companyModalTitle').textContent = 'Dodaj firmę';
             document.getElementById('companyForm').reset();
             document.getElementById('companyModal').classList.add('active');
+            // Render custom fields (blank / prefill)
+            renderRelationshipCustomFields('company', editingCompanyIndex !== null ? (companies[editingCompanyIndex]?.id || null) : null);
         }
 
 function editCompany(index) {
@@ -681,6 +698,8 @@ function editCompany(index) {
             }
             
             document.getElementById('companyModal').classList.add('active');
+            // Render custom fields (blank / prefill)
+            renderRelationshipCustomFields('company', editingCompanyIndex !== null ? (companies[editingCompanyIndex]?.id || null) : null);
         }
 
         function editCompanyFromDetail(companyId) {
@@ -785,6 +804,8 @@ async function saveCompany(e) {
 
             try {
                 await DataService.saveCompany(company, editingCompanyIndex);
+                // Save custom fields to sheet
+                await saveRelationshipCustomFields('company', company.id);
                 
                 if (editingCompanyIndex !== null) {
                     companies[editingCompanyIndex] = company;
@@ -849,6 +870,8 @@ async function saveCompany(e) {
             fillCompanyField(preselectedCompanyId);
             hideCompanySuggestions();
             document.getElementById('contactModal').classList.add('active');
+            // Render custom fields (blank / prefill)
+            renderRelationshipCustomFields('contact', editingContactIndex !== null ? (contacts[editingContactIndex]?.id || null) : null);
         }
 
         function editContact(index) {
@@ -862,6 +885,8 @@ async function saveCompany(e) {
             fillCompanyField(contact.companyId || null);
             hideCompanySuggestions();
             document.getElementById('contactModal').classList.add('active');
+            // Render custom fields (blank / prefill)
+            renderRelationshipCustomFields('contact', editingContactIndex !== null ? (contacts[editingContactIndex]?.id || null) : null);
         }
 
         function editContactFromDetail(contactId) {
@@ -1003,6 +1028,8 @@ async function saveCompany(e) {
                 };
 
                 await DataService.saveContact(contact, editingContactIndex);
+                // Save custom fields to sheet
+                await saveRelationshipCustomFields('contact', contact.id);
 
                 if (editingContactIndex !== null) {
                     contacts[editingContactIndex] = contact;
@@ -2466,19 +2493,25 @@ async function loadTagsData() {
         
         // ============= SELECTION FUNCTIONS - CONTACTS =============
 
-function toggleContactSelection(contactId, event) {
-    if (event) event.stopPropagation();
-    
-    const index = selectedContactIds.indexOf(contactId);
-    if (index > -1) {
-        selectedContactIds.splice(index, 1);
-    } else {
-        selectedContactIds.push(contactId);
-    }
-    
-    updateContactSelectionUI();
-    renderAllContacts(); // Re-render to update visual state
-}
+        function toggleContactSelection(contactId, event) {
+            if (event) event.stopPropagation();
+
+            const index = selectedContactIds.indexOf(contactId);
+            if (index > -1) {
+                selectedContactIds.splice(index, 1);
+            } else {
+                selectedContactIds.push(contactId);
+            }
+
+            updateContactSelectionUI();
+
+            // Toggle visual state on card (grid view)
+            if (event && event.target) {
+                const card = event.target.closest('.card');
+                if (card) card.classList.toggle('selected', selectedContactIds.includes(contactId));
+            }
+        }
+
         function selectAllContacts() {
             const filtered = getFilteredContacts();
             selectedContactIds = filtered.map(c => c.id);
@@ -2492,21 +2525,51 @@ function toggleContactSelection(contactId, event) {
             renderAllContacts(); // Re-render with checkboxes unchecked
         }
 
+        function updateContactSelectionUI() {
+            const count = selectedContactIds.length;
+            const counter = document.getElementById('contactsSelectionCount');
+            const controls = document.getElementById('contactsSelectionControls');
+            const exportBtn = document.getElementById('exportSelectedContactsBtn');
+            const exportBtnText = exportBtn ? exportBtn.querySelector('span') : null;
+
+            // Update counter
+            if (counter) counter.textContent = `Zaznaczono: ${count}`;
+
+            // Show/hide controls
+            if (controls) {
+                controls.style.display = count > 0 ? 'flex' : 'none';
+            }
+
+            // Update export button
+            if (exportBtn) {
+                exportBtn.disabled = count === 0;
+            }
+            if (exportBtnText) {
+                exportBtnText.textContent = `Eksportuj (${count})`;
+            }
+        }
+
         // ============= SELECTION FUNCTIONS - COMPANIES =============
 
-function toggleCompanySelection(companyId, event) {
-    if (event) event.stopPropagation();
-    
-    const index = selectedCompanyIds.indexOf(companyId);
-    if (index > -1) {
-        selectedCompanyIds.splice(index, 1);
-    } else {
-        selectedCompanyIds.push(companyId);
-    }
-    
-    updateCompanySelectionUI();
-    renderCompanies(); // Re-render to update visual state
-}
+        function toggleCompanySelection(companyId, event) {
+            if (event) event.stopPropagation();
+
+            const index = selectedCompanyIds.indexOf(companyId);
+            if (index > -1) {
+                selectedCompanyIds.splice(index, 1);
+            } else {
+                selectedCompanyIds.push(companyId);
+            }
+
+            updateCompanySelectionUI();
+
+            // Toggle visual state on card (grid view)
+            if (event && event.target) {
+                const card = event.target.closest('.card');
+                if (card) card.classList.toggle('selected', selectedCompanyIds.includes(companyId));
+            }
+        }
+
         function selectAllCompanies() {
             const filtered = getFilteredCompanies();
             selectedCompanyIds = filtered.map(c => c.id);
@@ -2520,60 +2583,52 @@ function toggleCompanySelection(companyId, event) {
             renderCompanies(); // Re-render with checkboxes unchecked
         }
 
+        function updateCompanySelectionUI() {
+            const count = selectedCompanyIds.length;
+            const counter = document.getElementById('companiesSelectionCount');
+            const controls = document.getElementById('companiesSelectionControls');
+            const exportBtn = document.getElementById('exportSelectedCompaniesBtn');
+            const exportBtnText = exportBtn ? exportBtn.querySelector('span') : null;
+
+            // Update counter
+            if (counter) counter.textContent = `Zaznaczono: ${count}`;
+
+            // Show/hide controls
+            if (controls) {
+                controls.style.display = count > 0 ? 'flex' : 'none';
+            }
+
+            // Update export button
+            if (exportBtn) {
+                exportBtn.disabled = count === 0;
+            }
+            if (exportBtnText) {
+                exportBtnText.textContent = `Eksportuj (${count})`;
+            }
+        }
+
+        // ============= EXPORT FUNCTIONS - CONTACTS =============
+
         function exportSelectedContacts() {
-    if (selectedContactIds.length === 0) {
-        showStatus('Zaznacz przynajmniej jeden kontakt', 'error');
-        return;
-    }
+            if (selectedContactIds.length === 0) {
+                showStatus('Zaznacz przynajmniej jeden kontakt', 'error');
+                return;
+            }
 
-    const selectedContacts = contacts.filter(c => selectedContactIds.includes(c.id));
-    generateContactsCSV(selectedContacts, `kontakty_zaznaczone_${getCurrentDateString()}.csv`);
-    showStatus(`Wyeksportowano ${selectedContacts.length} kontaktów`, 'success');
+            const selectedContacts = contacts.filter(c => selectedContactIds.includes(c.id));
+            generateContactsCSV(selectedContacts, `kontakty_zaznaczone_${getCurrentDateString()}.csv`);
+            showStatus(`Wyeksportowano ${selectedContacts.length} kontaktów`, 'success');
+        }
 
-    // Zamknij dropdown
-    const dropdown = document.getElementById('contactsExportDropdown');
-    if (dropdown) dropdown.classList.remove('visible');
-}
+        function exportAllContacts() {
+            if (contacts.length === 0) {
+                showStatus('Brak kontaktów do eksportu', 'error');
+                return;
+            }
 
-function exportAllContacts() {
-    if (contacts.length === 0) {
-        showStatus('Brak kontaktów do eksportu', 'error');
-        return;
-    }
-    
-    generateContactsCSV(contacts, `kontakty_wszystkie_${getCurrentDateString()}.csv`);
-    showStatus(`Wyeksportowano ${contacts.length} kontaktów`, 'success');
-    
-    // Zamknij dropdown
-    document.getElementById('contactsExportDropdown').classList.remove('visible');
-}
-
-function exportSelectedCompanies() {
-    if (selectedCompanyIds.length === 0) {
-        showStatus('Zaznacz przynajmniej jedną firmę', 'error');
-        return;
-    }
-    
-    const selectedCompanies = companies.filter(c => selectedCompanyIds.includes(c.id));
-    generateCompaniesCSV(selectedCompanies, `firmy_zaznaczone_${getCurrentDateString()}.csv`);
-    showStatus(`Wyeksportowano ${selectedCompanies.length} firm`, 'success');
-    
-    // Zamknij dropdown
-    document.getElementById('companiesExportDropdown').classList.remove('visible');
-}
-
-function exportAllCompanies() {
-    if (companies.length === 0) {
-        showStatus('Brak firm do eksportu', 'error');
-        return;
-    }
-    
-    generateCompaniesCSV(companies, `firmy_wszystkie_${getCurrentDateString()}.csv`);
-    showStatus(`Wyeksportowano ${companies.length} firm`, 'success');
-    
-    // Zamknij dropdown
-    document.getElementById('companiesExportDropdown').classList.remove('visible');
-}
+            generateContactsCSV(contacts, `kontakty_wszystkie_${getCurrentDateString()}.csv`);
+            showStatus(`Wyeksportowano ${contacts.length} kontaktów`, 'success');
+        }
 
         function generateContactsCSV(contactsList, filename) {
             // CSV Header (stałe kolumny)
@@ -2605,6 +2660,27 @@ function exportAllCompanies() {
         }
 
         // ============= EXPORT FUNCTIONS - COMPANIES =============
+
+        function exportSelectedCompanies() {
+            if (selectedCompanyIds.length === 0) {
+                showStatus('Zaznacz przynajmniej jedną firmę', 'error');
+                return;
+            }
+
+            const selectedCompanies = companies.filter(c => selectedCompanyIds.includes(c.id));
+            generateCompaniesCSV(selectedCompanies, `firmy_zaznaczone_${getCurrentDateString()}.csv`);
+            showStatus(`Wyeksportowano ${selectedCompanies.length} firm`, 'success');
+        }
+
+        function exportAllCompanies() {
+            if (companies.length === 0) {
+                showStatus('Brak firm do eksportu', 'error');
+                return;
+            }
+
+            generateCompaniesCSV(companies, `firmy_wszystkie_${getCurrentDateString()}.csv`);
+            showStatus(`Wyeksportowano ${companies.length} firm`, 'success');
+        }
 
         function generateCompaniesCSV(companiesList, filename) {
             // CSV Header (stałe kolumny)
@@ -2716,8 +2792,7 @@ function exportAllCompanies() {
         window.exportAllContacts = exportAllContacts;
         window.exportSelectedCompanies = exportSelectedCompanies;
         window.exportAllCompanies = exportAllCompanies;
-        window.toggleExportDropdown = toggleExportDropdown;
-        window.toggleSelectionMode = toggleSelectionMode;
+
 
 
         // ============= EVENT LISTENERS =============
@@ -2967,8 +3042,6 @@ function exportAllCompanies() {
     });
 });
 
-
-
 // ============= AI FUNCTIONS =============
 
 async function summarizeCompany() {
@@ -3005,6 +3078,68 @@ async function summarizeCompany() {
     }
 }
 
+async function enrichCompanyNotes(companyId = currentCompanyId) {
+    if (!companyId) return;
+
+    // Hard guard (przycisk w UI i tak jest disabled, ale to zabezpieczenie na wszelki wypadek)
+    if (!AIService.enabled || !localStorage.getItem('ai_api_key') || localStorage.getItem('ai_consent') !== 'true') {
+        showAiSettings();
+        return;
+    }
+
+    const company = companies.find(c => c.id === companyId);
+    if (!company) return;
+
+    // Przygotuj prompt enrichment
+    const systemPrompt = `Jesteś analitykiem B2B i asystentem handlowca pracującego w CRM.
+Twoim zadaniem jest przygotować "enrichment notatki" o firmie.
+Jeśli czegoś nie wiesz – jasno oznacz to jako hipotezę..
+Odpowiadaj TYLKO po polsku.
+Format: krótka, gotowa do wklejenia notatka dla handlowca (konkret, bez lania wody).`;
+
+    const companyInfo = [
+        `Nazwa: ${company.name || ''}`,
+        company.industry ? `Branża: ${company.industry}` : '',
+        company.website ? `Strona: ${company.website}` : '',
+        company.domain ? `Domena: ${company.domain}` : '',
+        (company.city || company.country) ? `Lokalizacja: ${[company.city, company.country].filter(Boolean).join(', ')}` : '',
+        company.phone ? `Telefon: ${company.phone}` : ''
+    ].filter(Boolean).join('\n');
+
+    const prompt = `Przygotuj enrichment notatki dla firmy w CRM.
+
+Dane z CRM:
+${companyInfo}
+
+W notatce uwzględnij:
+Czym firma się zajmuje (możesz szukać w internecie)
+
+Nie wymyślaj faktów jako pewników. Format odpowiedz to ciągły tekst, bez formatowania, bez informacji jak podawanie strony www, lokalizacji. Preferowanie zaczynaj od nazwy firmy później przechodź do opisu działalności, opisz jakie mają usługi po krótce, czym się charakteryzują, nie pisz o dalszych krokach z firmą`;
+
+    // zapamiętaj request do regeneracji i do "Zapisz"
+    lastAiRequest = {
+        type: 'enrichment_notes',
+        entityType: 'company',
+        entityId: companyId,
+        action: 'company_notes_enrichment',
+        data: { company, prompt, systemPrompt, temperature: 0.4 }
+    };
+
+    showAiModal('Enrichment notatki firmy', null);
+
+    try {
+        const enrichment = await AIService.generateContent(prompt, systemPrompt, 0.4, false);
+        lastAiResponse = enrichment;
+        showAiModal('Enrichment: ' + company.name, enrichment);
+    } catch (error) {
+        console.error('AI Error:', error);
+        lastAiRequest = null;
+        lastAiResponse = null;
+        showAiModal('Błąd AI', `Nie udało się wygenerować enrichment:\n\n${error.message}`);
+    }
+}
+
+
 async function summarizeContact() {
     if (!currentContactId) return;
     if (!AIService.enabled) {
@@ -3016,30 +3151,18 @@ async function summarizeContact() {
     const history = contactHistory.filter(h => h.contactId === currentContactId);
     const activities = contactActivities.filter(a => a.contactId === currentContactId);
 
-    const company = (contact && contact.companyId) ? companies.find(c => c.id === contact.companyId) : null;
-    const contactForAi = contact ? {
-        ...contact,
-        linkedCompany: company ? {
-            id: company.id,
-            name: company.name,
-            industry: company.industry,
-            city: company.city,
-            country: company.country
-        } : null
-    } : contact;
-
     // Zapisz info o requescie (do regeneracji)
     lastAiRequest = {
         type: 'summary',
         entityType: 'contact',
         entityId: currentContactId,
-        data: { contact: contactForAi, history, activities }
+        data: { contact, history, activities }
     };
 
     showAiModal('Podsumowanie kontaktu', null);
 
     try {
-        const summary = await AIService.summarizeCompany(contactForAi, history, [], activities);
+        const summary = await AIService.summarizeCompany(contact, history, [], activities);
         lastAiResponse = summary;
         showAiModal('Podsumowanie: ' + contact.name, summary);
     } catch (error) {
@@ -3094,30 +3217,18 @@ async function suggestContactNextSteps() {
     const history = contactHistory.filter(h => h.contactId === currentContactId);
     const activities = contactActivities.filter(a => a.contactId === currentContactId);
 
-    const company = (contact && contact.companyId) ? companies.find(c => c.id === contact.companyId) : null;
-    const contactForAi = contact ? {
-        ...contact,
-        linkedCompany: company ? {
-            id: company.id,
-            name: company.name,
-            industry: company.industry,
-            city: company.city,
-            country: company.country
-        } : null
-    } : contact;
-
     // Zapisz info o requescie (do regeneracji)
     lastAiRequest = {
         type: 'suggestions',
         entityType: 'contact',
         entityId: currentContactId,
-        data: { contact: contactForAi, history, activities }
+        data: { contact, history, activities }
     };
 
     showAiModal('Sugestie działań', null);
 
     try {
-        const suggestions = await AIService.suggestNextSteps(contactForAi, history, activities);
+        const suggestions = await AIService.suggestNextSteps(contact, history, activities);
         lastAiResponse = suggestions;
         showAiModal('Sugestie dla: ' + contact.name, suggestions);
     } catch (error) {
@@ -3133,8 +3244,15 @@ function showAiModal(title, content) {
     const titleEl = document.getElementById('aiModalTitle');
     const bodyEl = document.getElementById('aiModalBody');
     const actionsEl = document.getElementById('aiModalActions');
+    const saveBtn = document.getElementById('saveAiNoteBtn');
 
     titleEl.textContent = '✨ ' + title;
+
+    // Dopasuj opis przycisku zapisu zależnie od kontekstu
+    if (saveBtn) {
+        const isEnrichmentNotes = lastAiRequest?.type === 'enrichment_notes' && lastAiRequest?.entityType === 'company';
+        saveBtn.textContent = isEnrichmentNotes ? '💾 Zapisz do pola Notatki' : '💾 Zapisz jako notatkę';
+    }
 
     if (content === null) {
         bodyEl.innerHTML = `
@@ -3177,12 +3295,18 @@ async function regenerateLastAiRequest() {
     const { type, entityType, entityId, data } = lastAiRequest;
 
     // Pokaż loading state
-    const titleText = type === 'summary' ? 'Podsumowanie' : 'Sugestie działań';
+    const titleText = type === 'summary' ? 'Podsumowanie' : (type === 'suggestions' ? 'Sugestie działań' : (type === 'enrichment_notes' ? 'Enrichment notatki' : 'Odpowiedź AI'));
     showAiModal(titleText, null);
 
     try {
         let response;
         
+        
+        if (type === 'enrichment_notes') {
+            // Enrichment notatki firmy (forceRefresh)
+            const t = data?.temperature ?? 0.4;
+            response = await AIService.generateContent(data.prompt, data.systemPrompt, t, true);
+        } else {
         // Wywołaj odpowiednią funkcję z forceRefresh=true
         if (type === 'summary') {
             if (entityType === 'company') {
@@ -3220,6 +3344,8 @@ async function regenerateLastAiRequest() {
             }
         }
 
+        }
+
         lastAiResponse = response;
         const entityName = data.company?.name || data.contact?.name || 'Entity';
         const fullTitle = type === 'summary' 
@@ -3245,6 +3371,41 @@ async function saveAiResponseAsNote() {
     }
 
     const { entityType, entityId } = lastAiRequest;
+
+    // Specjalny case: enrichment -> zapis do pola "Notatki" firmy (Companies!D)
+    if (lastAiRequest?.type === 'enrichment_notes' && lastAiRequest?.entityType === 'company') {
+        try {
+            const idx = companies.findIndex(c => c.id === entityId);
+            if (idx === -1) {
+                showStatus('Nie znaleziono firmy do zapisu notatek', 'error');
+                return;
+            }
+
+            const company = companies[idx];
+            const stamp = new Date().toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' });
+            const header = `AI Enrichment (${stamp})`;
+            const enrichmentBlock = `${header}\n${lastAiResponse}`;
+
+            // Dopisz (bez ryzyka utraty istniejących notatek)
+            const existing = (company.notes || '').trim();
+            company.notes = existing ? `${existing}\n\n---\n${enrichmentBlock}` : enrichmentBlock;
+
+            await DataService.saveCompany(company, idx);
+
+            // Odśwież dane i widok szczegółów
+            companies = await DataService.loadCompanies(false);
+            viewCompanyDetail(entityId);
+
+            showStatus('💾 Zapisano w polu Notatki firmy', 'success');
+            setTimeout(() => closeAiModal(), 800);
+            return;
+        } catch (error) {
+            console.error('Save AI Enrichment Error:', error);
+            showStatus('Błąd podczas zapisu do pola Notatki', 'error');
+            return;
+        }
+    }
+
 
     try {
         // Zapisz notatkę w odpowiednim miejscu używając logHistory
@@ -3341,6 +3502,11 @@ function saveAiSettings() {
     }
 
     closeAiSettings();
+
+    // Odśwież widok szczegółów firmy, żeby przycisk 🔍 zaktualizował stan (disabled/enabled)
+    if (currentCompanyId) {
+        try { viewCompanyDetail(currentCompanyId); } catch (e) {}
+    }
 }
 async function testAiConnection() {
     const apiKey = document.getElementById('aiApiKey').value.trim();
@@ -3390,153 +3556,7 @@ window.closeAiSettings = closeAiSettings;
 window.saveAiSettings = saveAiSettings;
 window.testAiConnection = testAiConnection;
 window.updateAiProviderUI = updateAiProviderUI;
-
-// ============= EXPORT DROPDOWN =============
-
-function toggleExportDropdown(type) {
-    const dropdown = document.getElementById(`${type}ExportDropdown`);
-    const btn = document.getElementById(`${type}ExportBtn`);
-    const isVisible = dropdown.classList.contains('visible');
-    
-    // Zamknij wszystkie inne dropdown'y
-    document.querySelectorAll('.export-dropdown').forEach(d => {
-        if (d !== dropdown) d.classList.remove('visible');
-    });
-    document.querySelectorAll('.export-icon').forEach(b => {
-        if (b !== btn && !b.classList.contains('active')) b.classList.remove('active');
-    });
-    
-    // Toggle current dropdown
-    if (isVisible) {
-        dropdown.classList.remove('visible');
-    } else {
-        dropdown.classList.add('visible');
-    }
-}
-
-// Zamknij dropdown po kliknięciu poza nim
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.export-wrapper')) {
-        document.querySelectorAll('.export-dropdown').forEach(d => {
-            d.classList.remove('visible');
-        });
-    }
-});
-
-// ============= SELECTION MODE =============
-
-function toggleSelectionMode(type) {
-    if (type === 'contacts') {
-        contactsSelectionMode = !contactsSelectionMode;
-        
-        // Update checkbox
-        const toggle = document.getElementById('contactsSelectionModeToggle');
-        if (toggle) toggle.checked = contactsSelectionMode;
-        
-        // Update icon
-        const btn = document.getElementById('contactsExportBtn');
-        if (contactsSelectionMode) {
-            btn.classList.add('active');
-            document.body.setAttribute('data-contacts-selection-mode', 'true');
-        } else {
-            btn.classList.remove('active');
-            document.body.removeAttribute('data-contacts-selection-mode');
-            // Reset selections when turning off
-            selectedContactIds = [];
-            updateContactSelectionUI();
-        }
-        
-        // Re-render to show/hide checkboxes
-        renderAllContacts();
-        
-    } else if (type === 'companies') {
-        companiesSelectionMode = !companiesSelectionMode;
-        
-        // Update checkbox
-        const toggle = document.getElementById('companiesSelectionModeToggle');
-        if (toggle) toggle.checked = companiesSelectionMode;
-        
-        // Update icon
-        const btn = document.getElementById('companiesExportBtn');
-        if (companiesSelectionMode) {
-            btn.classList.add('active');
-            document.body.setAttribute('data-companies-selection-mode', 'true');
-        } else {
-            btn.classList.remove('active');
-            document.body.removeAttribute('data-companies-selection-mode');
-            // Reset selections when turning off
-            selectedCompanyIds = [];
-            updateCompanySelectionUI();
-        }
-        
-        // Re-render to show/hide checkboxes
-        renderCompanies();
-    }
-}
-
-// ============= SELECTION UI UPDATE =============
-
-function updateContactSelectionUI() {
-    const count = selectedContactIds.length;
-
-    // Legacy selection controls (if present)
-    const counter = document.getElementById('contactsSelectionCount');
-    const controls = document.getElementById('contactsSelectionControls');
-    const exportBtn = document.getElementById('exportSelectedContactsBtn');
-    const exportBtnText = exportBtn ? exportBtn.querySelector('span') : null;
-
-    if (counter) counter.textContent = `Zaznaczono: ${count}`;
-    if (controls) controls.style.display = count > 0 ? 'flex' : 'none';
-    if (exportBtn) exportBtn.disabled = count === 0;
-    if (exportBtnText) exportBtnText.textContent = `Eksportuj (${count})`;
-
-    // Export dropdown selection-mode UI (if present)
-    const countSpan = document.getElementById('contactsExportCount');
-    const exportItem = document.getElementById('contactsExportSelectedItem');
-
-    if (countSpan) countSpan.textContent = `(${count})`;
-    if (exportItem) exportItem.classList.toggle('disabled', count === 0);
-
-    // Select-all checkbox in list view (if present)
-    const selectAll = document.getElementById('selectAllContactsCheckbox');
-    if (selectAll) {
-        const filtered = getFilteredContacts();
-        const total = filtered.length;
-        selectAll.checked = total > 0 && count === total;
-        selectAll.indeterminate = count > 0 && count < total;
-    }
-}
-
-function updateCompanySelectionUI() {
-    const count = selectedCompanyIds.length;
-
-    // Legacy selection controls (if present)
-    const counter = document.getElementById('companiesSelectionCount');
-    const controls = document.getElementById('companiesSelectionControls');
-    const exportBtn = document.getElementById('exportSelectedCompaniesBtn');
-    const exportBtnText = exportBtn ? exportBtn.querySelector('span') : null;
-
-    if (counter) counter.textContent = `Zaznaczono: ${count}`;
-    if (controls) controls.style.display = count > 0 ? 'flex' : 'none';
-    if (exportBtn) exportBtn.disabled = count === 0;
-    if (exportBtnText) exportBtnText.textContent = `Eksportuj (${count})`;
-
-    // Export dropdown selection-mode UI (if present)
-    const countSpan = document.getElementById('companiesExportCount');
-    const exportItem = document.getElementById('companiesExportSelectedItem');
-
-    if (countSpan) countSpan.textContent = `(${count})`;
-    if (exportItem) exportItem.classList.toggle('disabled', count === 0);
-
-    // Select-all checkbox in list view (if present)
-    const selectAll = document.getElementById('selectAllCompaniesCheckbox');
-    if (selectAll) {
-        const filtered = getFilteredCompanies();
-        const total = filtered.length;
-        selectAll.checked = total > 0 && count === total;
-        selectAll.indeterminate = count > 0 && count < total;
-    }
-}
+window.enrichCompanyNotes = enrichCompanyNotes;
 
 // ============= START =============
 if (typeof gapi !== 'undefined') {
