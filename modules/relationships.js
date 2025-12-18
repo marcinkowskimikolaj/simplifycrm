@@ -2,7 +2,6 @@ import { AIService } from '../shared/ai-service.js';
 import { CONFIG } from '../shared/config.js';
         import { AuthService } from '../shared/auth.js';
         import { DataService } from '../shared/data-service.js';
-import { CustomFieldsUI } from '../shared/custom-fields-ui.js';
         import { ActivitiesService } from '../shared/activities-service.js';
 import { bootstrapProtectedPage } from '../shared/app-shell.js';
 
@@ -59,15 +58,6 @@ let selectedCompanyIds = [];
         // ============= INIT =============
         async function init() {
             try {                const { email } = await bootstrapProtectedPage({ logoAction: 'dashboard' });
-
-            // ⚙️ Settings shortcut
-            const settingsBtn = document.getElementById('settingsBtn');
-            if (settingsBtn) {
-                settingsBtn.addEventListener('click', () => {
-                    window.location.href = './settings.html';
-                });
-            }
-
 
                 // Load data
                 await loadData();
@@ -530,8 +520,6 @@ let selectedCompanyIds = [];
                     ${renderDetailTags(company.id, 'company')}
                 </div>
             `;
-            renderDetailCustomFields('company', company.id, 'companyCustomFieldsDetail');
-
             
             // Setup tag dropdown toggle
             const addBtn = document.getElementById('addCompanyTagBtn');
@@ -620,8 +608,6 @@ let selectedCompanyIds = [];
                     ${renderDetailTags(contact.id, 'contact')}
                 </div>
             `;
-            renderDetailCustomFields('contact', contact.id, 'contactCustomFieldsDetail');
-
             
             // Setup tag dropdown toggle
             const addBtn = document.getElementById('addContactTagBtn');
@@ -670,8 +656,6 @@ let selectedCompanyIds = [];
             document.getElementById('companyModalTitle').textContent = 'Dodaj firmę';
             document.getElementById('companyForm').reset();
             document.getElementById('companyModal').classList.add('active');
-            // Render custom fields (blank / prefill)
-            renderRelationshipCustomFields('company', editingCompanyIndex !== null ? (companies[editingCompanyIndex]?.id || null) : null);
         }
 
 function editCompany(index) {
@@ -698,8 +682,6 @@ function editCompany(index) {
             }
             
             document.getElementById('companyModal').classList.add('active');
-            // Render custom fields (blank / prefill)
-            renderRelationshipCustomFields('company', editingCompanyIndex !== null ? (companies[editingCompanyIndex]?.id || null) : null);
         }
 
         function editCompanyFromDetail(companyId) {
@@ -804,8 +786,6 @@ async function saveCompany(e) {
 
             try {
                 await DataService.saveCompany(company, editingCompanyIndex);
-                // Save custom fields to sheet
-                await saveRelationshipCustomFields('company', company.id);
                 
                 if (editingCompanyIndex !== null) {
                     companies[editingCompanyIndex] = company;
@@ -870,8 +850,6 @@ async function saveCompany(e) {
             fillCompanyField(preselectedCompanyId);
             hideCompanySuggestions();
             document.getElementById('contactModal').classList.add('active');
-            // Render custom fields (blank / prefill)
-            renderRelationshipCustomFields('contact', editingContactIndex !== null ? (contacts[editingContactIndex]?.id || null) : null);
         }
 
         function editContact(index) {
@@ -885,8 +863,6 @@ async function saveCompany(e) {
             fillCompanyField(contact.companyId || null);
             hideCompanySuggestions();
             document.getElementById('contactModal').classList.add('active');
-            // Render custom fields (blank / prefill)
-            renderRelationshipCustomFields('contact', editingContactIndex !== null ? (contacts[editingContactIndex]?.id || null) : null);
         }
 
         function editContactFromDetail(contactId) {
@@ -1028,8 +1004,6 @@ async function saveCompany(e) {
                 };
 
                 await DataService.saveContact(contact, editingContactIndex);
-                // Save custom fields to sheet
-                await saveRelationshipCustomFields('contact', contact.id);
 
                 if (editingContactIndex !== null) {
                     contacts[editingContactIndex] = contact;
