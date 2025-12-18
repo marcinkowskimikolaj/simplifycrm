@@ -2361,3 +2361,23 @@ body[data-companies-selection-mode="true"] #companiesList .list-view-table tbody
         transform-origin: top left;
     }
 }
+
+
+/* Icon buttons - disabled state */
+.icon-btn:disabled,
+.icon-btn.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.icon-btn:disabled:hover,
+.icon-btn.disabled:hover {
+    background: transparent;
+    border-color: var(--border-subtle);
+}
+
+/* Optional: slightly emphasize AI enrich button */
+.ai-enrich-btn {
+    font-size: 0.95rem;
+}
