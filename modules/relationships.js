@@ -2615,6 +2615,66 @@ async function loadTagsData() {
             }
         }
 
+ // ============= EXPORT DROPDOWN LOGIC =============
+        
+        function toggleExportDropdown(type) {
+            const dropdown = document.getElementById(`${type}ExportDropdown`);
+            const btn = document.getElementById(`${type}ExportBtn`);
+            
+            if (!dropdown) return;
+            
+            // Zamknij wszystkie inne dropdowny
+            document.querySelectorAll('.export-dropdown').forEach(d => {
+                if (d.id !== `${type}ExportDropdown`) {
+                    d.classList.remove('visible');
+                }
+            });
+            
+            // Toggle tego dropdowna
+            dropdown.classList.toggle('visible');
+            
+            // Zamknij dropdown po kliknięciu poza nim
+            if (dropdown.classList.contains('visible')) {
+                setTimeout(() => {
+                    document.addEventListener('click', function closeDropdown(e) {
+                        if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+                            dropdown.classList.remove('visible');
+                            document.removeEventListener('click', closeDropdown);
+                        }
+                    });
+                }, 10);
+            }
+        }
+        
+        function toggleSelectionMode(type) {
+            const checkbox = document.getElementById(`${type}SelectionModeToggle`);
+            const isEnabled = checkbox.checked;
+            
+            // Toggle checkbox
+            checkbox.checked = !isEnabled;
+            
+            // Toggle attribute na body
+            document.body.setAttribute(`data-${type}-selection-mode`, !isEnabled);
+            
+            // Jeśli wyłączamy tryb zaznaczania - wyczyść zaznaczenia
+            if (isEnabled) {
+                if (type === 'contacts') {
+                    selectedContactIds = [];
+                    updateContactSelectionUI();
+                } else if (type === 'companies') {
+                    selectedCompanyIds = [];
+                    updateCompanySelectionUI();
+                }
+            }
+            
+            // Przerenderuj listy aby pokazać/ukryć checkboxy
+            if (type === 'contacts') {
+                renderAllContacts();
+            } else if (type === 'companies') {
+                renderCompanies();
+            }
+        }
+
         // ============= EXPORT FUNCTIONS - CONTACTS =============
 
         function exportSelectedContacts() {
@@ -2784,6 +2844,8 @@ async function loadTagsData() {
         window.deleteActivity = deleteActivity;
 
         // Export & selection functions
+        window.toggleExportDropdown = toggleExportDropdown;
+        window.toggleSelectionMode = toggleSelectionMode;
         window.toggleContactSelection = toggleContactSelection;
         window.selectAllContacts = selectAllContacts;
         window.deselectAllContacts = deselectAllContacts;
