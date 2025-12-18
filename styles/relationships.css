@@ -1,4 +1,4 @@
-/* Relationships module styles (base styles are in styles/base.css) */
+/* Relationships module styles (base styles are in styles/base.css) */ 
 
 /* Header overrides for this module */
 .app-header { padding: 1.4rem 2rem; }
@@ -2360,4 +2360,24 @@ body[data-companies-selection-mode="true"] #companiesList .list-view-table tbody
         left: 0;
         transform-origin: top left;
     }
+}
+
+
+/* Icon buttons - disabled state */
+.icon-btn:disabled,
+.icon-btn.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.icon-btn:disabled:hover,
+.icon-btn.disabled:hover {
+    background: transparent;
+    border-color: var(--border-subtle);
+}
+
+/* Optional: slightly emphasize AI enrich button */
+.ai-enrich-btn {
+    font-size: 0.95rem;
 }
