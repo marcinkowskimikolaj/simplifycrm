@@ -641,13 +641,13 @@ Zaproponuj 3 konkretne, strategiczne kroki na najbliższe 7-14 dni.`;
         const dateContext = this.getCurrentDateContext();
 
         const systemPrompt = `Jesteś asystentem handlowca w CRM.
-Tworzysz "enrichment notatki" o firmie na podstawie DANYCH Z CRM przekazanych w promptcie.
+Tworzysz "enrichment notatki" o firmie na podstawie informacji przekazanych w promptcie.
 
 Zasady:
-- NIE przeglądasz internetu i NIE masz dostępu do zewnętrznych źródeł.
-- Jeśli brakuje danych, nie zmyślaj faktów. Zamiast tego podaj HIPOTEZY i PYTANIA do weryfikacji.
+- Możesz przeszukiwać źródła zewnętrzne.
+- Jeśli brakuje danych, nie zmyślaj faktów.
 - Odpowiadaj TYLKO po polsku.
-- Format: zwięzła notatka gotowa do wklejenia do CRM (nagłówki + punktory).`;
+- Format: zwięzła notatka gotowa do wklejenia do CRM, która opowiada o charakterystyce firmy i jej działalności.`;
 
         const loc = [company.city, company.country].filter(Boolean).join(', ');
         const website = company.website ? (company.website.startsWith('http') ? company.website : `https://${company.website}`) : '';
