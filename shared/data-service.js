@@ -1110,6 +1110,197 @@ export class DataService {
         });
     }
 
+
+    /**
+     * CUSTOM FIELDS - Definitions (new sheet: CustomFields)
+     * Columns (A-K):
+     * A id | B entityType (company/contact/both) | C key | D label | E fieldType
+     * F optionsJson | G required | H enabled | I order | J createdAt | K updatedAt
+     */
+    static async loadCustomFieldDefinitions(useCache = true) {
+        const cacheKey = 'customFieldDefinitions';
+        if (useCache) {
+            const cached = this.getCache(cacheKey);
+            if (cached) return cached;
+        }
+
+        return this.retryRequest(async () => {
+            const response = await gapi.client.sheets.spreadsheets.values.get({
+                spreadsheetId: CONFIG.SHEET_ID,
+                range: `${CONFIG.SHEETS.CUSTOM_FIELDS}!A2:K`,
+            });
+
+            const rows = response.result.values || [];
+            const defs = rows.map((row, idx) => {
+                const requiredRaw = (row[6] || '').toString().toLowerCase();
+                const enabledRaw  = (row[7] || '').toString().toLowerCase();
+                const orderRaw    = row[8];
+
+                return {
+                    _rowIndex: idx, // 0-based index in "A2:K" set (used for updates)
+                    id: row[0] || this.generateId(),
+                    entityType: row[1] || 'both',
+                    key: row[2] || '',
+                    label: row[3] || '',
+                    fieldType: row[4] || 'text',
+                    optionsJson: row[5] || '',
+                    required: requiredRaw === 'true' || requiredRaw === '1' || requiredRaw === 'yes',
+                    enabled: enabledRaw === '' ? true : (enabledRaw === 'true' || enabledRaw === '1' || enabledRaw === 'yes'),
+                    order: Number.isFinite(Number(orderRaw)) ? Number(orderRaw) : 0,
+                    createdAt: row[9] || '',
+                    updatedAt: row[10] || '',
+                };
+            }).filter(d => d.label && d.key);
+
+            this.setCache(cacheKey, defs);
+            return defs;
+        });
+    }
+
+    static async saveCustomFieldDefinition(definition, rowIndex = null) {
+        const now = new Date().toISOString();
+        const isUpdate = rowIndex !== null && rowIndex !== undefined;
+
+        const id = definition.id || this.generateId();
+        const createdAt = definition.createdAt || (isUpdate ? '' : now);
+
+        const values = [[
+            id,
+            definition.entityType || 'both',
+            definition.key || '',
+            definition.label || '',
+            definition.fieldType || 'text',
+            definition.optionsJson || '',
+            definition.required ? 'TRUE' : 'FALSE',
+            (definition.enabled ?? true) ? 'TRUE' : 'FALSE',
+            (definition.order ?? 0).toString(),
+            createdAt,
+            now
+        ]];
+
+        const range = isUpdate
+            ? `${CONFIG.SHEETS.CUSTOM_FIELDS}!A${rowIndex + 2}:K${rowIndex + 2}`
+            : `${CONFIG.SHEETS.CUSTOM_FIELDS}!A2:K`;
+
+        return this.retryRequest(async () => {
+            if (isUpdate) {
+                await gapi.client.sheets.spreadsheets.values.update({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range,
+                    valueInputOption: 'USER_ENTERED',
+                    resource: { values }
+                });
+            } else {
+                await gapi.client.sheets.spreadsheets.values.append({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range,
+                    valueInputOption: 'USER_ENTERED',
+                    insertDataOption: 'INSERT_ROWS',
+                    resource: { values }
+                });
+            }
+            this.clearCache('customFieldDefinitions');
+            return id;
+        });
+    }
+
+    /**
+     * Soft-delete: disable a definition (keeps history / avoids row deletion).
+     */
+    static async disableCustomFieldDefinition(rowIndex) {
+        const defs = await this.loadCustomFieldDefinitions(false);
+        const def = defs.find(d => d._rowIndex === rowIndex);
+        if (!def) return;
+        def.enabled = false;
+        await this.saveCustomFieldDefinition(def, rowIndex);
+    }
+
+    /**
+     * CUSTOM FIELD VALUES (new sheet: CustomFieldValues)
+     * Columns (A-F):
+     * A id | B entityType (company/contact) | C entityId | D valuesJson | E updatedAt | F updatedBy
+     */
+    static async loadCustomFieldValues(entityType, entityId, useCache = true) {
+        const cacheKey = `customFieldValues:${entityType}:${entityId}`;
+        if (useCache) {
+            const cached = this.getCache(cacheKey);
+            if (cached) return cached;
+        }
+
+        return this.retryRequest(async () => {
+            const response = await gapi.client.sheets.spreadsheets.values.get({
+                spreadsheetId: CONFIG.SHEET_ID,
+                range: `${CONFIG.SHEETS.CUSTOM_FIELD_VALUES}!A2:F`,
+            });
+
+            const rows = response.result.values || [];
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const et = (row[1] || '').toString();
+                const eid = (row[2] || '').toString();
+                if (et === entityType && eid === entityId) {
+                    let parsed = {};
+                    try { parsed = row[3] ? JSON.parse(row[3]) : {}; } catch (e) { parsed = {}; }
+                    const result = { _rowIndex: i, id: row[0] || '', values: parsed };
+                    this.setCache(cacheKey, result);
+                    return result;
+                }
+            }
+
+            const result = { _rowIndex: null, id: '', values: {} };
+            this.setCache(cacheKey, result);
+            return result;
+        });
+    }
+
+    static async saveCustomFieldValues(entityType, entityId, valuesObj) {
+        const now = new Date().toISOString();
+        const email = AuthService.getUserEmail() || '';
+
+        const current = await this.loadCustomFieldValues(entityType, entityId, false);
+        const isUpdate = current && current._rowIndex !== null && current._rowIndex !== undefined;
+
+        const id = (current && current.id) ? current.id : this.generateId();
+        const valuesJson = JSON.stringify(valuesObj || {});
+
+        const values = [[
+            id,
+            entityType,
+            entityId,
+            valuesJson,
+            now,
+            email
+        ]];
+
+        const range = isUpdate
+            ? `${CONFIG.SHEETS.CUSTOM_FIELD_VALUES}!A${current._rowIndex + 2}:F${current._rowIndex + 2}`
+            : `${CONFIG.SHEETS.CUSTOM_FIELD_VALUES}!A2:F`;
+
+        return this.retryRequest(async () => {
+            if (isUpdate) {
+                await gapi.client.sheets.spreadsheets.values.update({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range,
+                    valueInputOption: 'USER_ENTERED',
+                    resource: { values }
+                });
+            } else {
+                await gapi.client.sheets.spreadsheets.values.append({
+                    spreadsheetId: CONFIG.SHEET_ID,
+                    range,
+                    valueInputOption: 'USER_ENTERED',
+                    insertDataOption: 'INSERT_ROWS',
+                    resource: { values }
+                });
+            }
+
+            // Clear caches for this entity
+            this.clearCache('customFieldDefinitions');
+            this.clearCache(`customFieldValues:${entityType}:${entityId}`);
+            return id;
+        });
+    }
+
 }
 
 // Export dla kompatybilności bez ES6 modules
