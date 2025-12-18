@@ -175,7 +175,7 @@ function openEdit(field) {
 }
 
 async function deleteField(field) {
-  const ok = confirm(`Usunąć pole „${field.name}”?`);
+  const ok = confirm(`Usunąć pole „${field.name}"?`);
   if (!ok) return;
 
   try {
@@ -207,7 +207,7 @@ async function handleSaveField(e) {
   // Unique key check
   const dup = allFields.find(f => f.key === key && f.rowIndex !== editingRowIndex);
   if (dup) {
-    alert(`Klucz „${key}” już istnieje (pole: ${dup.name}). Wybierz unikalny klucz.`);
+    alert(`Klucz „${key}" już istnieje (pole: ${dup.name}). Wybierz unikalny klucz.`);
     return;
   }
 
@@ -232,11 +232,64 @@ async function handleSaveField(e) {
   }
 }
 
+// ============= PROFILE MODAL =============
+function openProfileModal() {
+  const email = AuthService.getUserEmail();
+  const displayName = AuthService.getDisplayName();
+  const displayText = AuthService.getUserDisplayText();
+  
+  $('userEmailDisplay').value = email || '';
+  $('displayName').value = displayName || '';
+  $('currentDisplay').textContent = displayText;
+  
+  $('profileModal').classList.add('active');
+  $('displayName').focus();
+}
+
+function closeProfileModal() {
+  $('profileModal').classList.remove('active');
+  $('profileForm').reset();
+}
+
+async function saveProfile(event) {
+  event.preventDefault();
+  
+  const email = AuthService.getUserEmail();
+  const displayName = $('displayName').value.trim();
+  
+  if (!email) {
+    alert('Błąd: brak emaila');
+    return;
+  }
+  
+  try {
+    await DataService.saveUserPreferences(email, displayName);
+    AuthService.saveDisplayName(displayName);
+    
+    const displayText = AuthService.getUserDisplayText();
+    $('userEmail').textContent = displayText;
+    
+    showStatus('✓ Profil zaktualizowany!', 'success');
+    closeProfileModal();
+  } catch (error) {
+    console.error('Błąd zapisu profilu:', error);
+    alert('Wystąpił błąd podczas zapisu.');
+  }
+}
+
+function showStatus(message, type) {
+  const msg = document.createElement('div');
+  msg.className = 'status-message' + (type ? ' ' + type : '');
+  msg.textContent = message;
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 3200);
+}
+
 async function init() {
   await bootstrapProtectedPage({ logoAction: 'dashboard' });
 
-  // Logo click already handled by app-shell if logoBlock exists, but keep safe
-  const logoBlock = document.getElementById('logoBlock');
+  // Logo click
+  const logoBlock = $('logoBlock');
   if (logoBlock) {
     logoBlock.addEventListener('click', () => window.location.href = '/simplifycrm/index.html');
   }
@@ -255,15 +308,33 @@ async function init() {
     });
   });
 
-  // Modal controls
+  // Modal controls - Custom Fields
   $('addFieldBtn').addEventListener('click', openCreate);
   $('closeFieldModalBtn').addEventListener('click', closeModal);
   $('cancelFieldBtn').addEventListener('click', closeModal);
   $('fieldModal').addEventListener('click', (e) => {
     if (e.target === $('fieldModal')) closeModal();
   });
-
   $('fieldForm').addEventListener('submit', handleSaveField);
+
+  // Profile modal controls
+  if ($('profileBtn')) {
+    $('profileBtn').addEventListener('click', openProfileModal);
+  }
+  if ($('closeProfileBtn')) {
+    $('closeProfileBtn').addEventListener('click', closeProfileModal);
+  }
+  if ($('cancelProfileBtn')) {
+    $('cancelProfileBtn').addEventListener('click', closeProfileModal);
+  }
+  if ($('profileForm')) {
+    $('profileForm').addEventListener('submit', saveProfile);
+  }
+  if ($('profileModal')) {
+    $('profileModal').addEventListener('click', (e) => {
+      if (e.target === $('profileModal')) closeProfileModal();
+    });
+  }
 
   await loadCustomFields();
 }
