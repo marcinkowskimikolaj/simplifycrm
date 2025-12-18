@@ -620,6 +620,83 @@ Zaproponuj 3 konkretne, strategiczne kroki na najbliższe 7-14 dni.`;
         }
     }
 
+
+    /**
+     * Funkcja 3: Enrichment notatki o firmie (bez przeglądania internetu)
+     * Tworzy notatkę gotową do wklejenia do CRM: czym firma może się zajmować,
+     * potencjalne potrzeby, pytania discovery i pomysły na pierwszy kontakt.
+     *
+     * WAŻNE:
+     * - Nie przeglądasz internetu i nie weryfikujesz faktów.
+     * - Nie wymyślaj twardych danych (np. przychody, klienci, liczba pracowników),
+     *   chyba że są w danych wejściowych.
+     *
+     * @param {Object} company
+     * @param {Array} contacts
+     * @param {Array} history
+     * @param {Array} activities
+     * @param {boolean} forceRefresh - Jeśli true, pomija cache
+     */
+    static async enrichCompanyNote(company, contacts = [], history = [], activities = [], forceRefresh = false) {
+        const dateContext = this.getCurrentDateContext();
+
+        const systemPrompt = `Jesteś asystentem handlowca w CRM.
+Tworzysz "enrichment notatki" o firmie na podstawie DANYCH Z CRM przekazanych w promptcie.
+
+Zasady:
+- NIE przeglądasz internetu i NIE masz dostępu do zewnętrznych źródeł.
+- Jeśli brakuje danych, nie zmyślaj faktów. Zamiast tego podaj HIPOTEZY i PYTANIA do weryfikacji.
+- Odpowiadaj TYLKO po polsku.
+- Format: zwięzła notatka gotowa do wklejenia do CRM (nagłówki + punktory).`;
+
+        const loc = [company.city, company.country].filter(Boolean).join(', ');
+        const website = company.website ? (company.website.startsWith('http') ? company.website : `https://${company.website}`) : '';
+
+        const keyPeople = contacts && contacts.length
+            ? contacts.slice(0, 6).map(c => `- ${c.name}${c.position ? ` (${c.position})` : ''}`).join('\n')
+            : 'Brak przypisanych osób kontaktowych';
+
+        const recentNotes = (history || [])
+            .filter(h => h.type === 'note')
+            .slice(0, 3)
+            .map(h => `- ${this.anonymize(h.content)}`)
+            .join('\n');
+
+        const recentActivities = (activities || [])
+            .slice(0, 3)
+            .map(a => `- ${a.type}: ${this.anonymize(a.title)} (${new Date(a.date).toLocaleDateString('pl-PL')})`)
+            .join('\n');
+
+        const prompt = `${dateContext}
+
+Dane firmy (z CRM, mogą być niepełne):
+- Nazwa: ${company.name}
+- Branża: ${company.industry || 'brak'}
+- WWW: ${website || 'brak'}
+- Lokalizacja: ${loc || 'brak'}
+- Notatki wewnętrzne: ${company.notes ? this.anonymize(company.notes) : 'brak'}
+
+Kluczowe osoby:
+${keyPeople}
+
+Ostatnie notatki:
+${recentNotes || 'Brak'}
+
+Ostatnie aktywności:
+${recentActivities || 'Brak'}
+
+Wygeneruj "enrichment notatkę" w tym układzie:
+1) PROFIL (1–2 zdania): czym firma może się zajmować. Jeśli nie masz danych — podaj 2–3 HIPOTEZY (wyraźnie oznaczone jako hipotezy).
+2) MOŻLIWE POTRZEBY / PAIN POINTS (3–5 punktów): dopasowane do branży i kontekstu z CRM.
+3) PYTANIA DISCOVERY (3 krótkie pytania).
+4) POMYSŁY NA PIERWSZY KONTAKT (3 propozycje: mail / telefon / LinkedIn).
+5) DALSZE KROKI W CRM (2–3 bardzo konkretne działania).
+
+Nie podawaj "twardych faktów" ani nazw klientów/produktów firmy, jeśli nie wynikają z danych wejściowych.`;
+
+        return await this.generateContent(prompt, systemPrompt, 0.7, forceRefresh);
+    }
+
     /**
      * Funkcja 3: Generuj draft emaila (Przywrócona!)
      */
