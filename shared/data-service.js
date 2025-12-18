@@ -1111,195 +1111,203 @@ export class DataService {
     }
 
 
-    /**
-     * CUSTOM FIELDS - Definitions (new sheet: CustomFields)
-     * Columns (A-K):
-     * A id | B entityType (company/contact/both) | C key | D label | E fieldType
-     * F optionsJson | G required | H enabled | I order | J createdAt | K updatedAt
-     */
-    static async loadCustomFieldDefinitions(useCache = true) {
-        const cacheKey = 'customFieldDefinitions';
-        if (useCache) {
-            const cached = this.getCache(cacheKey);
-            if (cached) return cached;
+
+// ============================
+// CUSTOM FIELDS (Definitions)
+// Sheets required:
+// - CONFIG.SHEETS.CUSTOM_FIELDS: columns A-K
+//   [id, entityType, key, name, type, required, enabled, order, optionsJson, createdAt, updatedAt]
+// - CONFIG.SHEETS.CUSTOM_FIELD_VALUES: columns A-F
+//   [id, entityType, entityId, valuesJson, updatedAt, updatedBy]
+// ============================
+
+static async loadCustomFields(useCache = true) {
+    const cacheKey = 'customFields';
+    if (useCache) {
+        const cached = this.getCache(cacheKey);
+        if (cached) return cached;
+    }
+
+    return this.retryRequest(async () => {
+        const response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: CONFIG.SHEET_ID,
+            range: `${CONFIG.SHEETS.CUSTOM_FIELDS}!A2:K`,
+        });
+
+        const rows = response.result.values || [];
+        const fields = rows.map((row, idx) => ({
+            rowIndex: idx,
+            id: row[0] || this.generateId(),
+            entityType: (row[1] || 'both').toLowerCase(), // 'company' | 'contact' | 'both'
+            key: row[2] || '',
+            name: row[3] || '',
+            type: (row[4] || 'text').toLowerCase(), // text | textarea | number | date | select
+            required: (row[5] || '').toString().toLowerCase() === 'true' || row[5] === '1' || (row[5] || '').toString().toLowerCase() === 'tak',
+            enabled: (row[6] || '').toString().toLowerCase() !== 'false' && row[6] !== '0' && (row[6] || '').toString().toLowerCase() !== 'nie',
+            order: parseInt(row[7] || '0', 10) || 0,
+            optionsJson: row[8] || '',
+            createdAt: row[9] || '',
+            updatedAt: row[10] || '',
+        })).filter(f => f.key && f.name);
+
+        fields.sort((a, b) => (a.order - b.order) || a.name.localeCompare(b.name, 'pl'));
+        this.setCache(cacheKey, fields);
+        return fields;
+    });
+}
+
+static async saveCustomField(field, rowIndex = null) {
+    const now = new Date().toISOString();
+    const id = field.id || this.generateId();
+
+    const values = [[
+        id,
+        (field.entityType || 'both'),
+        field.key || '',
+        field.name || '',
+        field.type || 'text',
+        field.required ? 'TRUE' : 'FALSE',
+        field.enabled ? 'TRUE' : 'FALSE',
+        (field.order ?? 0).toString(),
+        field.optionsJson || '',
+        field.createdAt || now,
+        now,
+    ]];
+
+    const isUpdate = rowIndex !== null && rowIndex !== undefined;
+    const range = isUpdate
+        ? `${CONFIG.SHEETS.CUSTOM_FIELDS}!A${rowIndex + 2}:K${rowIndex + 2}`
+        : `${CONFIG.SHEETS.CUSTOM_FIELDS}!A:K`;
+
+    return this.retryRequest(async () => {
+        if (isUpdate) {
+            await gapi.client.sheets.spreadsheets.values.update({
+                spreadsheetId: CONFIG.SHEET_ID,
+                range,
+                valueInputOption: 'USER_ENTERED',
+                resource: { values }
+            });
+        } else {
+            await gapi.client.sheets.spreadsheets.values.append({
+                spreadsheetId: CONFIG.SHEET_ID,
+                range,
+                valueInputOption: 'USER_ENTERED',
+                resource: { values }
+            });
         }
 
-        return this.retryRequest(async () => {
-            const response = await gapi.client.sheets.spreadsheets.values.get({
-                spreadsheetId: CONFIG.SHEET_ID,
-                range: `${CONFIG.SHEETS.CUSTOM_FIELDS}!A2:K`,
-            });
+        this.clearCache('customFields');
+        return id;
+    });
+}
 
-            const rows = response.result.values || [];
-            const defs = rows.map((row, idx) => {
-                const requiredRaw = (row[6] || '').toString().toLowerCase();
-                const enabledRaw  = (row[7] || '').toString().toLowerCase();
-                const orderRaw    = row[8];
-
-                return {
-                    _rowIndex: idx, // 0-based index in "A2:K" set (used for updates)
-                    id: row[0] || this.generateId(),
-                    entityType: row[1] || 'both',
-                    key: row[2] || '',
-                    label: row[3] || '',
-                    fieldType: row[4] || 'text',
-                    optionsJson: row[5] || '',
-                    required: requiredRaw === 'true' || requiredRaw === '1' || requiredRaw === 'yes',
-                    enabled: enabledRaw === '' ? true : (enabledRaw === 'true' || enabledRaw === '1' || enabledRaw === 'yes'),
-                    order: Number.isFinite(Number(orderRaw)) ? Number(orderRaw) : 0,
-                    createdAt: row[9] || '',
-                    updatedAt: row[10] || '',
-                };
-            }).filter(d => d.label && d.key);
-
-            this.setCache(cacheKey, defs);
-            return defs;
+static async deleteCustomField(rowIndex) {
+    const range = `${CONFIG.SHEETS.CUSTOM_FIELDS}!A${rowIndex + 2}:K${rowIndex + 2}`;
+    return this.retryRequest(async () => {
+        await gapi.client.sheets.spreadsheets.values.clear({
+            spreadsheetId: CONFIG.SHEET_ID,
+            range
         });
+        this.clearCache('customFields');
+    });
+}
+
+// ============================
+// CUSTOM FIELDS (Values)
+// valuesJson is a JSON object: { [key]: value }
+// ============================
+
+static async loadCustomFieldValues(entityType, entityId, useCache = true) {
+    const cacheKey = `customFieldValues:${entityType}:${entityId}`;
+    if (useCache) {
+        const cached = this.getCache(cacheKey);
+        if (cached) return cached;
     }
 
-    static async saveCustomFieldDefinition(definition, rowIndex = null) {
-        const now = new Date().toISOString();
-        const isUpdate = rowIndex !== null && rowIndex !== undefined;
-
-        const id = definition.id || this.generateId();
-        const createdAt = definition.createdAt || (isUpdate ? '' : now);
-
-        const values = [[
-            id,
-            definition.entityType || 'both',
-            definition.key || '',
-            definition.label || '',
-            definition.fieldType || 'text',
-            definition.optionsJson || '',
-            definition.required ? 'TRUE' : 'FALSE',
-            (definition.enabled ?? true) ? 'TRUE' : 'FALSE',
-            (definition.order ?? 0).toString(),
-            createdAt,
-            now
-        ]];
-
-        const range = isUpdate
-            ? `${CONFIG.SHEETS.CUSTOM_FIELDS}!A${rowIndex + 2}:K${rowIndex + 2}`
-            : `${CONFIG.SHEETS.CUSTOM_FIELDS}!A2:K`;
-
-        return this.retryRequest(async () => {
-            if (isUpdate) {
-                await gapi.client.sheets.spreadsheets.values.update({
-                    spreadsheetId: CONFIG.SHEET_ID,
-                    range,
-                    valueInputOption: 'USER_ENTERED',
-                    resource: { values }
-                });
-            } else {
-                await gapi.client.sheets.spreadsheets.values.append({
-                    spreadsheetId: CONFIG.SHEET_ID,
-                    range,
-                    valueInputOption: 'USER_ENTERED',
-                    insertDataOption: 'INSERT_ROWS',
-                    resource: { values }
-                });
-            }
-            this.clearCache('customFieldDefinitions');
-            return id;
+    return this.retryRequest(async () => {
+        const response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: CONFIG.SHEET_ID,
+            range: `${CONFIG.SHEETS.CUSTOM_FIELD_VALUES}!A2:F`,
         });
-    }
 
-    /**
-     * Soft-delete: disable a definition (keeps history / avoids row deletion).
-     */
-    static async disableCustomFieldDefinition(rowIndex) {
-        const defs = await this.loadCustomFieldDefinitions(false);
-        const def = defs.find(d => d._rowIndex === rowIndex);
-        if (!def) return;
-        def.enabled = false;
-        await this.saveCustomFieldDefinition(def, rowIndex);
-    }
-
-    /**
-     * CUSTOM FIELD VALUES (new sheet: CustomFieldValues)
-     * Columns (A-F):
-     * A id | B entityType (company/contact) | C entityId | D valuesJson | E updatedAt | F updatedBy
-     */
-    static async loadCustomFieldValues(entityType, entityId, useCache = true) {
-        const cacheKey = `customFieldValues:${entityType}:${entityId}`;
-        if (useCache) {
-            const cached = this.getCache(cacheKey);
-            if (cached) return cached;
-        }
-
-        return this.retryRequest(async () => {
-            const response = await gapi.client.sheets.spreadsheets.values.get({
-                spreadsheetId: CONFIG.SHEET_ID,
-                range: `${CONFIG.SHEETS.CUSTOM_FIELD_VALUES}!A2:F`,
-            });
-
-            const rows = response.result.values || [];
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                const et = (row[1] || '').toString();
-                const eid = (row[2] || '').toString();
-                if (et === entityType && eid === entityId) {
-                    let parsed = {};
-                    try { parsed = row[3] ? JSON.parse(row[3]) : {}; } catch (e) { parsed = {}; }
-                    const result = { _rowIndex: i, id: row[0] || '', values: parsed };
-                    this.setCache(cacheKey, result);
-                    return result;
-                }
-            }
-
-            const result = { _rowIndex: null, id: '', values: {} };
+        const rows = response.result.values || [];
+        const idx = rows.findIndex(r => (r[1] || '').toLowerCase() === (entityType || '').toLowerCase() && (r[2] || '') === entityId);
+        if (idx === -1) {
+            const result = { rowIndex: null, values: {} };
             this.setCache(cacheKey, result);
             return result;
-        });
-    }
+        }
 
-    static async saveCustomFieldValues(entityType, entityId, valuesObj) {
-        const now = new Date().toISOString();
-        const email = AuthService.getUserEmail() || '';
+        const row = rows[idx];
+        let values = {};
+        try {
+            values = row[3] ? JSON.parse(row[3]) : {};
+        } catch (_) {
+            values = {};
+        }
 
-        const current = await this.loadCustomFieldValues(entityType, entityId, false);
-        const isUpdate = current && current._rowIndex !== null && current._rowIndex !== undefined;
+        const result = { rowIndex: idx, values, updatedAt: row[4] || '', updatedBy: row[5] || '' };
+        this.setCache(cacheKey, result);
+        return result;
+    });
+}
 
-        const id = (current && current.id) ? current.id : this.generateId();
-        const valuesJson = JSON.stringify(valuesObj || {});
+static async saveCustomFieldValues(entityType, entityId, valuesObj) {
+    const now = new Date().toISOString();
+    const updatedBy = AuthService.getUserEmail ? (AuthService.getUserEmail() || '') : '';
+    const payload = {
+        id: this.generateId(),
+        entityType: (entityType || '').toLowerCase(),
+        entityId: entityId || '',
+        valuesJson: JSON.stringify(valuesObj || {}),
+        updatedAt: now,
+        updatedBy,
+    };
 
-        const values = [[
-            id,
-            entityType,
-            entityId,
-            valuesJson,
-            now,
-            email
-        ]];
+    // Find existing row
+    const existing = await this.loadCustomFieldValues(payload.entityType, payload.entityId, false);
 
-        const range = isUpdate
-            ? `${CONFIG.SHEETS.CUSTOM_FIELD_VALUES}!A${current._rowIndex + 2}:F${current._rowIndex + 2}`
-            : `${CONFIG.SHEETS.CUSTOM_FIELD_VALUES}!A2:F`;
+    const values = [[
+        existing.rowIndex !== null ? undefined : payload.id,
+        payload.entityType,
+        payload.entityId,
+        payload.valuesJson,
+        payload.updatedAt,
+        payload.updatedBy,
+    ]];
 
-        return this.retryRequest(async () => {
-            if (isUpdate) {
-                await gapi.client.sheets.spreadsheets.values.update({
-                    spreadsheetId: CONFIG.SHEET_ID,
-                    range,
-                    valueInputOption: 'USER_ENTERED',
-                    resource: { values }
-                });
-            } else {
-                await gapi.client.sheets.spreadsheets.values.append({
-                    spreadsheetId: CONFIG.SHEET_ID,
-                    range,
-                    valueInputOption: 'USER_ENTERED',
-                    insertDataOption: 'INSERT_ROWS',
-                    resource: { values }
-                });
-            }
+    return this.retryRequest(async () => {
+        if (existing.rowIndex !== null) {
+            // keep existing id
+            const response = await gapi.client.sheets.spreadsheets.values.get({
+                spreadsheetId: CONFIG.SHEET_ID,
+                range: `${CONFIG.SHEETS.CUSTOM_FIELD_VALUES}!A${existing.rowIndex + 2}:A${existing.rowIndex + 2}`,
+            });
+            const existingId = (response.result.values && response.result.values[0] && response.result.values[0][0]) || payload.id;
+            values[0][0] = existingId;
 
-            // Clear caches for this entity
-            this.clearCache('customFieldDefinitions');
-            this.clearCache(`customFieldValues:${entityType}:${entityId}`);
-            return id;
-        });
-    }
+            const range = `${CONFIG.SHEETS.CUSTOM_FIELD_VALUES}!A${existing.rowIndex + 2}:F${existing.rowIndex + 2}`;
+            await gapi.client.sheets.spreadsheets.values.update({
+                spreadsheetId: CONFIG.SHEET_ID,
+                range,
+                valueInputOption: 'USER_ENTERED',
+                resource: { values }
+            });
+        } else {
+            // append new
+            values[0][0] = payload.id;
+            await gapi.client.sheets.spreadsheets.values.append({
+                spreadsheetId: CONFIG.SHEET_ID,
+                range: `${CONFIG.SHEETS.CUSTOM_FIELD_VALUES}!A:F`,
+                valueInputOption: 'USER_ENTERED',
+                resource: { values }
+            });
+        }
+
+        this.clearCache(`customFieldValues:${payload.entityType}:${payload.entityId}`);
+        return payload.id;
+    });
+}
 
 }
 
