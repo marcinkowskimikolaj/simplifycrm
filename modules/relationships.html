@@ -8,6 +8,7 @@
     <!-- FONTS & STYLES -->
         <link rel="stylesheet" href="../styles/base.css">
         <link rel="stylesheet" href="../styles/relationships.css">
+        <link rel="stylesheet" href="../styles/custom-fields.css">
 
 </head>
 <body>
@@ -494,6 +495,11 @@
                         <span style="font-size:0.8rem; color:var(--text-secondary);">Najpierw utwórz etykiety w ustawieniach (ikona 🏷️)</span>
                     </div>
                 </div>
+
+                <!-- 🆕 CUSTOM FIELDS CONTAINER -->
+                <div id="companyCustomFieldsContainer" class="custom-fields-container">
+                </div>
+    
                 <div class="form-group">
                     <label for="companyNotes">Notatki <span class="optional">(opcjonalnie)</span></label>
                     <textarea id="companyNotes" placeholder="Dodatkowe informacje o firmie"></textarea>
@@ -538,6 +544,11 @@
                     <label for="contactPhone">Telefon <span class="optional">(opcjonalnie)</span></label>
                     <input type="tel" id="contactPhone">
                 </div>
+
+<!-- 🆕 CUSTOM FIELDS CONTAINER -->
+                <div id="contactCustomFieldsContainer" class="custom-fields-container">
+                </div>
+                
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="cancelContactBtn">Anuluj</button>
                     <button type="submit" class="btn btn-primary">Zapisz</button>
