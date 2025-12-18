@@ -1,0 +1,103 @@
+/* Custom Fields (Kontakty/Firmy) - shared styling */
+
+.custom-fields-section {
+  margin: 0.75rem 0 0.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-subtle, rgba(15,23,42,0.12));
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.custom-fields-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-primary, #0f172a);
+  margin-bottom: 0.6rem;
+}
+
+.custom-fields-container {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.custom-fields-container .form-group {
+  margin: 0;
+}
+
+.custom-fields-container label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary, rgba(15,23,42,0.7));
+}
+
+.custom-fields-container input,
+.custom-fields-container select,
+.custom-fields-container textarea {
+  width: 100%;
+}
+
+.custom-fields-empty {
+  font-size: 0.8rem;
+  color: var(--text-secondary, rgba(15,23,42,0.7));
+  line-height: 1.5;
+}
+
+/* Detail view: simple rows */
+.detail-custom-fields {
+  margin-top: 0.75rem;
+  border-top: 1px dashed var(--border-subtle, rgba(15,23,42,0.18));
+  padding-top: 0.75rem;
+}
+
+.detail-custom-fields .detail-info-row {
+  margin-top: 0.45rem;
+}
+
+/* Added for dynamic custom fields sections */
+
+.custom-fields-section {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(15,23,42,0.08);
+}
+
+.custom-fields-title {
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.custom-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.custom-fields-hint {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.custom-field textarea {
+  min-height: 80px;
+}
+
+.custom-field-checkbox {
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
+.detail-custom-fields {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(15,23,42,0.08);
+}
+
+@media (max-width: 720px) {
+  .custom-fields-grid {
+    grid-template-columns: 1fr;
+  }
+}
