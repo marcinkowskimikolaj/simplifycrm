@@ -1,0 +1,230 @@
+/* Settings page layout */
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.settings-nav {
+  position: sticky;
+  top: 1rem;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border-subtle, rgba(15,23,42,0.12));
+  border-radius: 14px;
+  padding: 0.75rem;
+}
+
+.settings-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.settings-nav-item:hover {
+  background: rgba(15,23,42,0.04);
+}
+
+.settings-nav-item.active {
+  border-color: rgba(15,23,42,0.14);
+  background: rgba(59,130,246,0.08);
+}
+
+.settings-nav-emoji {
+  font-size: 1.15rem;
+}
+
+.settings-nav-title {
+  display: block;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  line-height: 1.2;
+}
+
+.settings-nav-subtitle {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary, rgba(15,23,42,0.7));
+}
+
+.badge-soon {
+  margin-left: auto;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.08);
+  color: var(--text-secondary, rgba(15,23,42,0.75));
+}
+
+.badge-soon.big {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.65rem;
+}
+
+.settings-content {
+  min-width: 0;
+}
+
+.settings-section {
+  display: none;
+}
+
+.settings-section.active {
+  display: block;
+}
+
+.settings-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.settings-title {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+}
+
+.settings-subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--text-secondary, rgba(15,23,42,0.75));
+  line-height: 1.45;
+}
+
+.settings-card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border-subtle, rgba(15,23,42,0.12));
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.card-title {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+}
+
+.card-list {
+  margin: 0 0 0.75rem 1.1rem;
+  color: var(--text-secondary, rgba(15,23,42,0.75));
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+.settings-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+}
+
+.settings-table th,
+.settings-table td {
+  text-align: left;
+  padding: 0.6rem 0.6rem;
+  border-bottom: 1px solid rgba(15,23,42,0.08);
+  vertical-align: middle;
+}
+
+.settings-table th {
+  font-size: 0.85rem;
+  color: var(--text-secondary, rgba(15,23,42,0.75));
+  font-weight: 700;
+}
+
+.settings-table td {
+  font-size: 0.9rem;
+}
+
+.settings-table .muted {
+  text-align: center;
+}
+
+.settings-hint {
+  margin-top: 0.75rem;
+}
+
+.settings-scope-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.scope-tab {
+  border: 1px solid rgba(15,23,42,0.12);
+  background: rgba(15,23,42,0.02);
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.scope-tab.active {
+  background: rgba(59,130,246,0.12);
+  border-color: rgba(59,130,246,0.25);
+}
+
+.ai-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.ai-status-item {
+  border: 1px dashed rgba(15,23,42,0.18);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: rgba(15,23,42,0.02);
+}
+
+.ai-status-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary, rgba(15,23,42,0.75));
+}
+
+.ai-status-value {
+  font-weight: 700;
+  margin-top: 0.2rem;
+  word-break: break-word;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 960px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+  .settings-nav {
+    position: static;
+  }
+  .settings-table {
+    min-width: 680px;
+  }
+  .ai-status-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.btn-sm {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+}
