@@ -540,6 +540,7 @@ let selectedCompanyIds = [];
 
             renderCompanyContacts(companyId);
             renderCompanyHistory(companyId);
+            renderCompanyDetailCustomFields(companyId);
         }
 
         function backToCompaniesList() {
@@ -650,6 +651,7 @@ let selectedCompanyIds = [];
             }
 
             renderContactHistory(contactId);
+            renderContactDetailCustomFields(contactId);
         }
 
         function backToContactsList() {
@@ -659,10 +661,11 @@ let selectedCompanyIds = [];
         }
 
         // ============= COMPANY CRUD =============
-        function openCompanyModal() {
+        async function openCompanyModal() {
             editingCompanyIndex = null;
             document.getElementById('companyModalTitle').textContent = 'Dodaj firmę';
             document.getElementById('companyForm').reset();
+            await renderCompanyCustomFields(null);
             document.getElementById('companyModal').classList.add('active');
         }
 
@@ -688,7 +691,8 @@ function editCompany(index) {
             if (typeof renderTagSelector === 'function') {
                 renderTagSelector('companyTagsSelector', 'company', company.tags || '');
             }
-            
+            renderCompanyCustomFields(company.id);
+
             document.getElementById('companyModal').classList.add('active');
         }
 
@@ -786,6 +790,9 @@ async function saveCompany(e) {
                 tagsIds = companies[editingCompanyIndex].tags || '';
             }
 
+// Zbierz custom fields
+            const customFieldValues = collectCompanyCustomFields();
+        
             const company = {
                 id: editingCompanyIndex !== null ? companies[editingCompanyIndex].id : DataService.generateId(),
                 name, industry, website, phone, city, country, domain, notes,
@@ -794,7 +801,14 @@ async function saveCompany(e) {
 
             try {
                 await DataService.saveCompany(company, editingCompanyIndex);
-                
+
+// Zapisz custom fields
+                try {
+                    await saveCompanyCustomFieldValues(company.id, customFieldValues);
+                } catch (cfError) {
+                    console.warn('Nie udało się zapisać custom fields:', cfError);
+                }
+                    
                 if (editingCompanyIndex !== null) {
                     companies[editingCompanyIndex] = company;
                     await DataService.logCompanyHistory(company.id, 'event', 'Firma zaktualizowana');
@@ -851,12 +865,13 @@ async function saveCompany(e) {
         }
 
         // ============= CONTACT CRUD =============
-        function openContactModal(preselectedCompanyId = null) {
+        async function openContactModal(preselectedCompanyId = null) {
             editingContactIndex = null;
             document.getElementById('contactModalTitle').textContent = 'Dodaj kontakt';
             document.getElementById('contactForm').reset();
             fillCompanyField(preselectedCompanyId);
             hideCompanySuggestions();
+            await renderContactCustomFields(null);
             document.getElementById('contactModal').classList.add('active');
         }
 
@@ -870,6 +885,7 @@ async function saveCompany(e) {
             document.getElementById('contactPhone').value = contact.phone;
             fillCompanyField(contact.companyId || null);
             hideCompanySuggestions();
+            renderContactCustomFields(contact.id);
             document.getElementById('contactModal').classList.add('active');
         }
 
@@ -1003,7 +1019,10 @@ async function saveCompany(e) {
                 } else if (editingContactIndex !== null) {
                     tagsIds = contacts[editingContactIndex].tags || '';
                 }
-
+                    
+                // Zbierz custom fields
+                const customFieldValues = collectContactCustomFields();
+                    
                 const contact = {
                     id: editingContactIndex !== null ? contacts[editingContactIndex].id : DataService.generateId(),
                     companyId: selectedCompanyId || '',
@@ -1012,6 +1031,13 @@ async function saveCompany(e) {
                 };
 
                 await DataService.saveContact(contact, editingContactIndex);
+
+                    // Zapisz custom fields
+                try {
+                    await saveContactCustomFieldValues(contact.id, customFieldValues);
+                } catch (cfError) {
+                    console.warn('Nie udało się zapisać custom fields kontaktu:', cfError);
+                }
 
                 if (editingContactIndex !== null) {
                     contacts[editingContactIndex] = contact;
