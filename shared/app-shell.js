@@ -11,6 +11,32 @@ import { CONFIG } from './config.js';
 import { AuthService } from './auth.js';
 import { DataService } from './data-service.js';
 
+
+
+async function ensureGapiLoaded(timeoutMs = 15000) {
+  if (typeof window === 'undefined') return;
+  if (window.gapi && window.gapi.client) return;
+
+  const existing = document.querySelector('script[data-gapi-loader="1"]');
+  if (!existing) {
+    const s = document.createElement('script');
+    s.src = 'https://apis.google.com/js/api.js';
+    s.async = true;
+    s.defer = true;
+    s.dataset.gapiLoader = '1';
+    document.head.appendChild(s);
+  }
+
+  const start = Date.now();
+  await new Promise((resolve, reject) => {
+    const tick = () => {
+      if (window.gapi) return resolve();
+      if (Date.now() - start > timeoutMs) return reject(new Error('GAPI nie jest załadowane'));
+      setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
 /**
  * Uruchamia standardową inicjalizację strony chronionej.
  *
@@ -63,7 +89,8 @@ export async function bootstrapProtectedPage(opts = {}) {
     userEl.textContent = AuthService.getUserDisplayText();
   }
 
-  // 4) Ensure GAPI client
+  // 4) Ensure GAPI script & client
+  await ensureGapiLoaded();
   await AuthService.initializeGoogleAPIs();
   AuthService.setGAPIToken();
 
