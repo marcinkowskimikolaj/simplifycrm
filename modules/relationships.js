@@ -3540,6 +3540,187 @@ window.testAiConnection = testAiConnection;
 window.updateAiProviderUI = updateAiProviderUI;
 window.enrichCompanyNotes = enrichCompanyNotes;
 
+// ============= CUSTOM FIELDS LOGIC =============
+
+async function loadCustomFieldsDefinitions() {
+    try {
+        customFieldsDefinitions = await DataService.loadCustomFields(true);
+        
+        companyCustomFields = customFieldsDefinitions.filter(
+            f => f.entityType === 'company' || f.entityType === 'both'
+        );
+        contactCustomFields = customFieldsDefinitions.filter(
+            f => f.entityType === 'contact' || f.entityType === 'both'
+        );
+        
+        console.log(`✓ Załadowano ${companyCustomFields.length} custom fields dla firm`);
+        console.log(`✓ Załadowano ${contactCustomFields.length} custom fields dla kontaktów`);
+    } catch (error) {
+        console.warn('Custom fields nie są dostępne:', error);
+        companyCustomFields = [];
+        contactCustomFields = [];
+    }
+}
+
+async function renderCompanyCustomFields(companyId = null) {
+    const container = document.getElementById('companyCustomFieldsContainer');
+    if (!container) {
+        console.warn('Brak kontenera companyCustomFieldsContainer');
+        return;
+    }
+    
+    if (companyCustomFields.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let values = {};
+    if (companyId) {
+        try {
+            const result = await DataService.loadCustomFieldValues('company', companyId, false);
+            values = result.values || {};
+        } catch (error) {
+            console.warn('Nie udało się załadować wartości custom fields:', error);
+        }
+    }
+    
+    CustomFieldsUI.mount(container, companyCustomFields, values, 'company_cf_');
+}
+
+async function renderContactCustomFields(contactId = null) {
+    const container = document.getElementById('contactCustomFieldsContainer');
+    if (!container) {
+        console.warn('Brak kontenera contactCustomFieldsContainer');
+        return;
+    }
+    
+    if (contactCustomFields.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let values = {};
+    if (contactId) {
+        try {
+            const result = await DataService.loadCustomFieldValues('contact', contactId, false);
+            values = result.values || {};
+        } catch (error) {
+            console.warn('Nie udało się załadować wartości custom fields:', error);
+        }
+    }
+    
+    CustomFieldsUI.mount(container, contactCustomFields, values, 'contact_cf_');
+}
+
+function collectCompanyCustomFields() {
+    const container = document.getElementById('companyCustomFieldsContainer');
+    if (!container || companyCustomFields.length === 0) {
+        return {};
+    }
+    return CustomFieldsUI.collect(container, companyCustomFields, 'company_cf_');
+}
+
+function collectContactCustomFields() {
+    const container = document.getElementById('contactCustomFieldsContainer');
+    if (!container || contactCustomFields.length === 0) {
+        return {};
+    }
+    return CustomFieldsUI.collect(container, contactCustomFields, 'contact_cf_');
+}
+
+async function saveCompanyCustomFieldValues(companyId, values) {
+    if (!companyId || Object.keys(values).length === 0) {
+        return;
+    }
+    
+    try {
+        await DataService.saveCustomFieldValues('company', companyId, values);
+        console.log('✓ Custom fields firmy zapisane');
+    } catch (error) {
+        console.error('Błąd zapisu custom fields firmy:', error);
+        throw error;
+    }
+}
+
+async function saveContactCustomFieldValues(contactId, values) {
+    if (!contactId || Object.keys(values).length === 0) {
+        return;
+    }
+    
+    try {
+        await DataService.saveCustomFieldValues('contact', contactId, values);
+        console.log('✓ Custom fields kontaktu zapisane');
+    } catch (error) {
+        console.error('Błąd zapisu custom fields kontaktu:', error);
+        throw error;
+    }
+}
+
+async function renderCompanyDetailCustomFields(companyId) {
+    const detailInfo = document.querySelector('#companyDetailModal .detail-info');
+    if (!detailInfo || companyCustomFields.length === 0) {
+        return;
+    }
+    
+    try {
+        const result = await DataService.loadCustomFieldValues('company', companyId, false);
+        const values = result.values || {};
+        
+        const customFieldsHtml = CustomFieldsUI.detailRows(companyCustomFields, values);
+        
+        if (customFieldsHtml) {
+            const customSection = `
+                <div class="detail-section custom-fields-section">
+                    <h3 class="detail-section-title">Pola własne</h3>
+                    ${customFieldsHtml}
+                </div>
+            `;
+            
+            const historySection = detailInfo.querySelector('.history-section');
+            if (historySection) {
+                historySection.insertAdjacentHTML('beforebegin', customSection);
+            } else {
+                detailInfo.insertAdjacentHTML('beforeend', customSection);
+            }
+        }
+    } catch (error) {
+        console.warn('Nie udało się załadować custom fields dla detail view:', error);
+    }
+}
+
+async function renderContactDetailCustomFields(contactId) {
+    const detailInfo = document.querySelector('#contactDetailModal .detail-info');
+    if (!detailInfo || contactCustomFields.length === 0) {
+        return;
+    }
+    
+    try {
+        const result = await DataService.loadCustomFieldValues('contact', contactId, false);
+        const values = result.values || {};
+        
+        const customFieldsHtml = CustomFieldsUI.detailRows(contactCustomFields, values);
+        
+        if (customFieldsHtml) {
+            const customSection = `
+                <div class="detail-section custom-fields-section">
+                    <h3 class="detail-section-title">Pola własne</h3>
+                    ${customFieldsHtml}
+                </div>
+            `;
+            
+            const historySection = detailInfo.querySelector('.history-section');
+            if (historySection) {
+                historySection.insertAdjacentHTML('beforebegin', customSection);
+            } else {
+                detailInfo.insertAdjacentHTML('beforeend', customSection);
+            }
+        }
+    } catch (error) {
+        console.warn('Nie udało się załadować custom fields dla detail view:', error);
+    }
+}
+
+
 // ============= START =============
 if (typeof gapi !== 'undefined') {
     init();
