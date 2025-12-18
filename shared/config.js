@@ -26,7 +26,10 @@ export const CONFIG = {
         // Arkusz preferencji użytkownika  
         USER_PREFERENCES: 'UserPreferences',
         // Arkusz aktywności
-        ACTIVITIES: 'Activities'
+        ACTIVITIES: 'Activities',
+        // Pola własne (Custom Fields)
+        CUSTOM_FIELDS: 'CustomFields',
+        CUSTOM_FIELD_VALUES: 'CustomFieldValues'
     },
     
     // OAuth Scopes
@@ -53,7 +56,8 @@ export const CONFIG = {
         RELATIONSHIPS: '/simplifycrm/modules/relationships.html',
         PIPELINE: '/simplifycrm/modules/pipeline.html',
         TASKS: '/simplifycrm/modules/tasks.html',
-        ANALYTICS: '/simplifycrm/modules/analytics.html'
+        ANALYTICS: '/simplifycrm/modules/analytics.html',
+        SETTINGS: '/simplifycrm/modules/settings.html'
     },
     
     // App Info
