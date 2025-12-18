@@ -2,235 +2,208 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <title>Ustawienia CRM - Simplify CRM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simplify CRM — Ustawienia</title>
 
-  <link rel="stylesheet" href="../styles/base.css">
-  <link rel="stylesheet" href="../styles/settings.css">
-  <link rel="stylesheet" href="../styles/custom-fields.css">
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/settings.css" />
+  <link rel="stylesheet" href="../styles/custom-fields.css" />
 </head>
 <body>
 
 <header class="app-header">
   <div class="app-header-inner">
-    <div class="app-header-left">
-      <div class="app-logo" id="appLogo">Simplify CRM</div>
-      <div class="app-logo-subtitle">Ustawienia CRM</div>
+    <div class="logo-block" id="logoBlock" style="cursor:pointer;">
+      <div class="logo">SIMPLIFY CRM</div>
+      <div class="subtitle">USTAWIENIA CRM</div>
     </div>
-    <div class="app-header-right">
-      <span class="user-email" id="userEmail">Ładowanie...</span>
-      <button id="logoutBtn" class="logout-btn">Wyloguj</button>
+
+    <div class="header-right">
+      <span id="userEmail" class="user-email">...</span>
+      <button id="profileBtn" class="icon-btn" title="Personalizacja konta">
+        👤
+      </button>
+      <button id="logoutBtn" class="logout-btn">WYLOGUJ</button>
     </div>
   </div>
 </header>
 
-<main class="main-container">
+<main class="settings-container">
   <div class="settings-layout">
-    <aside class="settings-nav">
-      <button class="settings-nav-item active" data-section="custom-fields">
-        <span class="settings-nav-emoji">🧩</span>
-        <span class="settings-nav-text">
-          <span class="settings-nav-title">Pola własne</span>
-          <span class="settings-nav-subtitle">Kontakty i firmy</span>
-        </span>
-      </button>
 
-      <button class="settings-nav-item" data-section="pipeline">
-        <span class="settings-nav-emoji">🧭</span>
-        <span class="settings-nav-text">
-          <span class="settings-nav-title">Pipeline</span>
-          <span class="settings-nav-subtitle">Etapy sprzedaży</span>
-        </span>
-        <span class="badge-soon">Wkrótce</span>
-      </button>
+    <aside class="settings-sidebar">
+      <div class="settings-nav-title">Nawigacja</div>
+      <div class="settings-nav">
+        <button class="active" data-section="customFields">
+          <div class="nav-item-top">
+            <span class="nav-item-label">🧩 Pola własne</span>
+          </div>
+          <span class="nav-item-sub">Kontakty i firmy</span>
+        </button>
 
-      <button class="settings-nav-item" data-section="ai">
-        <span class="settings-nav-emoji">✨</span>
-        <span class="settings-nav-text">
-          <span class="settings-nav-title">Ustawienia AI</span>
-          <span class="settings-nav-subtitle">Modele i klucze</span>
-        </span>
-        <span class="badge-soon">Wkrótce</span>
-      </button>
+        <button data-section="pipeline">
+          <div class="nav-item-top">
+            <span class="nav-item-label">🧱 Pipeline</span>
+            <span class="badge-soon">Wkrótce</span>
+          </div>
+          <span class="nav-item-sub">Etapy sprzedaży</span>
+        </button>
+
+        <button data-section="ai">
+          <div class="nav-item-top">
+            <span class="nav-item-label">✨ Ustawienia AI</span>
+            <span class="badge-soon">Wkrótce</span>
+          </div>
+          <span class="nav-item-sub">Modele i klucze</span>
+        </button>
+      </div>
     </aside>
 
     <section class="settings-content">
-
-      <!-- CUSTOM FIELDS -->
-      <section class="settings-section active" id="section-custom-fields">
-        <div class="settings-section-header">
+      <!-- Custom Fields -->
+      <div id="section-customFields" class="settings-section">
+        <div class="section-header">
           <div>
-            <h1 class="settings-title">Pola własne</h1>
-            <p class="settings-subtitle">Zdefiniuj własne pola dla kontaktów i firm. Pola pokażą się w formularzach oraz w widoku szczegółów.</p>
-          </div>
-          <button class="btn btn-primary" id="addCustomFieldBtn">+ Dodaj pole</button>
-        </div>
-
-        <div class="settings-scope-tabs">
-          <button class="scope-tab active" data-scope="company">Firmy</button>
-          <button class="scope-tab" data-scope="contact">Kontakty</button>
-          <button class="scope-tab" data-scope="both">Obie</button>
-        </div>
-
-        <div class="settings-card">
-          <div class="table-wrap">
-            <table class="settings-table" id="customFieldsTable">
-              <thead>
-                <tr>
-                  <th>Nazwa</th>
-                  <th>Klucz</th>
-                  <th>Typ</th>
-                  <th>Wymagane</th>
-                  <th>Aktywne</th>
-                  <th>Kolejność</th>
-                  <th>Akcje</th>
-                </tr>
-              </thead>
-              <tbody id="customFieldsTbody">
-                <tr><td colspan="7" class="muted">Ładowanie...</td></tr>
-              </tbody>
-            </table>
+            <div class="section-title">Pola własne</div>
+            <div class="section-desc">Zdefiniuj własne pola dla kontaktów i firm. Pola pojawią się w formularzach oraz w widoku szczegółów.</div>
           </div>
 
-          <div class="settings-hint muted">
-            💡 Arkusze wymagane w Google Sheets: <b>CustomFields</b> oraz <b>CustomFieldValues</b>.
+          <div class="section-actions">
+            <div class="tabs" role="tablist" aria-label="Filtr pól własnych">
+              <button class="tab active" data-filter="company" type="button">Firmy</button>
+              <button class="tab" data-filter="contact" type="button">Kontakty</button>
+              <button class="tab" data-filter="both" type="button">Obie</button>
+            </div>
+            <button class="btn btn-primary" id="addFieldBtn" type="button">＋ Dodaj pole</button>
           </div>
         </div>
-      </section>
 
-      <!-- PIPELINE -->
-      <section class="settings-section" id="section-pipeline">
-        <div class="settings-section-header">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nazwa</th>
+                <th>Klucz</th>
+                <th>Typ</th>
+                <th>Wymagane</th>
+                <th>Aktywne</th>
+                <th>Kolejność</th>
+                <th>Akcje</th>
+              </tr>
+            </thead>
+            <tbody id="fieldsTbody">
+              <tr><td colspan="7" class="muted">Ładowanie…</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="notice">
+          <b>Arkusze wymagane w Google Sheets:</b> <code>CustomFields</code> oraz <code>CustomFieldValues</code>.
+          Jeśli ich nie ma, utwórz je i dodaj nagłówki w wierszu 1 (kolumny zgodnie z dokumentacją w kodzie).
+        </div>
+      </div>
+
+      <!-- Pipeline placeholder -->
+      <div id="section-pipeline" class="settings-section" style="display:none;">
+        <div class="section-header">
           <div>
-            <h1 class="settings-title">Pipeline</h1>
-            <p class="settings-subtitle">Zarządzanie etapami sprzedaży (nazwa, kolejność, prawdopodobieństwo, kolor).</p>
+            <div class="section-title">Pipeline</div>
+            <div class="section-desc">Tu będziesz zarządzać etapami sprzedaży oraz domyślnymi ustawieniami deal'i.</div>
           </div>
-          <span class="badge-soon big">Wkrótce</span>
         </div>
+        <div class="muted">Sekcja w przygotowaniu.</div>
+      </div>
 
-        <div class="settings-card">
-          <h3 class="card-title">Co tu będzie</h3>
-          <ul class="card-list">
-            <li>Dodawanie / edycja etapów</li>
-            <li>Domyślne etapy dla nowych leadów</li>
-            <li>Reguły automatyzacji (np. po zmianie etapu)</li>
-          </ul>
-          <div class="muted">Na razie przygotowana jest struktura strony oraz nawigacja — kodowanie logiki pipeline zrobimy w kolejnym kroku.</div>
-        </div>
-      </section>
-
-      <!-- AI SETTINGS -->
-      <section class="settings-section" id="section-ai">
-        <div class="settings-section-header">
+      <!-- AI placeholder -->
+      <div id="section-ai" class="settings-section" style="display:none;">
+        <div class="section-header">
           <div>
-            <h1 class="settings-title">Ustawienia AI</h1>
-            <p class="settings-subtitle">Podgląd aktualnych ustawień oraz przyszłe miejsce do zarządzania providerami i promptami.</p>
-          </div>
-          <span class="badge-soon big">Wkrótce</span>
-        </div>
-
-        <div class="settings-card">
-          <h3 class="card-title">Aktualny stan (z localStorage)</h3>
-          <div class="ai-status-grid">
-            <div class="ai-status-item">
-              <div class="ai-status-label">Provider</div>
-              <div class="ai-status-value" id="aiProviderValue">—</div>
-            </div>
-            <div class="ai-status-item">
-              <div class="ai-status-label">Klucz API</div>
-              <div class="ai-status-value" id="aiKeyValue">—</div>
-            </div>
-            <div class="ai-status-item">
-              <div class="ai-status-label">Zgoda (consent)</div>
-              <div class="ai-status-value" id="aiConsentValue">—</div>
-            </div>
-          </div>
-
-          <div class="muted" style="margin-top: 0.75rem;">
-            Docelowo przeniesiemy tu pełne zarządzanie: wybór modelu, test połączenia, prompt globalny i limity.
+            <div class="section-title">Ustawienia AI</div>
+            <div class="section-desc">Tu dodasz modele, klucze API oraz zgodę na przetwarzanie danych (per użytkownik).</div>
           </div>
         </div>
-      </section>
-
+        <div class="muted">Sekcja w przygotowaniu.</div>
+      </div>
     </section>
+
   </div>
 </main>
 
-<!-- MODAL: Add/Edit Custom Field -->
-<div class="modal" id="customFieldModal">
+<!-- Modal: Add/Edit Custom Field -->
+<div id="fieldModal" class="modal" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h2 id="customFieldModalTitle">Dodaj pole</h2>
-      <button class="close-btn" id="closeCustomFieldModalBtn">&times;</button>
+      <h2 id="fieldModalTitle">Dodaj pole</h2>
+      <button class="close-btn" id="closeFieldModalBtn" type="button">×</button>
     </div>
 
-    <form id="customFieldForm">
-      <div class="form-group">
-        <label for="cfLabel">Nazwa pola *</label>
-        <input id="cfLabel" type="text" required placeholder="np. Źródło leadu">
-      </div>
+    <form id="fieldForm">
+      <div class="modal-body">
+        <input type="hidden" id="fieldRowIndex" />
 
-      <div class="form-group">
-        <label for="cfKey">Klucz (ID) *</label>
-        <input id="cfKey" type="text" required placeholder="np. lead_source">
-        <div class="form-hint">Używany do zapisu wartości (musi być unikalny).</div>
-      </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="fieldName">Nazwa pola *</label>
+            <input id="fieldName" required placeholder="np. Źródło leadu" />
+          </div>
 
-      <div class="form-group">
-        <label for="cfEntityType">Dotyczy</label>
-        <select id="cfEntityType">
-          <option value="company">Firma</option>
-          <option value="contact">Kontakt</option>
-          <option value="both">Firma + Kontakt</option>
-        </select>
-      </div>
+          <div class="form-group">
+            <label for="fieldKey">Klucz (ID) *</label>
+            <input id="fieldKey" required placeholder="np. lead_source" />
+          </div>
 
-      <div class="form-group">
-        <label for="cfType">Typ pola</label>
-        <select id="cfType">
-          <option value="text">Tekst (1 linia)</option>
-          <option value="textarea">Tekst (wielolinijkowy)</option>
-          <option value="number">Liczba</option>
-          <option value="date">Data</option>
-          <option value="select">Lista wyboru</option>
-          <option value="checkbox">Checkbox (Tak/Nie)</option>
-          <option value="email">Email</option>
-          <option value="url">URL</option>
-        </select>
-      </div>
+          <div class="form-group">
+            <label for="fieldEntityType">Dotyczy</label>
+            <select id="fieldEntityType">
+              <option value="company">Firma</option>
+              <option value="contact">Kontakt</option>
+              <option value="both">Obie</option>
+            </select>
+          </div>
 
-      <div class="form-group" id="cfOptionsGroup" style="display:none;">
-        <label for="cfOptions">Opcje (1 linia = 1 opcja)</label>
-        <textarea id="cfOptions" placeholder="np.
-Polecenie
-Wyszukiwarka
-Reklama"></textarea>
-      </div>
+          <div class="form-group">
+            <label for="fieldType">Typ pola</label>
+            <select id="fieldType">
+              <option value="text">Tekst (1 linia)</option>
+              <option value="textarea">Tekst (wiele linii)</option>
+              <option value="number">Liczba</option>
+              <option value="date">Data</option>
+              <option value="select">Lista wyboru</option>
+            </select>
+          </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="cfRequired">Wymagane</label>
-          <select id="cfRequired">
-            <option value="false">Nie</option>
-            <option value="true">Tak</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="cfEnabled">Aktywne</label>
-          <select id="cfEnabled">
-            <option value="true">Tak</option>
-            <option value="false">Nie</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="cfOrder">Kolejność</label>
-          <input id="cfOrder" type="number" value="0" min="0">
+          <div class="form-group">
+            <label for="fieldRequired">Wymagane</label>
+            <select id="fieldRequired">
+              <option value="false">Nie</option>
+              <option value="true">Tak</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="fieldEnabled">Aktywne</label>
+            <select id="fieldEnabled">
+              <option value="true">Tak</option>
+              <option value="false">Nie</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="fieldOrder">Kolejność</label>
+            <input id="fieldOrder" type="number" value="0" />
+          </div>
+
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label for="fieldOptions">Opcje (tylko dla „Lista wyboru”)</label>
+            <textarea id="fieldOptions" placeholder="Jedna opcja na linię&#10;np. Polecenie&#10;Reklama&#10;LinkedIn"></textarea>
+            <div class="muted" style="margin-top:0.35rem;">W arkuszu zapisujemy jako JSON (tablica stringów).</div>
+          </div>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" id="cancelCustomFieldBtn">Anuluj</button>
-        <button type="submit" class="btn btn-primary">Zapisz</button>
+        <button class="btn" type="button" id="cancelFieldBtn">Anuluj</button>
+        <button class="btn btn-primary" type="submit">Zapisz</button>
       </div>
     </form>
   </div>
